@@ -1,0 +1,7 @@
+{
+    "[shellscript]": {
+        "editor.unfoldOnClickAfterEndOfLine": false
+    },
+    "files.eol": "\n",
+    "material-icon-theme.activeIconPack": "nest"
+}

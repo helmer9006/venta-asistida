@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//Entidades
+model Users {
+  id                 Int      @id @default(autoincrement())
+  uid                String?  @db.VarChar
+  name               String   @db.VarChar
+  lastname           String   @db.VarChar
+  identificationType String   @db.VarChar
+  identification     String   @unique @db.VarChar
+  email              String   @unique @db.VarChar
+  address            String?  @db.VarChar
+  phone              String?  @db.VarChar
+  isActive           Boolean  @default(true)
+  roles              Roles?   @relation(fields: [roleId], references: [id])
+  roleId             Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Roles {
+  id               Int                @id @default(autoincrement())
+  name             String             @unique @db.VarChar
+  description      String?            @db.VarChar
+  isActive         Boolean            @default(true)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  user             Users[]
+  rolesPermissions RolesPermissions[]
+}
+
+model Modules {
+  id          Int           @id @default(autoincrement())
+  name        String?       @db.VarChar
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  permissions Permissions[]
+}
+
+model Permissions {
+  id              Int                @id @default(autoincrement())
+  description     String?            @db.VarChar
+  path            String?            @db.VarChar
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  modules         Modules            @relation(fields: [moduleId], references: [id])
+  moduleId        Int
+  isActive        Boolean            @default(true)
+  rolesPermission RolesPermissions[]
+}
+
+model RolesPermissions {
+  id           Int         @id @default(autoincrement())
+  role         Roles       @relation(fields: [roleId], references: [id])
+  roleId       Int
+  permissions  Permissions @relation(fields: [permissionId], references: [id])
+  permissionId Int
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
