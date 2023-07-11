@@ -1,5 +1,5 @@
 
-export interface CreateRolePermission {
+export interface ICreateRolePermission {
     roleId: number
     permissionId: number
 }

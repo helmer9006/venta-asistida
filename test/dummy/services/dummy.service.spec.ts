@@ -15,7 +15,7 @@ const MENSAJE_NO_FEATURE_FLAG = 'Not enable feature try again later...';
 describe('DummyService Test', () => {
   let dummyService: DummyService;
   let exampleProviderService: ExampleProviderService;
-  
+
   let prismaService: PrismaService;
 
   beforeEach(async () => {
@@ -26,7 +26,7 @@ describe('DummyService Test', () => {
           provide: ExampleProviderService,
           useValue: createMock<ExampleProviderService>(),
         },
-        
+
         {
           provide: PrismaService,
           useValue: createMock<PrismaService>({
@@ -34,9 +34,9 @@ describe('DummyService Test', () => {
               findMany: async () => {
                 //Pass
               },
-              create: async (creationDto: {data: Prisma.UserCreateInput }) => {
+              create: async (creationDto: { data: Prisma.UserCreateInput }) => {
                 //Pass
-              }
+              },
             },
           }),
         },
@@ -47,26 +47,26 @@ describe('DummyService Test', () => {
     exampleProviderService = moduleRef.get<ExampleProviderService>(
       ExampleProviderService,
     );
-    
-    prismaService =  moduleRef.get<PrismaService>(PrismaService);
+
+    prismaService = moduleRef.get<PrismaService>(PrismaService);
   });
 
   it('Definición del servicio', () => {
     expect(dummyService).toBeDefined();
   });
-  
+
   it('Deberia mostrar mensaje de feature flag habilitada', async () => {
     // arrange
     const flagEnable = true;
     const genericResponseFake = new GenericResponseTestDataBuilder().build();
-    
-      const getDataFromProviderSpy = jest
+
+    const getDataFromProviderSpy = jest
       .spyOn(exampleProviderService, 'getDataFromProvider')
       .mockResolvedValue(genericResponseFake);
     //act
     const result: any = await dummyService.dummyServiceExample();
     //assert
-    
+
     expect(getDataFromProviderSpy).toHaveBeenCalledTimes(
       GeneralTestConstant.ONCE,
     );
@@ -74,34 +74,32 @@ describe('DummyService Test', () => {
     expect(result.statusCode).toStrictEqual(genericResponseFake.statusCode);
     expect(result.message).toStrictEqual(genericResponseFake.message);
   });
-  
+
   it('Deberia mostrar mensaje de feature flag deshabilitada', async () => {
     // arrange
     const flagEnable = false;
-    
-      const getDataFromProviderSpy = jest
+
+    const getDataFromProviderSpy = jest
       .spyOn(exampleProviderService, 'getDataFromProvider')
       .mockResolvedValue(undefined);
     //act
     const result: any = await dummyService.dummyServiceExample();
     //assert
-    
+
     expect(getDataFromProviderSpy).toHaveBeenCalledTimes(
       GeneralTestConstant.ONCE,
     );
-    
   });
 
   it('Deberia guardar un usuario en la db y mostrar un listado de ellos', async () => {
     // arrange
     const CANTIDAD_REGISTROS = 3;
-    const {userId, ...userRequest} = new UserTestDataBuilder().build();
+    const { userId, ...userRequest } = new UserTestDataBuilder().build();
     const users = new UserTestDataBuilder().buildList(CANTIDAD_REGISTROS);
     const findMany = jest
       .spyOn(prismaService.user, 'findMany')
       .mockResolvedValue(users);
-    const create = jest
-      .spyOn(prismaService.user, 'create');
+    const create = jest.spyOn(prismaService.user, 'create');
 
     //act
     const userResponse = await dummyService.dummyPrismaService(userRequest);
@@ -109,8 +107,7 @@ describe('DummyService Test', () => {
     // assert
     expect(findMany).toHaveBeenCalledTimes(GeneralTestConstant.ONCE);
     expect(create).toHaveBeenCalledTimes(GeneralTestConstant.ONCE);
-    expect(create).toHaveBeenCalledWith({data:userRequest});
+    expect(create).toHaveBeenCalledWith({ data: userRequest });
     expect(userResponse).toHaveLength(CANTIDAD_REGISTROS);
   });
-
 });

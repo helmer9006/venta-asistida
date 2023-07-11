@@ -2,7 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { ExampleProviderService } from 'src/adapter/example-provider/services/example-provider.service';
 
 import { PrismaService } from '@src/prisma/services/prisma.service';
-import { Users } from '@prisma/client'
+import { Users } from '@prisma/client';
 import { UserRequest } from '../models/request/user-request.model';
 import { ConflictException } from '@src/shared/exceptions/conflict.exception';
 
@@ -12,7 +12,7 @@ export class DummyService {
     private readonly exampleProviderService: ExampleProviderService,
 
     private readonly prismaService: PrismaService,
-  ) { }
+  ) {}
 
   async dummyServiceExample() {
     const data = await this.exampleProviderService.getDataFromProvider();
@@ -35,5 +35,4 @@ export class DummyService {
   //     })
   //   }
   // }
-
 }

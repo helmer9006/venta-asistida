@@ -1,4 +1,3 @@
-
 import { DummyModule } from './dummy/dummy.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -10,10 +9,8 @@ import { RouterModule } from '@nestjs/core';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 
-
 @Module({
   imports: [
-    
     DummyModule,
     ConfigModule.forRoot({
       isGlobal: true,
@@ -23,9 +20,8 @@ import { RolesModule } from './roles/roles.module';
         JWT_SECRET: Joi.string().required(),
         EXAMPLE_PROVIDER_GET_SERVICE: Joi.string().required(),
         DATABASE_URL: Joi.string().required(),
-        
+
         SWAGGER_PASS: Joi.string().required(),
-        
       }),
     }),
     AuthModule,

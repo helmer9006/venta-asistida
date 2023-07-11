@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { BadRequestException, ConflictException } from '@src/shared/exceptions';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
-import { CreateRolePermission } from '../interface/create-role-permission.interface';
+import { ICreateRolePermission } from '../interface/create-role-permission.interface';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
 
 @Injectable()
@@ -27,7 +27,7 @@ export class RolesService {
         return new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error al crear rol.');
       }
       if (permissions.length > 0) {
-        let rolesPermissions: CreateRolePermission[] = permissions.map(permission => { return { roleId: role.id, permissionId: permission } })
+        let rolesPermissions: ICreateRolePermission[] = permissions.map(permission => { return { roleId: role.id, permissionId: permission } })
 
         const insertPermissionsNewRol = await this.prismaService.rolesPermissions.createMany({
           data: rolesPermissions,

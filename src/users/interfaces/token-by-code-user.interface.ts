@@ -1,9 +1,9 @@
-export interface TokenByCode {
-    user:    User;
+export interface ITokenByCode {
+    user:    IUser;
     idToken: string;
 }
 
-export interface User {
+export interface IUser {
     homeAccountId:  string;
     environment:    string;
     tenantId:       string;

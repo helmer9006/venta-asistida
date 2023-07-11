@@ -24,7 +24,7 @@ import { UserRequest } from '../models/request/user-request.model';
 @ApiTags('Servicios Dummy')
 @UseInterceptors(RequestLoggerInterceptor)
 export class DummyController {
-  constructor(private readonly dummyService: DummyService) { }
+  constructor(private readonly dummyService: DummyService) {}
 
   @UseGuards(AuthGuard)
   @Get('/only-guard')
@@ -36,7 +36,6 @@ export class DummyController {
     return 'Hello from auth guard ';
   }
 
-
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(RolesEnum.ADMIN)
   @Get('/only-guard-mod')
@@ -46,7 +45,6 @@ export class DummyController {
   getDummyWithAuthGuardModule() {
     return 'Hello from auth guard module with roles';
   }
-
 
   @Get('/service')
   @ApiOperation({ description: 'Api con un servicio inyectado' })
@@ -67,7 +65,6 @@ export class DummyController {
     return new GenericResponse({}, HttpStatus.OK.valueOf(), 'Success');
   }
 
-
   @ApiOperation({
     description: 'Api post para generar un usuario randon con validaciones',
   })
@@ -77,5 +74,4 @@ export class DummyController {
     // return new GenericResponse(data, HttpStatus.OK, 'Success');
     return new GenericResponse({}, HttpStatus.OK.valueOf(), 'Success');
   }
-
 }

@@ -25,9 +25,10 @@ export class ExampleProviderService {
               error: 'No se encontro registro del usuario',
               status: HttpStatus.NOT_FOUND,
               title: 'El usuario no se encuentra afiliado',
-            })
-          })
-    ));
+            });
+          }),
+        ),
+    );
     return data;
   }
 }

@@ -1,1 +1,1 @@
-import { TokenByCode } from "./token-by-code-user.interface";
+import { ITokenByCode } from "./token-by-code-user.interface";

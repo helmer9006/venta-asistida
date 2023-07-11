@@ -2,13 +2,13 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpStatus
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../models/dto/create-user.dto';
 import { UpdateUserDto } from '../models/dto/update-user.dto';
-import { Request, Response } from 'express'
+import { Request, Response } from 'express';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { EmailPipe } from '@src/shared/pipes/email.pipe';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(private readonly usersService: UsersService) {}
 
   @Post('create')
   async create(@Body() createUserDto: CreateUserDto) {

@@ -10,8 +10,10 @@ import { isNumber } from '@src/shared/helpers/general';
 import { Type } from 'class-transformer';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { validate as IsUUID } from 'uuid';
-import { TokenByCode } from '../interfaces/token-by-code-user.interface';
+import { ITokenByCode } from '../interfaces/token-by-code-user.interface';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
+import { AuditLogs } from '@src/shared/helpers/user-audit-logs';
+
 const confidentialClientConfig = {
   auth: {
     clientId: process.env.APP_CLIENT_ID,
@@ -19,7 +21,7 @@ const confidentialClientConfig = {
     clientSecret: process.env.APP_CLIENT_SECRET,
     knownAuthorities: [process.env.AUTHORITY_DOMAIN], //This must be an array
     redirectUri: process.env.APP_REDIRECT_URI,
-    validateAuthority: false
+    validateAuthority: false,
   },
   system: {
     loggerOptions: {
@@ -28,12 +30,14 @@ const confidentialClientConfig = {
       },
       piiLoggingEnabled: false,
       logLevel: msal.LogLevel.Verbose,
-    }
-  }
+    },
+  },
 };
 
 // Initialize MSAL Node
-const confidentialClientApplication = new msal.ConfidentialClientApplication(confidentialClientConfig);
+const confidentialClientApplication = new msal.ConfidentialClientApplication(
+  confidentialClientConfig,
+);
 
 const authCodeRequest: any = {
   redirectUri: confidentialClientConfig.auth.redirectUri,
@@ -50,18 +54,21 @@ export class UsersService {
     private readonly configuration: ConfigType<typeof config>,
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService,
-
-  ) {
-  }
+    private auditLogs: AuditLogs,
+  ) {}
 
   logger = new Logger('UserService');
 
   async create(createUserDto: CreateUserDto) {
+    const auditAction = this.configuration.auditActions.user_create;
     try {
       createUserDto.email = createUserDto.email.toLowerCase().trim();
       await this.prismaService.users.create({ data: createUserDto })
       // TODO: ENVIAR EMAIL POR MULE A USUARIO SEGUN CORREO.
-      //TODO: crear registro de logs a partir del createUserDto
+      //IN_PROGRES: crear registro de logs a partir del createUserDto
+
+      await this.auditLogs.sendLogsBD(1, createUserDto, auditAction);
+
       return this.prismaService.users.findMany();
     } catch (error) {
       this.handleExceptions(error);
@@ -76,7 +83,11 @@ export class UsersService {
         skip: offset,
       });
     } catch (error) {
-      return new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error del servidor.');
+      return new GenericResponse(
+        [],
+        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+        'Error del servidor.',
+      );
     }
   }
 
@@ -91,11 +102,14 @@ export class UsersService {
     try {
       return await this.prismaService.users.findMany({
         where,
-      })
+      });
     } catch (error) {
-      return new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error del servidor.');
+      return new GenericResponse(
+        [],
+        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+        'Error del servidor.',
+      );
     }
-
   }
 
   async findByMail(email: string) {
@@ -103,19 +117,23 @@ export class UsersService {
     try {
       user = await this.prismaService.users.findUnique({
         where: {
-          email: email.toString().trim().toLowerCase()
-        }
-      })
+          email: email.toString().trim().toLowerCase(),
+        },
+      });
     } catch (error) {
-      return new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error del servidor.');
+      return new GenericResponse(
+        [],
+        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+        'Error del servidor.',
+      );
     }
     if (!user) {
       throw new NotFoundException({
         title: 'Usuario no encontrado.',
         status: 404,
         error: 'Usuario no encontrado.',
-        details: 'Usuario no encontrado.'
-      })
+        details: 'Usuario no encontrado.',
+      });
     }
     return user;
   }
@@ -178,15 +196,16 @@ export class UsersService {
       const updatedUser = await this.prismaService.users.update({
         where: {
           id: id,
-        }, data: updateUserDto
-      })
+        },
+        data: updateUserDto,
+      });
       if (!updatedUser) {
         throw new NotFoundException({
           title: 'Usuario no actualizado.',
           status: 404,
           error: 'Usuario no actualizado.',
-          details: 'Usuario no actualizado..'
-        })
+          details: 'Usuario no actualizado..',
+        });
       }
       // TODO: crear registro de log a partir del updateUserDto
       return updatedUser;
@@ -201,8 +220,8 @@ export class UsersService {
         status: HttpStatus.CONFLICT.valueOf(),
         details: error.detail,
         error: 'Error creando usuario',
-        title: 'Error creando usuario'
-      })
+        title: 'Error creando usuario',
+      });
     }
 
     if (error.code === 'P2002') {
@@ -210,10 +229,12 @@ export class UsersService {
         status: HttpStatus.CONFLICT.valueOf(),
         details: `Ya existe un registro duplicado por el campo ${error.meta.target[0]}`,
         error: 'Error creando usuario, el usuario ya se encuentra registrado.',
-        title: 'El usuario ya se encuentra registrado.'
-      })
+        title: 'El usuario ya se encuentra registrado.',
+      });
     }
-    throw new BadRequestException('Error inesperado, revise los logs del servidor.')
+    throw new BadRequestException(
+      'Error inesperado, revise los logs del servidor.',
+    );
   }
 
   async getAuthCode(authority, scopes, state, res) {
