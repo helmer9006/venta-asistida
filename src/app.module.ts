@@ -8,6 +8,7 @@ import * as Joi from 'joi';
 import { environments } from './config/environments';
 import { RouterModule } from '@nestjs/core';
 import { UsersModule } from './users/users.module';
+import { RolesModule } from './roles/roles.module';
 
 
 @Module({
@@ -40,6 +41,7 @@ import { UsersModule } from './users/users.module';
       },
     ]),
     UsersModule,
+    RolesModule,
   ],
   controllers: [],
 })

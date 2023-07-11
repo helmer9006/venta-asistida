@@ -22,7 +22,10 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     })
   );
-  app.enableCors();
+  app.enableCors({
+    origin: process.env.APP_CLIENT,
+    credentials: true,
+  });
   app.use(
     ['/cs/docs', '/cs/docs-json'],
     basicAuth({

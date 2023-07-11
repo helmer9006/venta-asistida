@@ -10,7 +10,7 @@ datasource db {
 //Entidades
 model Users {
   id                 Int      @id @default(autoincrement())
-  uid                String?  @db.VarChar
+  uid                String?  @unique @db.VarChar
   name               String   @db.VarChar
   lastname           String   @db.VarChar
   identificationType String   @db.VarChar

@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpStatus, Query, ParseUUIDPipe } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../models/dto/create-user.dto';
 import { UpdateUserDto } from '../models/dto/update-user.dto';
 import { Request, Response } from 'express'
 import { GenericResponse } from '@src/shared/models/generic-response.model';
-import { PaginationDto } from '../models/dto';
 import { EmailPipe } from '@src/shared/pipes/email.pipe';
+import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
@@ -22,9 +22,9 @@ export class UsersController {
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Success');
   }
 
-  @Get('/getByIdOrName/:term')
-  async getByIdOrName(@Param('term') term: string) {
-    const data = await this.usersService.getByIdOrName(term);
+  @Get('/getByterm/:term')
+  async getByterm(@Param('term') term: string) {
+    const data = await this.usersService.getByterm(term);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Success');
   }
 
@@ -37,22 +37,24 @@ export class UsersController {
   @Get('/signin')
   async signIn(@Req() req: Request, @Res() res: Response) {
     const url = await this.usersService.signIn(res)
-    console.log("url")
-    res.redirect(url);
-    // res.status(200).json({ data: url, statusCode: 200, message: 'Success' })
+    res.status(200).json({ data: url, statusCode: 200, message: 'Success' })
   }
 
   @Get('/signout')
   async signout(@Req() req: Request, @Res() res: Response) {
     const url = await this.usersService.signout()
-    res.redirect(url);
-    // res.status(200).json({ data: url, statusCode: 200, message: 'Success' })
+    res.status(200).json({ data: url, statusCode: 200, message: 'Success' })
   }
 
-  @Get('getByMail/:email')
+  @Get('/getByMail/:email')
   async getById(@Param('email', EmailPipe) email: string) {
     const data = await this.usersService.findByMail(email);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Success');
   }
-  //TODO: crear servicio para consultar si el usuario está activo o no
+
+  @Post('/getUserAndTokenByCode')
+  async getToken(@Body('code') code: string, @Req() req: Request, @Res() res: Response) {
+    const data = await this.usersService.findUserAndTokenByCode(code, req, res)
+    res.status(200).json({ data: data, statusCode: 200, message: 'Success' })
+  }
 }

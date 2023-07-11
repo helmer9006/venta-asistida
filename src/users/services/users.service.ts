@@ -1,5 +1,5 @@
 import { Injectable, HttpStatus, Logger, InternalServerErrorException, Inject, NotFoundException } from '@nestjs/common';
-import { CreateUserDto, PaginationDto, RequestUserDto, UpdateUserDto } from '../models/dto';
+import { CreateUserDto, RequestUserDto, UpdateUserDto } from '../models/dto';
 import { Users } from '@prisma/client';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { ConflictException, BadRequestException } from '@src/shared/exceptions';
@@ -9,7 +9,9 @@ import config from 'src/config/config';
 import { isNumber } from '@src/shared/helpers/general';
 import { Type } from 'class-transformer';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
-
+import { validate as IsUUID } from 'uuid';
+import { TokenByCode } from '../interfaces/token-by-code-user.interface';
+import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
 const confidentialClientConfig = {
   auth: {
     clientId: process.env.APP_CLIENT_ID,
@@ -56,7 +58,10 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     try {
+      createUserDto.email = createUserDto.email.toLowerCase().trim();
       await this.prismaService.users.create({ data: createUserDto })
+      // TODO: ENVIAR EMAIL POR MULE A USUARIO SEGUN CORREO.
+      //TODO: crear registro de logs a partir del createUserDto
       return this.prismaService.users.findMany();
     } catch (error) {
       this.handleExceptions(error);
@@ -75,9 +80,9 @@ export class UsersService {
     }
   }
 
-  async getByIdOrName(term: string) {
+  async getByterm(term: string) {
     let where;
-    where = isNumber(term) ? { id: Number(term) } : {
+    where = isNumber(term.trim()) ? { id: Number(term) } : IsUUID(term) ? { uid: term.toString().trim().toLowerCase() } : {
       name: {
         contains: term,
         mode: 'insensitive',
@@ -115,6 +120,59 @@ export class UsersService {
     return user;
   }
 
+  async findUserAndTokenByCode(code: string, req, res) {
+    tokenRequest.code = code;
+    let userUid, email, idTokenClaims, token;
+
+    try {
+      let response: any = await confidentialClientApplication.acquireTokenByCode(tokenRequest)
+      userUid = response?.idTokenClaims?.sub || null;
+      email = response?.idTokenClaims?.emails[0] || null;
+      token = response?.idToken || null;
+      idTokenClaims = response?.idTokenClaims || null;
+
+    } catch (error) {
+      res.status(401).json({ data: {}, statusCode: 401, message: 'No es posible validar la identidad del usuario.' })
+    }
+
+    if (!userUid) {
+      throw new NotFoundException({
+        title: 'No existe id de usuario.',
+        status: 404,
+        error: 'No éxiste id de usuario.',
+        details: 'No éxiste id de usuario.'
+      })
+    }
+    if (!email) {
+      throw new NotFoundException({
+        title: 'No es posible validar la identidad del usuario.',
+        status: 401,
+        error: 'No es posible validar la identidad del usuario.',
+        details: 'No es posible validar la identidad del usuario.'
+      })
+    }
+    const user = await this.prismaService.users.findUnique({
+      where: { email }
+    });
+    if (!user) {
+      throw new NotFoundException({
+        title: 'El usuario no se encuentra registrado.',
+        status: 401,
+        error: 'El usuario no existe.',
+        details: 'El usuario no existe.'
+      })
+    }
+
+    if (!user?.uid) {
+      await this.prismaService.users.update({
+        where: {
+          id: user.id,
+        }, data: { uid: userUid }
+      })
+    }
+    return { user, token, idTokenClaims }
+  }
+
   async update(id: number, updateUserDto: UpdateUserDto) {
     try {
       const updatedUser = await this.prismaService.users.update({
@@ -130,32 +188,11 @@ export class UsersService {
           details: 'Usuario no actualizado..'
         })
       }
+      // TODO: crear registro de log a partir del updateUserDto
       return updatedUser;
     } catch (error) {
       this.handleExceptions(error);
     }
-    return `This action updates a #${id} user`;
-  }
-
-  async getAuthCode(authority, scopes, state, res) {
-    authCodeRequest.authority = authority;
-    authCodeRequest.scopes = scopes;
-    authCodeRequest.state = state;
-    //Each time you fetch Authorization code, update the relevant authority in the tokenRequest configuration
-    tokenRequest.authority = authority;
-    // request an authorization code to exchange for a token
-    return await confidentialClientApplication.getAuthCodeUrl(authCodeRequest)
-  }
-
-  signIn(res) {
-    //Initiate a Auth Code Flow >> for sign in
-    //no scopes passed. openid, profile and offline_access will be used by default.
-    const url = this.getAuthCode(this.configService.get('SIGN_UP_SIGN_IN_POLICY_AUTHORITY'), [], this.configuration.APP_B2C_STATES.LOGIN, res);
-    return url
-  }
-
-  signout() {
-    return this.configService.get('LOGOUT_ENDPOINT');
   }
 
   private handleExceptions(error: any): never {
@@ -177,5 +214,26 @@ export class UsersService {
       })
     }
     throw new BadRequestException('Error inesperado, revise los logs del servidor.')
+  }
+
+  async getAuthCode(authority, scopes, state, res) {
+    authCodeRequest.authority = authority;
+    authCodeRequest.scopes = scopes;
+    authCodeRequest.state = state;
+    //Each time you fetch Authorization code, update the relevant authority in the tokenRequest configuration
+    tokenRequest.authority = authority;
+    // request an authorization code to exchange for a token
+    return await confidentialClientApplication.getAuthCodeUrl(authCodeRequest)
+  }
+
+  signIn(res) {
+    //Initiate a Auth Code Flow >> for sign in
+    //no scopes passed. openid, profile and offline_access will be used by default.
+    const url = this.getAuthCode(this.configService.get('SIGN_UP_SIGN_IN_POLICY_AUTHORITY'), [], this.configuration.APP_B2C_STATES.LOGIN, res);
+    return url
+  }
+
+  signout() {
+    return this.configService.get('LOGOUT_ENDPOINT');
   }
 }

@@ -1,6 +1,1 @@
-export interface tokenReq {
-    redirectUri: string
-    authority?: string;
-    code?: string,
-    scopes?: []
-}
+import { TokenByCode } from "./token-by-code-user.interface";
