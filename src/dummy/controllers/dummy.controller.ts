@@ -26,7 +26,6 @@ import { UserRequest } from '../models/request/user-request.model';
 export class DummyController {
   constructor(private readonly dummyService: DummyService) {}
 
-  @UseGuards(AuthGuard)
   @Get('/only-guard')
   @ApiOperation({
     description:
@@ -36,8 +35,6 @@ export class DummyController {
     return 'Hello from auth guard ';
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolesEnum.ADMIN)
   @Get('/only-guard-mod')
   @ApiOperation({
     description: 'Api solo accesible para usuarios de rol admin',

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpStatus, Query, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpStatus, Query, ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../models/dto/create-user.dto';
 import { UpdateUserDto } from '../models/dto/update-user.dto';
@@ -6,7 +6,13 @@ import { Request, Response } from 'express';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { EmailPipe } from '@src/shared/pipes/email.pipe';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { ExtractJwt } from 'passport-jwt';
+import { AADAuthGaurd } from '@src/auth/guards/aad-auth.guard';
+import { ApiTags } from '@nestjs/swagger';
+
 @Controller('users')
+@ApiTags('Servicios Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -17,6 +23,8 @@ export class UsersController {
   }
 
   @Get()
+  // @UseGuards(AADAuthGaurd)
+  @UseGuards(AuthGuard('oauth-bearer'))
   async findAll(@Query() paginationDto: PaginationDto) {
     const data = await this.usersService.findAll(paginationDto);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Success');

@@ -63,6 +63,8 @@ export class UsersService {
     const auditAction = this.configuration.auditActions.user_create;
     try {
       createUserDto.email = createUserDto.email.toLowerCase().trim();
+      createUserDto.name = createUserDto.name.toLowerCase().trim();
+      createUserDto.lastname = createUserDto.lastname.toLowerCase().trim();
       await this.prismaService.users.create({ data: createUserDto })
       // TODO: ENVIAR EMAIL POR MULE A USUARIO SEGUN CORREO.
       //IN_PROGRES: crear registro de logs a partir del createUserDto
@@ -193,6 +195,10 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     try {
+      if (updateUserDto.email) updateUserDto.email = updateUserDto.email.toLowerCase().trim();
+      if (updateUserDto.name) updateUserDto.name = updateUserDto.name.toLowerCase().trim();
+      if (updateUserDto.lastname) updateUserDto.lastname = updateUserDto.lastname.toLowerCase().trim();
+
       const updatedUser = await this.prismaService.users.update({
         where: {
           id: id,

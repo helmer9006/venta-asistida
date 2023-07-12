@@ -8,7 +8,7 @@ import { UnauthorizedException } from 'src/shared/exceptions/unauthorized.except
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private reflector: Reflector) { }
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
