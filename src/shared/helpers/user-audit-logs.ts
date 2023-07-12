@@ -1,13 +1,13 @@
 import { HttpStatus } from '@nestjs/common';
-import { PrismaService } from '../../prisma/services/prisma.service';
+import { PrismaService } from '@src/prisma/services/prisma.service';
 import { IAuditAction } from '../interfaces/audit-logs.interfaces';
 import { NewAuditLogDto } from '../models/dto/userAuditLogDto';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 
 export class AuditLogs {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prismaService: PrismaService) { }
 
-  async sendLogsBD(userId: number, data: object, typeAction: IAuditAction) {
+  async sendLogsDB(userId: number, data: object, typeAction: IAuditAction) {
     const log: NewAuditLogDto = {
       userId: userId,
       description: typeAction.description,
@@ -16,8 +16,10 @@ export class AuditLogs {
       createdAt: new Date(),
     };
     try {
-      await this.prismaService.userAuditLogs.create({ data: log });
+      await this.prismaService.auditLogs.create({ data: log });
+
     } catch (error) {
+      console.log(error);
       return new GenericResponse(
         [],
         HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),

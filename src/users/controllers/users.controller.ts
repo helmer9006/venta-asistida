@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpStatus, Query, ParseUUIDPipe, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpStatus, Query, ParseUUIDPipe, UseGuards, SetMetadata } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../models/dto/create-user.dto';
 import { UpdateUserDto } from '../models/dto/update-user.dto';
@@ -6,40 +6,43 @@ import { Request, Response } from 'express';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { EmailPipe } from '@src/shared/pipes/email.pipe';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { ExtractJwt } from 'passport-jwt';
-import { AADAuthGaurd } from '@src/auth/guards/aad-auth.guard';
 import { ApiTags } from '@nestjs/swagger';
+
+import { GetUser } from '@src/auth/decorators/get-user.decorator';
+import { Users } from '@prisma/client';
+import { RolesEnum } from '@src/auth/enums/roles.enum';
+import { Auth } from '@src/auth/decorators';
 
 @Controller('users')
 @ApiTags('Servicios Users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post('create')
-  async create(@Body() createUserDto: CreateUserDto) {
-    const data = await this.usersService.create(createUserDto);
-    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Success');
+  @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
+  async create(@Body() createUserDto: CreateUserDto, @GetUser('id') userId: number) {
+    const data = await this.usersService.create(createUserDto, userId);
+    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario creado correctamente.');
   }
-
   @Get()
-  // @UseGuards(AADAuthGaurd)
-  @UseGuards(AuthGuard('oauth-bearer'))
+  @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
   async findAll(@Query() paginationDto: PaginationDto) {
     const data = await this.usersService.findAll(paginationDto);
-    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Success');
+    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuarios encontrados');
   }
 
   @Get('/getByterm/:term')
+  @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
   async getByterm(@Param('term') term: string) {
     const data = await this.usersService.getByterm(term);
-    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Success');
+    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario encontrado.');
   }
 
   @Patch('update/:id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    const data = await this.usersService.update(+id, updateUserDto);
-    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Success');
+  @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @GetUser('id') userId: number) {
+    const data = await this.usersService.update(+id, updateUserDto, userId);
+    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario actualizado correctamente.');
   }
 
   @Get('/signin')
@@ -55,14 +58,15 @@ export class UsersController {
   }
 
   @Get('/getByMail/:email')
+  @Auth()
   async getById(@Param('email', EmailPipe) email: string) {
     const data = await this.usersService.findByMail(email);
-    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Success');
+    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario encontrado.');
   }
 
   @Post('/getUserAndTokenByCode')
   async getToken(@Body('code') code: string, @Req() req: Request, @Res() res: Response) {
     const data = await this.usersService.findUserAndTokenByCode(code, req, res)
-    res.status(200).json({ data: data, statusCode: 200, message: 'Success' })
+    res.status(200).json({ data: data, statusCode: 200, message: 'Usuario identificado.' })
   }
 }

@@ -4,22 +4,23 @@ import { Injectable, ValidationPipe } from '@nestjs/common';
 import { UnauthorizedException } from '@src/shared/exceptions';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { IPayload } from '../models/payload.model';
+import { Users } from '@prisma/client';
 
 @Injectable()
 export class AADStrategy extends PassportStrategy(BearerStrategy) {
     constructor(private readonly prismaService: PrismaService) {
         super({
-            identityMetadata: process.env.IDENTITYMETADATA,
+            identityMetadata: process.env.IDENTITY_METADATA,
             clientID: process.env.APP_CLIENT_ID,
         })
     }
 
     async validate(payload: IPayload) {
-        const { emails } = payload;
-        if (emails.length == 0) {
+        const { sub } = payload;
+        if (!sub) {
             throw new UnauthorizedException('Usuario no identificado.');
         }
-        const user = await this.prismaService.users.findUnique({ where: { email: emails[0] } })
+        const user: Users = await this.prismaService.users.findUnique({ where: { uid: sub } })
         if (!user) {
             throw new UnauthorizedException('Token no es válido');
         }

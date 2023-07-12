@@ -149,7 +149,7 @@ export class RolesService {
       }
 
       if (permissionsToInsert && permissionsToInsert.length > 0) {
-        let rolesPermissions: CreateRolePermission[] = permissionsToInsert.map(permission => { return { roleId: roleId, permissionId: permission } })
+        let rolesPermissions: ICreateRolePermission[] = permissionsToInsert.map(permission => { return { roleId: roleId, permissionId: permission } })
         await this.prismaService.rolesPermissions.createMany({
           data: rolesPermissions,
         })

@@ -8,6 +8,7 @@ import { environments } from './config/environments';
 import { RouterModule } from '@nestjs/core';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
+import { PrismaService } from './prisma/services/prisma.service';
 
 @Module({
   imports: [
@@ -41,4 +42,4 @@ import { RolesModule } from './roles/roles.module';
   ],
   controllers: [],
 })
-export class AppModule {}
+export class AppModule { }

@@ -19,11 +19,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: IPayload): Promise<Users> {
-    const { emails } = payload;
-    if (emails.length == 0) {
+    const { sub } = payload;
+    if (!sub) {
       throw new UnauthorizedException('Usuario no identificado.');
     }
-    const user = await this.prismaService.users.findUnique({ where: { email: emails[0] } })
+    const user = await this.prismaService.users.findUnique({ where: { uid: sub } })
     if (!user) {
       throw new UnauthorizedException('Token no es válido');
     }

@@ -55,11 +55,11 @@ export class UsersService {
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService,
     private auditLogs: AuditLogs,
-  ) {}
+  ) { }
 
   logger = new Logger('UserService');
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto, userId: number) {
     const auditAction = this.configuration.auditActions.user_create;
     try {
       createUserDto.email = createUserDto.email.toLowerCase().trim();
@@ -67,9 +67,7 @@ export class UsersService {
       createUserDto.lastname = createUserDto.lastname.toLowerCase().trim();
       await this.prismaService.users.create({ data: createUserDto })
       // TODO: ENVIAR EMAIL POR MULE A USUARIO SEGUN CORREO.
-      //IN_PROGRES: crear registro de logs a partir del createUserDto
-
-      await this.auditLogs.sendLogsBD(1, createUserDto, auditAction);
+      await this.auditLogs.sendLogsDB(userId, createUserDto, auditAction);
 
       return this.prismaService.users.findMany();
     } catch (error) {
@@ -193,7 +191,8 @@ export class UsersService {
     return { user, token, idTokenClaims }
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto, userId: number) {
+    const auditAction = this.configuration.auditActions.user_update;
     try {
       if (updateUserDto.email) updateUserDto.email = updateUserDto.email.toLowerCase().trim();
       if (updateUserDto.name) updateUserDto.name = updateUserDto.name.toLowerCase().trim();
@@ -213,7 +212,7 @@ export class UsersService {
           details: 'Usuario no actualizado..',
         });
       }
-      // TODO: crear registro de log a partir del updateUserDto
+      await this.auditLogs.sendLogsDB(userId, updateUserDto, auditAction);
       return updatedUser;
     } catch (error) {
       this.handleExceptions(error);
