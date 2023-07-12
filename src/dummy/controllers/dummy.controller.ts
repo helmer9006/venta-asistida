@@ -38,7 +38,7 @@ export class DummyController {
 
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(RolesEnum.ADMIN)
+  @Roles(RolesEnum.ADMINISTRADOR)
   @Get('/only-guard-mod')
   @ApiOperation({
     description: 'Api solo accesible para usuarios de rol admin',
