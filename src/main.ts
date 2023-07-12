@@ -31,7 +31,7 @@ async function bootstrap() {
     basicAuth({
       challenge: true,
       users: {
-        LaboratorioDigital: passSwagger,
+        ventas_docs: passSwagger,
       },
     }),
   );
