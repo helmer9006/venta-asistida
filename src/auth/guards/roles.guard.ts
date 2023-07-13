@@ -3,7 +3,6 @@ import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 import { RolesEnum } from '../enums/roles.enum';
-import { UnauthorizedException } from 'src/shared/exceptions/unauthorized.exception';
 import { Users } from '@prisma/client';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 
@@ -17,7 +16,7 @@ export class RolesGuard implements CanActivate {
       ROLES_KEY,
       context.getHandler(),
     );
-    if (!roles) {
+    if (roles.length == 0) {
       return true;
     }
     const request = context.switchToHttp().getRequest();

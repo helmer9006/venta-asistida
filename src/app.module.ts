@@ -9,6 +9,7 @@ import { RouterModule } from '@nestjs/core';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { PrismaService } from './prisma/services/prisma.service';
+import { PermissionsModule } from './permissions/permissions.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { PrismaService } from './prisma/services/prisma.service';
     ]),
     UsersModule,
     RolesModule,
+    PermissionsModule,
   ],
   controllers: [],
 })

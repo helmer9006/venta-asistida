@@ -1,15 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpStatus, Query, ParseUUIDPipe, UseGuards, SetMetadata } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpStatus, Query, UseGuards, SetMetadata } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { ApiTags } from '@nestjs/swagger';
+
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../models/dto/create-user.dto';
 import { UpdateUserDto } from '../models/dto/update-user.dto';
-import { Request, Response } from 'express';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { EmailPipe } from '@src/shared/pipes/email.pipe';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
-import { ApiTags } from '@nestjs/swagger';
-
 import { GetUser } from '@src/auth/decorators/get-user.decorator';
-import { Users } from '@prisma/client';
 import { RolesEnum } from '@src/auth/enums/roles.enum';
 import { Auth } from '@src/auth/decorators';
 
@@ -20,21 +19,22 @@ export class UsersController {
 
   @Post('create')
   @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
-  async create(@Body() createUserDto: CreateUserDto, @GetUser('id') userId: number) {
-    const data = await this.usersService.create(createUserDto, userId);
+  // @Auth()
+  async create(@Body() createUserDto: CreateUserDto, @GetUser('id') userId: number, @GetUser('roleId') roleId: number) {
+    const data = await this.usersService.create(createUserDto, userId, roleId);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario creado correctamente.');
   }
   @Get()
   @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
-  async findAll(@Query() paginationDto: PaginationDto) {
+  async findAll(@Query() paginationDto: PaginationDto, @GetUser('id') userId: number) {
     const data = await this.usersService.findAll(paginationDto);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuarios encontrados');
   }
 
   @Get('/getByterm/:term')
   @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
-  async getByterm(@Param('term') term: string) {
-    const data = await this.usersService.getByterm(term);
+  async getByterm(@Param('term') term: string, @GetUser('id') userId: number) {
+    const data = await this.usersService.findByterm(term);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario encontrado.');
   }
 
@@ -45,9 +45,23 @@ export class UsersController {
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario actualizado correctamente.');
   }
 
+  @Get('/getByMail/:email')
+  @Auth()
+  async getById(@Param('email', EmailPipe) email: string, @GetUser('id') userId: number) {
+    const data = await this.usersService.findByMail(email);
+    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario encontrado.');
+  }
+
+  // PUBLIC
+  @Post('/getUserAndTokenByCode')
+  async getToken(@Body('code') code: string, @Req() req: Request, @Res() res: Response) {
+    const data = await this.usersService.findUserAndTokenByCode(code, req, res)
+    res.status(200).json({ data: data, statusCode: 200, message: 'Usuario identificado.' })
+  }
+
   @Get('/signin')
   async signIn(@Req() req: Request, @Res() res: Response) {
-    const url = await this.usersService.signIn(res)
+    const url = await this.usersService.signIn()
     res.status(200).json({ data: url, statusCode: 200, message: 'Success' })
   }
 
@@ -55,18 +69,5 @@ export class UsersController {
   async signout(@Req() req: Request, @Res() res: Response) {
     const url = await this.usersService.signout()
     res.status(200).json({ data: url, statusCode: 200, message: 'Success' })
-  }
-
-  @Get('/getByMail/:email')
-  @Auth()
-  async getById(@Param('email', EmailPipe) email: string) {
-    const data = await this.usersService.findByMail(email);
-    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario encontrado.');
-  }
-
-  @Post('/getUserAndTokenByCode')
-  async getToken(@Body('code') code: string, @Req() req: Request, @Res() res: Response) {
-    const data = await this.usersService.findUserAndTokenByCode(code, req, res)
-    res.status(200).json({ data: data, statusCode: 200, message: 'Usuario identificado.' })
   }
 }

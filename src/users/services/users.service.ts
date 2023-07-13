@@ -1,18 +1,16 @@
 import { Injectable, HttpStatus, Logger, InternalServerErrorException, Inject, NotFoundException } from '@nestjs/common';
-import { CreateUserDto, RequestUserDto, UpdateUserDto } from '../models/dto';
-import { Users } from '@prisma/client';
-import { PrismaService } from '@src/prisma/services/prisma.service';
-import { ConflictException, BadRequestException } from '@src/shared/exceptions';
 import * as msal from '@azure/msal-node';
 import { ConfigService, ConfigType } from '@nestjs/config';
+import { validate as IsUUID } from 'uuid';
+
+import { CreateUserDto, RequestUserDto, UpdateUserDto } from '../models/dto';
+import { PrismaService } from '@src/prisma/services/prisma.service';
+import { ConflictException, BadRequestException } from '@src/shared/exceptions';
 import config from 'src/config/config';
 import { isNumber } from '@src/shared/helpers/general';
-import { Type } from 'class-transformer';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
-import { validate as IsUUID } from 'uuid';
-import { ITokenByCode } from '../interfaces/token-by-code-user.interface';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
-import { AuditLogs } from '@src/shared/helpers/user-audit-logs';
+import { UtilsService } from '../../shared/services/utils.service';
 
 const confidentialClientConfig = {
   auth: {
@@ -54,12 +52,13 @@ export class UsersService {
     private readonly configuration: ConfigType<typeof config>,
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService,
-    private auditLogs: AuditLogs,
+    private readonly utilService: UtilsService
   ) { }
 
   logger = new Logger('UserService');
 
-  async create(createUserDto: CreateUserDto, userId: number) {
+  async create(createUserDto: CreateUserDto, userId: number, roleId) {
+    // await this.utilService.validatePermission('USER007', roleId)
     const auditAction = this.configuration.auditActions.user_create;
     try {
       createUserDto.email = createUserDto.email.toLowerCase().trim();
@@ -67,8 +66,7 @@ export class UsersService {
       createUserDto.lastname = createUserDto.lastname.toLowerCase().trim();
       await this.prismaService.users.create({ data: createUserDto })
       // TODO: ENVIAR EMAIL POR MULE A USUARIO SEGUN CORREO.
-      await this.auditLogs.sendLogsDB(userId, createUserDto, auditAction);
-
+      await this.utilService.saveLogs(userId, createUserDto, auditAction)
       return this.prismaService.users.findMany();
     } catch (error) {
       this.handleExceptions(error);
@@ -81,6 +79,9 @@ export class UsersService {
       return await this.prismaService.users.findMany({
         take: limit,
         skip: offset,
+        orderBy: {
+          name: 'asc',
+        },
       });
     } catch (error) {
       return new GenericResponse(
@@ -91,7 +92,7 @@ export class UsersService {
     }
   }
 
-  async getByterm(term: string) {
+  async findByterm(term: string) {
     let where;
     where = isNumber(term.trim()) ? { id: Number(term) } : IsUUID(term) ? { uid: term.toString().trim().toLowerCase() } : {
       name: {
@@ -102,6 +103,9 @@ export class UsersService {
     try {
       return await this.prismaService.users.findMany({
         where,
+        orderBy: {
+          name: 'asc',
+        },
       });
     } catch (error) {
       return new GenericResponse(
@@ -212,7 +216,7 @@ export class UsersService {
           details: 'Usuario no actualizado..',
         });
       }
-      await this.auditLogs.sendLogsDB(userId, updateUserDto, auditAction);
+      await this.utilService.saveLogs(userId, updateUserDto, auditAction);
       return updatedUser;
     } catch (error) {
       this.handleExceptions(error);
@@ -242,20 +246,20 @@ export class UsersService {
     );
   }
 
-  async getAuthCode(authority, scopes, state, res) {
+  async getAuthCode(authority, scopes, state) {
     authCodeRequest.authority = authority;
     authCodeRequest.scopes = scopes;
     authCodeRequest.state = state;
-    //Each time you fetch Authorization code, update the relevant authority in the tokenRequest configuration
     tokenRequest.authority = authority;
-    // request an authorization code to exchange for a token
-    return await confidentialClientApplication.getAuthCodeUrl(authCodeRequest)
+    try {
+      return await confidentialClientApplication.getAuthCodeUrl(authCodeRequest)
+    } catch (error) {
+      throw new InternalServerErrorException('Error consultando url login.')
+    }
   }
 
-  signIn(res) {
-    //Initiate a Auth Code Flow >> for sign in
-    //no scopes passed. openid, profile and offline_access will be used by default.
-    const url = this.getAuthCode(this.configService.get('SIGN_UP_SIGN_IN_POLICY_AUTHORITY'), [], this.configuration.APP_B2C_STATES.LOGIN, res);
+  signIn() {
+    const url = this.getAuthCode(this.configService.get('SIGN_UP_SIGN_IN_POLICY_AUTHORITY'), [], this.configuration.APP_B2C_STATES.LOGIN);
     return url
   }
 

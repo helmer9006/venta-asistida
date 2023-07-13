@@ -34,10 +34,4 @@ export class RolesController {
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Rol actualizado correctamente.');
   }
 
-  @Get('/getPermissionsByRole/:idRol')
-  @Auth()
-  async getPermissionsByRole(@Param('idRol') idRol: string) {
-    const data = await this.rolesService.findPermissionsByRole(+idRol);
-    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Permisos encontrados.');
-  }
 }

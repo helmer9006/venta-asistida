@@ -9,21 +9,21 @@ datasource db {
 
 //Entidades
 model Users {
-  id                 Int         @id @default(autoincrement())
-  uid                String?     @unique @db.VarChar
-  name               String      @db.VarChar
-  lastname           String      @db.VarChar
-  identificationType String      @db.VarChar
-  identification     String      @unique @db.VarChar
-  email              String      @unique @db.VarChar
-  address            String?     @db.VarChar
-  phone              String?     @db.VarChar
-  isActive           Boolean     @default(true)
-  roles              Roles?      @relation(fields: [roleId], references: [id])
+  id                 Int      @id @default(autoincrement())
+  uid                String?  @unique @db.VarChar
+  name               String   @db.VarChar
+  lastname           String   @db.VarChar
+  identificationType String   @db.VarChar
+  identification     String   @unique @db.VarChar
+  email              String   @unique @db.VarChar
+  address            String?  @db.VarChar
+  phone              String?  @db.VarChar
+  isActive           Boolean  @default(true)
+  roles              Roles?   @relation(fields: [roleId], references: [id])
   roleId             Int
-  createdAt          DateTime    @default(now())
-  updatedAt          DateTime    @updatedAt
-  auditLogs          AuditLogs[] // Campo de relación opuesto
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  Logs               Logs[]
 }
 
 model Roles {
@@ -51,6 +51,7 @@ model Permissions {
   path            String?            @db.VarChar
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
+  code            String             @db.VarChar
   modules         Modules            @relation(fields: [moduleId], references: [id])
   moduleId        Int
   isActive        Boolean            @default(true)
@@ -67,9 +68,9 @@ model RolesPermissions {
   updatedAt    DateTime    @updatedAt
 }
 
-model AuditLogs {
+model Logs {
   id          Int      @id @default(autoincrement())
-  user        Users    @relation(fields: [userId], references: [id])
+  users       Users?   @relation(fields: [userId], references: [id])
   userId      Int
   description String   @db.VarChar
   typeAction  String   @db.VarChar

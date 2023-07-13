@@ -1,4 +1,4 @@
-import { Injectable, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import { CreateRoleDto } from '../models/dto/create-role.dto';
 import { UpdateRoleDto } from '../models/dto/update-role.dto';
 import { ConfigService } from '@nestjs/config';
@@ -57,9 +57,12 @@ export class RolesService {
       return await this.prismaService.roles.findMany({
         take: limit,
         skip: offset,
+        orderBy: {
+          name: 'asc',
+        },
       });
     } catch (error) {
-      return new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error al buscar roles.');
+      throw new InternalServerErrorException('Error al buscar roles.')
     }
   }
 
@@ -92,9 +95,11 @@ export class RolesService {
             },
           },
         },
+        orderBy: {
+          name: 'asc',
+        },
       });
     } catch (error) {
-      console.log(error);
       this.handleExceptions(error)
     }
   }
@@ -125,7 +130,7 @@ export class RolesService {
         title: 'No se pudo insertar el rol.'
       })
     }
-    throw new BadRequestException('Error inesperado, revise los logs del servidor.')
+    throw new InternalServerErrorException('Error inesperado del servidor.')
   }
 
   async updateRolePermission(roleId: number, permissions: number[]) {
@@ -157,20 +162,7 @@ export class RolesService {
 
       return;
     } catch (error) {
-      new GenericResponse({}, 500, "El Rol fue actualizado pero Se presento un error al actualizar sus permisos.")
-    }
-  }
-
-  async findPermissionsByRole(roleId: number) {
-    try {
-      return await this.prismaService.rolesPermissions.findMany({
-        where: { roleId: roleId },
-        include: {
-          permissions: true,
-        },
-      });
-    } catch (error) {
-      return new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error al buscar permisos del rol.');
+      throw new InternalServerErrorException('El Rol fue actualizado pero Se presento un error al actualizar sus permisos.')
     }
   }
 }
