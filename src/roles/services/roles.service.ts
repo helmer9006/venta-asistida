@@ -1,7 +1,6 @@
-import { Injectable, HttpStatus, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, HttpStatus, InternalServerErrorException, Logger } from '@nestjs/common';
 import { CreateRoleDto } from '../models/dto/create-role.dto';
 import { UpdateRoleDto } from '../models/dto/update-role.dto';
-import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { BadRequestException, ConflictException } from '@src/shared/exceptions';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
@@ -15,6 +14,7 @@ export class RolesService {
     private readonly prismaService: PrismaService,
   ) {
   }
+  logger = new Logger('RolesService');
   async create(createRoleDto: CreateRoleDto) {
     let role;
     try {
@@ -32,15 +32,21 @@ export class RolesService {
           data: rolesPermissions,
         })
       }
-      return await this.prismaService.roles.findMany({
+
+      const roleFound = await this.prismaService.roles.findUnique({
+        where: { id: role.id },
         include: {
           rolesPermissions: {
-            include: {
+            select: {
               permissions: true,
-            },
+            }
           },
         },
       });
+      const permissionsByRole = roleFound.rolesPermissions.map(permission => permission.permissions)
+      delete roleFound.rolesPermissions;
+      return { ...roleFound, permissions: permissionsByRole };
+      return role;
     } catch (error) {
       if (role && role.id) {
         await this.prismaService.roles.delete({
@@ -55,6 +61,13 @@ export class RolesService {
     try {
       const { limit = 10, offset = 0 } = paginationDto;
       return await this.prismaService.roles.findMany({
+        include: {
+          rolesPermissions: {
+            include: {
+              permissions: true,
+            },
+          },
+        },
         take: limit,
         skip: offset,
         orderBy: {
@@ -86,20 +99,21 @@ export class RolesService {
       if (permissions.length > 0) {
         await this.updateRolePermission(role.id, permissions);
       }
-      return await this.prismaService.roles.findMany({
+      const roleFound = await this.prismaService.roles.findUnique({
         where: { id: role.id },
         include: {
           rolesPermissions: {
-            include: {
+            select: {
               permissions: true,
-            },
+            }
           },
         },
-        orderBy: {
-          name: 'asc',
-        },
       });
+      const permissionsByRole = roleFound.rolesPermissions.map(permission => permission.permissions)
+      delete roleFound.rolesPermissions;
+      return { ...roleFound, permissions: permissionsByRole };
     } catch (error) {
+      this.logger.error(error)
       this.handleExceptions(error)
     }
   }
@@ -138,7 +152,7 @@ export class RolesService {
       let currentPermissions = await this.prismaService.rolesPermissions.findMany({
         where: { roleId: roleId }
       })
-      const IdsCurrentRolesPermissions = currentPermissions.map(permission => permission.permissionId)
+      const IdsCurrentRolesPermissions = currentPermissions.length > 0 ? currentPermissions.map(permission => permission.permissionId) : []
       let permissionsToInsert = permissions.filter(permiso => !IdsCurrentRolesPermissions.includes(permiso))
       let permissionsToDelete = IdsCurrentRolesPermissions.filter(permiso => !permissions.includes(permiso))
       let IdsPermissionsToDelete = currentPermissions.filter(permission => permissionsToDelete.includes(permission.permissionId)).map(item => item.id)
@@ -154,15 +168,14 @@ export class RolesService {
       }
 
       if (permissionsToInsert && permissionsToInsert.length > 0) {
-        let rolesPermissions: ICreateRolePermission[] = permissionsToInsert.map(permission => { return { roleId: roleId, permissionId: permission } })
+        let rolesPermissions: ICreateRolePermission[] = await permissionsToInsert.map(permission => { return { roleId: roleId, permissionId: permission } })
         await this.prismaService.rolesPermissions.createMany({
           data: rolesPermissions,
         })
       }
-
       return;
     } catch (error) {
-      throw new InternalServerErrorException('El Rol fue actualizado pero Se presento un error al actualizar sus permisos.')
+      throw new InternalServerErrorException(`El Rol fue actualizado pero Se presento un error al actualizar sus permisos. Error ${error}`)
     }
   }
 }

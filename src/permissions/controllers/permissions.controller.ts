@@ -3,8 +3,10 @@ import { PermissionsService } from '../services/permissions.service';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { Auth } from '@src/auth/decorators';
 import { RolesEnum } from '@src/auth/enums/roles.enum';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('permissions')
+@ApiTags('Services permissions')
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) { }
 

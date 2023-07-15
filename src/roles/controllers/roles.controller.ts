@@ -9,7 +9,7 @@ import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
 import { Auth } from '@src/auth/decorators';
 import { RolesEnum } from '@src/auth/enums/roles.enum';
 @Controller('roles')
-@ApiTags('Servicios Roles')
+@ApiTags('Services roles')
 export class RolesController {
   constructor(private readonly rolesService: RolesService) { }
 

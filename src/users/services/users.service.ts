@@ -11,7 +11,9 @@ import { isNumber } from '@src/shared/helpers/general';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
 import { UtilsService } from '../../shared/services/utils.service';
-
+import { AxiosAdapter } from '@src/shared/adapters/axios.adapter';
+import { readFileSync } from 'fs';
+import { IResponseSignIn } from '@src/shared/interfaces/response-signin.interface';
 const confidentialClientConfig = {
   auth: {
     clientId: process.env.APP_CLIENT_ID,
@@ -52,22 +54,25 @@ export class UsersService {
     private readonly configuration: ConfigType<typeof config>,
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService,
-    private readonly utilService: UtilsService
+    private readonly utilService: UtilsService,
   ) { }
 
   logger = new Logger('UserService');
 
   async create(createUserDto: CreateUserDto, userId: number, roleId) {
-    // await this.utilService.validatePermission('USER007', roleId)
+    await this.utilService.validatePermission('USER001', roleId)
     const auditAction = this.configuration.auditActions.user_create;
     try {
       createUserDto.email = createUserDto.email.toLowerCase().trim();
       createUserDto.name = createUserDto.name.toLowerCase().trim();
       createUserDto.lastname = createUserDto.lastname.toLowerCase().trim();
-      await this.prismaService.users.create({ data: createUserDto })
-      // TODO: ENVIAR EMAIL POR MULE A USUARIO SEGUN CORREO.
-      await this.utilService.saveLogs(userId, createUserDto, auditAction)
-      return this.prismaService.users.findMany();
+      const userCreated = await this.prismaService.users.create({ data: createUserDto })
+      const userName = `${userCreated.name} ${userCreated.lastname}`
+      // email sent to a new user to finish registration
+      this.sendEmailInvitationMule(userName, createUserDto.email);
+      // Insert log for audit
+      this.utilService.saveLogs(userId, createUserDto, auditAction)
+      return userCreated;
     } catch (error) {
       this.handleExceptions(error);
     }
@@ -144,7 +149,7 @@ export class UsersService {
 
   async findUserAndTokenByCode(code: string, req, res) {
     tokenRequest.code = code;
-    let userUid, email, idTokenClaims, token;
+    let userUid, email, idTokenClaims, token, isNew;
 
     try {
       let response: any = await confidentialClientApplication.acquireTokenByCode(tokenRequest)
@@ -152,6 +157,7 @@ export class UsersService {
       email = response?.idTokenClaims?.emails[0] || null;
       token = response?.idToken || null;
       idTokenClaims = response?.idTokenClaims || null;
+      isNew = response?.idTokenClaims?.newUser || false
 
     } catch (error) {
       res.status(401).json({ data: {}, statusCode: 401, message: 'No es posible validar la identidad del usuario.' })
@@ -185,7 +191,7 @@ export class UsersService {
       })
     }
 
-    if (!user?.uid) {
+    if (isNew) {
       await this.prismaService.users.update({
         where: {
           id: user.id,
@@ -241,6 +247,7 @@ export class UsersService {
         title: 'El usuario ya se encuentra registrado.',
       });
     }
+    this.logger.error(`Error inesperado, revise los logs del servidor. Error ${JSON.stringify(error)}`)
     throw new BadRequestException(
       'Error inesperado, revise los logs del servidor.',
     );
@@ -265,5 +272,39 @@ export class UsersService {
 
   signout() {
     return this.configService.get('LOGOUT_ENDPOINT');
+  }
+
+  async sendEmailInvitationMule(nameUser: string, email: string) {
+    const formData = new FormData();
+    const url: string = await this.signIn();
+    const fileData = readFileSync('./src/shared/templates/invitation-new-user.html', 'utf-8');
+    let body = fileData.toString();
+    body = body.replace('@NAME', nameUser);
+    body = body.replace('<URL_REDIRECCION>', url);
+    const data = {
+      "to": ['helmer.villarreal@vasscompany.com'],
+      "cc": [],
+      "body": body,
+      "account": "26cb3b68-0a53-44bb-890a-ff7291b7f333",
+      "type": "SendCode",
+      "subject": "Registro de usuario",
+      "isBodyHtml": true,
+      "configParameters": {
+        "expiry": 300
+      },
+      "replacementData": {
+        "__NAME__": "Helmer",
+        "__LASTNAME__": "Villarreal Larios"
+      }
+    }
+    const jsonData = JSON.stringify(data);
+    formData.append('body', jsonData);
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+      'client_id': this.configService.get('MULE_CLIENT_ID_METHOD'),
+      'client_secret': this.configService.get('MULE_CLIENT_SECRET_METHOD'),
+    };
+    const urlMule = this.configService.get('MULE_URL_SEND_EMAIL');
+    return await this.utilService.sendEmailMule(urlMule, formData, headers)
   }
 }

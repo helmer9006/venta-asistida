@@ -13,13 +13,12 @@ import { RolesEnum } from '@src/auth/enums/roles.enum';
 import { Auth } from '@src/auth/decorators';
 
 @Controller('users')
-@ApiTags('Servicios Users')
+@ApiTags('Services users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @Post('create')
   @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
-  // @Auth()
   async create(@Body() createUserDto: CreateUserDto, @GetUser('id') userId: number, @GetUser('roleId') roleId: number) {
     const data = await this.usersService.create(createUserDto, userId, roleId);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario creado correctamente.');
