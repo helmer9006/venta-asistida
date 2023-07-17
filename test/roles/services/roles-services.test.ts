@@ -9,10 +9,14 @@ import { RolesService } from '@src/roles/services/roles.service';
 import { RolesController } from '@src/roles/controllers/roles.controller';
 import { CreateRoleDto } from '@src/roles/models/dto/create-role.dto';
 import { UpdateRoleDto } from '@src/roles/models/dto/update-role.dto';
+import { UtilsService } from '@src/shared/services/utils.service';
+import { ConfigService } from '@nestjs/config';
+import { AxiosAdapter } from '@src/shared/adapters/axios.adapter';
+import config from '@src/config/config';
 
 let rolesService: RolesService;
 let prismaService: PrismaService;
-//let auditLogs: UtilsService;
+let utilService: UtilsService;
 let rolesController: RolesController;
 let roleId: number;
 let role;
@@ -26,11 +30,13 @@ beforeEach(async () => {
     providers: [
       RolesService,
       PrismaService,
-      //UtilsService,
-      // {
-      //   provide: config.KEY,
-      //   useValue: config,
-      // },
+      UtilsService,
+      ConfigService,
+      AxiosAdapter,
+      {
+        provide: config.KEY,
+        useValue: config,
+      },
       {
         provide: RolesController,
         useValue: createMock<RolesController>(),
@@ -45,7 +51,7 @@ beforeEach(async () => {
   rolesService = module.get<RolesService>(RolesService);
   prismaService = module.get<PrismaService>(PrismaService);
   rolesController = module.get<RolesController>(RolesController);
-  //auditLogs = module.get<UtilsService>(UtilsService);
+  utilService = module.get<UtilsService>(UtilsService);
 });
 
 describe('RolesService', () => {
@@ -57,7 +63,7 @@ describe('RolesService', () => {
 describe('RolesService Create role', () => {
   it('servicio crear rol correctamente', async () => {
     try {
-      const serviceResponse = await rolesService.create(createRoleDto);
+      const serviceResponse = await rolesService.create(createRoleDto, 1);
       const genericResponseOK = new GenericResponseTestDataBuilder().build(
         serviceResponse,
         HttpStatus.OK,
@@ -67,13 +73,12 @@ describe('RolesService Create role', () => {
       jest
         .spyOn(rolesController, 'create')
         .mockResolvedValue(genericResponseOK);
-      const controlllerResponse = await rolesController.create(createRoleDto);
+      const controlllerResponse = await rolesController.create(createRoleDto, 1);
 
       if (controlllerResponse.statusCode === 200) {
         roleId = controlllerResponse.data.id;
         role = controlllerResponse.data;
       }
-
       expect(controlllerResponse.data).toStrictEqual(genericResponseOK.data);
       expect(controlllerResponse.statusCode).toStrictEqual(
         genericResponseOK.statusCode,
@@ -82,6 +87,7 @@ describe('RolesService Create role', () => {
         'Rol creado correctamente.',
       );
     } catch (error) {
+      console.log("error", error);
       return error;
     }
   });
@@ -90,7 +96,7 @@ describe('RolesService Create role', () => {
     try {
       createRoleDto.permissions = [999999, 888888];
       createRoleDto.name = 'role test 2';
-      const serviceResponse = await rolesService.create(createRoleDto);
+      const serviceResponse = await rolesService.create(createRoleDto, 1);
 
       const genericResponseOK = new GenericResponseTestDataBuilder().build(
         serviceResponse,
@@ -101,7 +107,7 @@ describe('RolesService Create role', () => {
       jest
         .spyOn(rolesController, 'create')
         .mockResolvedValue(genericResponseOK);
-      const controlllerResponse = await rolesController.create(createRoleDto);
+      const controlllerResponse = await rolesController.create(createRoleDto, 1);
 
       if (controlllerResponse.statusCode === 200)
         roleId = controlllerResponse.data.id;
@@ -126,7 +132,7 @@ describe('RolesService Create role', () => {
 
   it('la creacion de ocurre pero hay un error de servidor', async () => {
     try {
-      await rolesService.create(createRoleDto);
+      await rolesService.create(createRoleDto, 1);
     } catch (error) {
       const genericResponseOK = new GenericResponseTestDataBuilder().build(
         {},
@@ -137,7 +143,7 @@ describe('RolesService Create role', () => {
         .spyOn(rolesController, 'create')
         .mockResolvedValue(genericResponseOK);
 
-      const controlllerResponse = await rolesController.create(createRoleDto);
+      const controlllerResponse = await rolesController.create(createRoleDto, 1);
 
       expect(controlllerResponse.data).toStrictEqual({});
       expect(controlllerResponse.statusCode).toStrictEqual(500);
@@ -195,7 +201,7 @@ describe('RolesService FindAll roles', () => {
 
 describe('RolesService Update role', () => {
   it('servicio actualizar rol correctamente', async () => {
-    const serviceResponse = await rolesService.update(roleId, updateRoleDto);
+    const serviceResponse = await rolesService.update(roleId, updateRoleDto, 1);
 
     const genericResponseOK = new GenericResponseTestDataBuilder().build(
       serviceResponse,
@@ -208,6 +214,7 @@ describe('RolesService Update role', () => {
     const controlllerResponse = await rolesController.update(
       `${roleId}`,
       updateRoleDto,
+      1
     );
 
     expect(controlllerResponse.data).toStrictEqual(genericResponseOK.data);
@@ -221,7 +228,7 @@ describe('RolesService Update role', () => {
     updateRoleDto.permissions = [5];
     updateRoleDto.name = 'admin_test';
 
-    const serviceResponse = await rolesService.update(roleId, updateRoleDto);
+    const serviceResponse = await rolesService.update(roleId, updateRoleDto, 1);
     await rolesService.updateRolePermission(roleId, [5]);
 
     const genericResponseOK = new GenericResponseTestDataBuilder().build(
@@ -235,6 +242,7 @@ describe('RolesService Update role', () => {
     const controlllerResponse = await rolesController.update(
       `${roleId}`,
       updateRoleDto,
+      1
     );
 
     expect(controlllerResponse.data).toStrictEqual(genericResponseOK.data);
@@ -248,7 +256,7 @@ describe('RolesService Update role', () => {
 
     updateRoleDto.permissions = [1, 2];
 
-    const serviceResponse = await rolesService.update(roleId, updateRoleDto);
+    const serviceResponse = await rolesService.update(roleId, updateRoleDto, 1);
     await rolesService.updateRolePermission(roleId, [1, 2]);
 
     const genericResponseOK = new GenericResponseTestDataBuilder().build(
@@ -262,6 +270,7 @@ describe('RolesService Update role', () => {
     const controlllerResponse = await rolesController.update(
       `${roleId}`,
       updateRoleDto,
+      1
     );
 
     if (controlllerResponse.statusCode === 200) {
@@ -286,7 +295,7 @@ describe('RolesService Update role', () => {
   it('servicio actualizar rol falla por que el rol se encuentra registrado', async () => {
     try {
       updateRoleDto.name = 'administrador';
-      await rolesService.update(2, updateRoleDto);
+      await rolesService.update(2, updateRoleDto,1);
     } catch (error) {
       const genericResponseOK = new GenericResponseTestDataBuilder().build(
         [],
@@ -301,6 +310,7 @@ describe('RolesService Update role', () => {
       const controlllerResponse = await rolesController.update(
         `${roleId}`,
         updateRoleDto,
+        1
       );
 
       expect(controlllerResponse.data).toStrictEqual([]);
@@ -317,7 +327,7 @@ describe('RolesService Update role', () => {
       .mockRejectedValue('error');
     updateRoleDto.name = 'admin_test_2';
     try {
-      await rolesService.update(roleId, updateRoleDto);
+      await rolesService.update(roleId, updateRoleDto, 1);
       await rolesService.updateRolePermission(roleId, [888, 999]);
     } catch (error) {
       const genericResponseError = new GenericResponseTestDataBuilder().build(
@@ -333,6 +343,7 @@ describe('RolesService Update role', () => {
       const controlllerResponse = await rolesController.update(
         `${roleId}`,
         updateRoleDto,
+        1
       );
 
       await prismaService.roles.delete({

@@ -4,15 +4,11 @@ import { createMock } from '@golevelup/ts-jest';
 import { PermissionsService } from '@src/permissions/services/permissions.service';
 import { PermissionsController } from '@src/permissions/controllers/permissions.controller';
 import { HttpStatus } from '@nestjs/common';
-
-//import { prismaMock } from '@test/utils/singleton';
 import { GenericResponseTestDataBuilder } from '@test/utils/generic-response.testdatabuilder';
 
 let permissionsService: PermissionsService;
 let prismaService: PrismaService;
-//let auditLogs: UtilsService;
 let permissionsController: PermissionsController;
-
 
 beforeEach(async () => {
   const module: TestingModule = await Test.createTestingModule({

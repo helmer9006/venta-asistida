@@ -1,11 +1,10 @@
-import { Injectable, HttpStatus, Logger, InternalServerErrorException, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, HttpStatus, Logger, InternalServerErrorException, Inject } from '@nestjs/common';
 import * as msal from '@azure/msal-node';
 import { ConfigService, ConfigType } from '@nestjs/config';
 import { validate as IsUUID } from 'uuid';
-
 import { CreateUserDto, RequestUserDto, UpdateUserDto } from '../models/dto';
 import { PrismaService } from '@src/prisma/services/prisma.service';
-import { ConflictException, BadRequestException } from '@src/shared/exceptions';
+import { ConflictException, BadRequestException, UnauthorizedException, NotFoundException } from '@src/shared/exceptions';
 import config from '@src/config/config';
 import { isNumber } from '@src/shared/helpers/general';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
@@ -160,7 +159,7 @@ export class UsersService {
       isNew = response?.idTokenClaims?.newUser || false
 
     } catch (error) {
-      res.status(401).json({ data: {}, statusCode: 401, message: 'No es posible validar la identidad del usuario.' })
+      throw new UnauthorizedException('No es posible validar la identidad del usuario.')
     }
 
     if (!userUid) {
@@ -171,25 +170,16 @@ export class UsersService {
         details: 'No éxiste id de usuario.'
       })
     }
-    if (!email) {
-      throw new NotFoundException({
-        title: 'No es posible validar la identidad del usuario.',
-        status: 401,
-        error: 'No es posible validar la identidad del usuario.',
-        details: 'No es posible validar la identidad del usuario.'
-      })
-    }
+    if (!email) throw new UnauthorizedException('No es posible validar la identidad del usuario.')
     const user = await this.prismaService.users.findUnique({
-      where: { email }
+      where: { email },
+      include: {
+        roles: true
+      }
     });
-    if (!user) {
-      throw new NotFoundException({
-        title: 'El usuario no se encuentra registrado.',
-        status: 401,
-        error: 'El usuario no existe.',
-        details: 'El usuario no existe.'
-      })
-    }
+    const rolStatus: boolean = user.roles?.isActive || false;
+    if (!user) throw new UnauthorizedException('El usuario no se encuentra registrado.')
+    if (!rolStatus) throw new UnauthorizedException('El rol asignado al usuario no se encuentra activo.')
 
     if (isNew) {
       await this.prismaService.users.update({
@@ -198,7 +188,22 @@ export class UsersService {
         }, data: { uid: userUid }
       })
     }
-    return { user, token, idTokenClaims }
+    const modules = await this.prismaService.modules.findMany({
+      where: { permissions: { some: {} } },
+      include: {
+        permissions: {
+          where: {
+            rolesPermission: {
+              some: {
+                roleId: user.roleId
+              }
+            }
+          }
+        }
+      }
+    });
+    const modulesToReturn = modules.filter(module => module.permissions.length > 0)
+    return { user, token, idTokenClaims, modules: modulesToReturn }
   }
 
   async update(id: number, updateUserDto: UpdateUserDto, userId: number) {
