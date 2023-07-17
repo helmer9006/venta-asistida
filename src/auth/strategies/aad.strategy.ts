@@ -20,9 +20,18 @@ export class AADStrategy extends PassportStrategy(BearerStrategy) {
         if (!sub) {
             throw new UnauthorizedException('Usuario no identificado.');
         }
-        const user: Users = await this.prismaService.users.findUnique({ where: { uid: sub } })
+        const user = await this.prismaService.users.findUnique({
+            where: { uid: sub },
+            include: {
+                roles: true
+            }
+        })
         if (!user) {
             throw new UnauthorizedException('Token no es válido');
+        }
+        const rolStatus: boolean = user.roles?.isActive || false;
+        if (!rolStatus) {
+            throw new UnauthorizedException('El rol asignado al usuario se encuentra inactivo.');
         }
         if (!user.isActive) {
             throw new UnauthorizedException('Usuario se encuentra inactivo.');
