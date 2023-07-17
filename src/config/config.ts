@@ -30,6 +30,18 @@ export default registerAs('config', () => {
         action: 'USER_DISABLE',
         description: 'El usuario fue desabilitado en el sistema.',
       },
+      role_create: {
+        action: 'ROLE_CREATE',
+        description: 'Nuevo rol creado en el sistema.',
+      },
+      role_update: {
+        action: 'ROLE_UPDATE',
+        description: 'El Rol fue actualizado.',
+      },
+      role_disable: {
+        action: 'ROLE_DISABLE',
+        description: 'El rol fue desabilitado en el sistema.',
+      },
     },
   };
 });

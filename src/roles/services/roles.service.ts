@@ -1,4 +1,4 @@
-import { Injectable, HttpStatus, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Injectable, HttpStatus, InternalServerErrorException, Logger, Inject } from '@nestjs/common';
 import { CreateRoleDto } from '../models/dto/create-role.dto';
 import { UpdateRoleDto } from '../models/dto/update-role.dto';
 import { PrismaService } from '@src/prisma/services/prisma.service';
@@ -6,16 +6,22 @@ import { BadRequestException, ConflictException } from '@src/shared/exceptions';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { ICreateRolePermission } from '../interface/create-role-permission.interface';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
+import { UtilsService } from '../../shared/services/utils.service';
+import { ConfigType } from '@nestjs/config';
+import config from '@src/config/config';
 
 @Injectable()
 export class RolesService {
 
   constructor(
     private readonly prismaService: PrismaService,
+    private readonly utilService: UtilsService,
+    @Inject(config.KEY)
+    private readonly configuration: ConfigType<typeof config>
   ) {
   }
   logger = new Logger('RolesService');
-  async create(createRoleDto: CreateRoleDto) {
+  async create(createRoleDto: CreateRoleDto, userId: number) {
     let role;
     try {
       const permissions = createRoleDto.permissions;
@@ -32,6 +38,9 @@ export class RolesService {
           data: rolesPermissions,
         })
       }
+      // Insert log for audit
+      const auditAction = this.configuration.auditActions.role_create;
+      this.utilService.saveLogs(userId, createRoleDto, auditAction)
 
       const roleFound = await this.prismaService.roles.findUnique({
         where: { id: role.id },
@@ -79,7 +88,7 @@ export class RolesService {
     }
   }
 
-  async update(id: number, updateRoleDto: UpdateRoleDto) {
+  async update(id: number, updateRoleDto: UpdateRoleDto, userId: number) {
     let role;
     try {
       const permissions = updateRoleDto?.permissions || [];
@@ -95,6 +104,9 @@ export class RolesService {
       if (!role) {
         return new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error al actualizar rol.');
       }
+      // Insert log for audit
+      const auditAction = this.configuration.auditActions.role_update;
+      this.utilService.saveLogs(userId, updateRoleDto, auditAction)
 
       if (permissions.length > 0) {
         await this.updateRolePermission(role.id, permissions);
@@ -176,6 +188,29 @@ export class RolesService {
       return;
     } catch (error) {
       throw new InternalServerErrorException(`El Rol fue actualizado pero Se presento un error al actualizar sus permisos. Error ${error}`)
+    }
+  }
+
+  async findModulesByRole(roleId: number) {
+    try {
+      const modules = await this.prismaService.modules.findMany({
+        where: { permissions: { some: {} } },
+        include: {
+          permissions: {
+            where: {
+              rolesPermission: {
+                some: {
+                  roleId: roleId
+                }
+              }
+            }
+          }
+        }
+      });
+      const modulesToReturn = modules.filter(module => module.permissions.length > 0)
+      return modulesToReturn;
+    } catch (error) {
+      throw new InternalServerErrorException('Error consultando permisos del rol.')
     }
   }
 }

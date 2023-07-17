@@ -198,7 +198,23 @@ export class UsersService {
         }, data: { uid: userUid }
       })
     }
-    return { user, token, idTokenClaims }
+    const modules = await this.prismaService.modules.findMany({
+      where: { permissions: { some: {} } },
+      include: {
+        permissions: {
+          where: {
+            rolesPermission: {
+              some: {
+                roleId: user.roleId
+              }
+            }
+          }
+        }
+      }
+    });
+    const modulesToReturn = modules.filter(module => module.permissions.length > 0)
+
+    return { user, token, idTokenClaims, modules: modulesToReturn }
   }
 
   async update(id: number, updateUserDto: UpdateUserDto, userId: number) {
