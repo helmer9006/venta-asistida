@@ -22,13 +22,9 @@ export class RolesService {
       createRoleDto.name = createRoleDto.name.toLowerCase().trim();
       delete createRoleDto.permissions
       role = await this.prismaService.roles.create({ data: createRoleDto })
-      if (!role) {
-        return new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error al crear rol.');
-      }
       if (permissions.length > 0) {
         let rolesPermissions: ICreateRolePermission[] = permissions.map(permission => { return { roleId: role.id, permissionId: permission } })
-
-        const insertPermissionsNewRol = await this.prismaService.rolesPermissions.createMany({
+        await this.prismaService.rolesPermissions.createMany({
           data: rolesPermissions,
         })
       }
@@ -46,7 +42,7 @@ export class RolesService {
       const permissionsByRole = roleFound.rolesPermissions.map(permission => permission.permissions)
       delete roleFound.rolesPermissions;
       return { ...roleFound, permissions: permissionsByRole };
-      return role;
+      //return role;
     } catch (error) {
       if (role && role.id) {
         await this.prismaService.roles.delete({
@@ -92,26 +88,11 @@ export class RolesService {
           id: id,
         }, data: updateRoleDto
       })
-      if (!role) {
-        return new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error al actualizar rol.');
-      }
-
+      
       if (permissions.length > 0) {
         await this.updateRolePermission(role.id, permissions);
       }
-      const roleFound = await this.prismaService.roles.findUnique({
-        where: { id: role.id },
-        include: {
-          rolesPermissions: {
-            select: {
-              permissions: true,
-            }
-          },
-        },
-      });
-      const permissionsByRole = roleFound.rolesPermissions.map(permission => permission.permissions)
-      delete roleFound.rolesPermissions;
-      return { ...roleFound, permissions: permissionsByRole };
+      return role;
     } catch (error) {
       this.logger.error(error)
       this.handleExceptions(error)
@@ -166,14 +147,15 @@ export class RolesService {
           },
         });
       }
-
+      let res;
       if (permissionsToInsert && permissionsToInsert.length > 0) {
-        let rolesPermissions: ICreateRolePermission[] = await permissionsToInsert.map(permission => { return { roleId: roleId, permissionId: permission } })
-        await this.prismaService.rolesPermissions.createMany({
+        let rolesPermissions: ICreateRolePermission[] = permissionsToInsert.map(permission => { return { roleId: roleId, permissionId: permission } })
+        res = await this.prismaService.rolesPermissions.createMany({
           data: rolesPermissions,
         })
       }
-      return;
+
+      return res;
     } catch (error) {
       throw new InternalServerErrorException(`El Rol fue actualizado pero Se presento un error al actualizar sus permisos. Error ${error}`)
     }

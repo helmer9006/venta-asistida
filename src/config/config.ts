@@ -17,16 +17,16 @@ export default registerAs('config', () => {
       PASSWORD_RESET: 'password_reset',
       EDIT_PROFILE: 'update_profile',
     },
-    auditActions: {
-      user_create: {
+    AUDIT_ACTIONS: {
+      USER_CREATE: {
         action: 'USER_CREATE',
         description: 'Nuevo usuario creado en el sistema.',
       },
-      user_update: {
+      USER_UPDATE: {
         action: 'USER_UPDATE',
         description: 'El usuario fue actualizado',
       },
-      user_disable: {
+      USER_DISABLE: {
         action: 'USER_DISABLE',
         description: 'El usuario fue desabilitado en el sistema.',
       },

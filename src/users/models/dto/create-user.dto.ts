@@ -11,10 +11,6 @@ import {
 } from 'class-validator';
 
 export class CreateUserDto {
-  @IsOptional()
-  @IsNumber()
-  id: number;
-
   // @IsUUID() TODO:  validar el tipo de uid que llega de microsoft
   @IsString()
   @IsOptional()

@@ -6,7 +6,7 @@ import { validate as IsUUID } from 'uuid';
 import { CreateUserDto, RequestUserDto, UpdateUserDto } from '../models/dto';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { ConflictException, BadRequestException } from '@src/shared/exceptions';
-import config from 'src/config/config';
+import config from '@src/config/config';
 import { isNumber } from '@src/shared/helpers/general';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
@@ -61,7 +61,7 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto, userId: number, roleId) {
     await this.utilService.validatePermission('USER001', roleId)
-    const auditAction = this.configuration.auditActions.user_create;
+    const auditAction = this.configuration.AUDIT_ACTIONS ? this.configuration.AUDIT_ACTIONS.USER_CREATE : null;
     try {
       createUserDto.email = createUserDto.email.toLowerCase().trim();
       createUserDto.name = createUserDto.name.toLowerCase().trim();
@@ -69,9 +69,9 @@ export class UsersService {
       const userCreated = await this.prismaService.users.create({ data: createUserDto })
       const userName = `${userCreated.name} ${userCreated.lastname}`
       // email sent to a new user to finish registration
-      this.sendEmailInvitationMule(userName, createUserDto.email);
+      await this.sendEmailInvitationMule(userName, createUserDto.email);
       // Insert log for audit
-      this.utilService.saveLogs(userId, createUserDto, auditAction)
+      await this.utilService.saveLogs(userId, createUserDto, auditAction)
       return userCreated;
     } catch (error) {
       this.handleExceptions(error);
@@ -202,7 +202,7 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto, userId: number) {
-    const auditAction = this.configuration.auditActions.user_update;
+    const auditAction =  this.configuration.AUDIT_ACTIONS ? this.configuration.AUDIT_ACTIONS.USER_UPDATE : null;
     try {
       if (updateUserDto.email) updateUserDto.email = updateUserDto.email.toLowerCase().trim();
       if (updateUserDto.name) updateUserDto.name = updateUserDto.name.toLowerCase().trim();
@@ -266,6 +266,7 @@ export class UsersService {
   }
 
   signIn() {
+    const LOGIN = this.configuration.APP_B2C_STATES ? this.configuration.APP_B2C_STATES.LOGIN : null
     const url = this.getAuthCode(this.configService.get('SIGN_UP_SIGN_IN_POLICY_AUTHORITY'), [], this.configuration.APP_B2C_STATES.LOGIN);
     return url
   }

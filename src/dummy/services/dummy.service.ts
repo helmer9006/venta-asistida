@@ -1,6 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { ExampleProviderService } from 'src/adapter/example-provider/services/example-provider.service';
-
+import { ExampleProviderService } from '@src/adapter/example-provider/services/example-provider.service';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { Users } from '@prisma/client';
 import { UserRequest } from '../models/request/user-request.model';

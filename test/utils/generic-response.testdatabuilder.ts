@@ -8,11 +8,11 @@ export class GenericResponseTestDataBuilder {
 
   constructor() {
     this.data = {};
-    this.statusCode = HttpStatus.OK;
-    this.message = 'OK';
+    this.statusCode = 0;
+    this.message = '';
   }
 
-  public build(): GenericResponse {
-    return new GenericResponse(this.data, this.statusCode, this.message);
+  public build(data, statusCode, message): GenericResponse {
+    return new GenericResponse(data, statusCode, message);
   }
 }
