@@ -4,17 +4,21 @@ import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { Permission } from '../entities/permission.entity';
 import { Role } from '../../roles/entities/role.entity';
 import { ConflictException } from '@src/shared/exceptions';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PermissionsService {
-  constructor(private readonly prismaService: PrismaService) { }
+  constructor(private readonly prismaService: PrismaService, private readonly configService: ConfigService) { }
   async findAll() {
+    const permissionsOnlySuper = this.configService.get('PERMISSIONS_DEFAULT_SUPERADMINISTRADOR');
     try {
-      return await this.prismaService.permissions.findMany({
+      let permissions = await this.prismaService.permissions.findMany({
         orderBy: {
           description: 'asc',
         },
       });
+      permissions = permissions.filter(permission => !permissionsOnlySuper.includes(permission.id))
+      return permissions;
     } catch (error) {
       throw new InternalServerErrorException('Error consultando permisos.')
     }
