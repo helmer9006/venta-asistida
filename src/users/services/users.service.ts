@@ -288,7 +288,7 @@ export class UsersService {
     body = body.replace('@NAME', nameUser);
     body = body.replace('<URL_REDIRECCION>', url);
     const data = {
-      "to": ['helmer.villarreal@vasscompany.com'],
+      "to": [email],
       "cc": [],
       "body": body,
       "account": "26cb3b68-0a53-44bb-890a-ff7291b7f333",

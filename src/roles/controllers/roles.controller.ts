@@ -21,7 +21,7 @@ export class RolesController {
   }
 
   @Get()
-  @Auth(RolesEnum.SUPERADMINISTRADOR)
+  @Auth()
   async findAll(@Query() paginationDto: PaginationDto) {
     const data = await this.rolesService.findAll(paginationDto);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Roles encontrados.');
