@@ -26,6 +26,8 @@ const dataUpdateDto: UpdateUserDto = testExpectValues.dataUpdateUserDto;
 let testUser: any;
 let isOk: boolean = false;
 
+// Inyeccion de dependencias y providers necesarios para ejecutar el servicio
+
 beforeEach(async () => {
   const module: TestingModule = await Test.createTestingModule({
     providers: [
@@ -51,12 +53,12 @@ beforeEach(async () => {
   utilService = module.get<UtilsService>(UtilsService);
 });
 
-describe('UsersService Create', () => {
+describe('UsersService User-create', () => {
   it('servicio conectado', () => {
     expect(usersService).toBeDefined();
   });
 
-  it('creacion de un usuario en el sistemas satisfactoriamente', async () => {
+  it('deberia crear un usuario correctamente en el sistema.', async () => {
     jest.spyOn(utilService, 'saveLogs').mockResolvedValue();
     jest.spyOn(usersService, 'sendEmailInvitationMule').mockResolvedValue(true);
 
@@ -72,7 +74,8 @@ describe('UsersService Create', () => {
       1,
       1,
     );
-
+    
+    // Crea el usuario en la BD y obtiene su Id para usarlo en los test posteriores
     if (controlllerResponse.statusCode === 200)
       userId = controlllerResponse.data.id;
 
@@ -85,7 +88,7 @@ describe('UsersService Create', () => {
     );
   });
 
-  it('UserService Create falla al intentar crear un usuario con un email ya registrado', async () => {
+  it('deberia de fallar la creacion del usuario por que el email ya esta registrado.', async () => {
     try {
       await usersService.create(createUserDto, 1, 1);
     } catch (error) {
@@ -113,8 +116,8 @@ describe('UsersService Create', () => {
   });
 });
 
-describe('UserService FindAll', () => {
-  it('obtencion de todos los usuario del sistema', async () => {
+describe('UserService Users-findAll', () => {
+  it('deberia obtener los usuarios del sistema.', async () => {
     const users = await usersService.findAll(paginationDto);
 
     const genericResponseOK = new GenericResponseTestDataBuilder().build(
@@ -130,7 +133,7 @@ describe('UserService FindAll', () => {
     expect(controlllerResponse.statusCode).toStrictEqual(200);
   });
 
-  it('error en la obtencion de todos los usuario del sistema', async () => {
+  it('deberia fallar al obtener los usuarios del sistema.', async () => {
     jest.spyOn(prismaService.users, 'findMany').mockRejectedValue('error');
 
     await usersService.findAll(paginationDto);
@@ -151,8 +154,8 @@ describe('UserService FindAll', () => {
   });
 });
 
-describe('UserService FindByTerm', () => {
-  it('deberia obtener un usuario por un termino especifico', async () => {
+describe('UserService Users-findByTerm', () => {
+  it('deberia obtener un usuario por un termino especifico.', async () => {
     const user = await usersService.findByterm(`${userId}`);
     testUser = user;
 
@@ -170,7 +173,7 @@ describe('UserService FindByTerm', () => {
     expect(controlllerResponse.statusCode).toStrictEqual(200);
   });
 
-  it('error en la obtencion deun usuario por un termino especifico', async () => {
+  it('deberia fallar al obtener un usuario por un termino especifico.', async () => {
     jest.spyOn(prismaService.users, 'findMany').mockRejectedValue('error');
 
     await usersService.findByterm(`${userId}`);
@@ -190,8 +193,8 @@ describe('UserService FindByTerm', () => {
   });
 });
 
-describe('UserService FindByMail', () => {
-  it('deberia obtener un usuario por su email correctamente', async () => {
+describe('UserService Users-findByMail', () => {
+  it('deberia obtener un usuario por su email.', async () => {
     const user = testUser[0];
     jest.spyOn(prismaService.users, 'findUnique').mockResolvedValue(user);
 
@@ -208,7 +211,7 @@ describe('UserService FindByMail', () => {
     expect(controlllerResponse.statusCode).toStrictEqual(200);
   });
 
-  it('error en la obtencion de un usuario por su email', async () => {
+  it('deberia fallar al obtener un usuario por su email.', async () => {
     jest.spyOn(prismaService.users, 'findUnique').mockRejectedValue('error');
 
     await usersService.findByMail(testUser.email);
@@ -227,7 +230,7 @@ describe('UserService FindByMail', () => {
     expect(controlllerResponse.data).toStrictEqual([]);
   });
 
-  it('error en la obtencion de un usuario cuando no se encuentra en el sistema', async () => {
+  it('deberia fallar al obtener un usuario por su email no registrado.', async () => {
     jest.spyOn(prismaService.users, 'findUnique').mockResolvedValue(null);
 
     try {
@@ -256,8 +259,8 @@ describe('UserService FindByMail', () => {
   });
 });
 
-describe('UserService Update', () => {
-  it('deberia actualizar un usuario correctamente', async () => {
+describe('UserService Users-update', () => {
+  it('deberia actualizar un usuario correctamente en el sistema', async () => {
     jest.spyOn(utilService, 'saveLogs').mockResolvedValue();
 
     const responseUserUpdate = await usersService.update(
@@ -280,6 +283,7 @@ describe('UserService Update', () => {
     );
     if (controlllerResponse.statusCode === 200) isOk = true;
 
+    // Si todos los test resultan bien, elimina el usuario creado para las pruebas de la BD.
     if (isOk && userId !== undefined) {
       await prismaService.users.delete({
         where: { id: userId },
@@ -289,7 +293,7 @@ describe('UserService Update', () => {
     expect(controlllerResponse.statusCode).toStrictEqual(200);
   });
 
-  it('error en el servidor al actualizar un usuario', async () => {
+  it('deberia fallar la actualizacion de un usuario.', async () => {
     jest.spyOn(prismaService.users, 'update').mockRejectedValue('error');
 
     try {
@@ -317,7 +321,7 @@ describe('UserService Update', () => {
     }
   });
 
-  it('error al actualizar un usuario que no se encuentra en el sistema', async () => {
+  it('deberia fallar la actualizacion de un usuario no registrado', async () => {
     jest.spyOn(prismaService.users, 'update').mockResolvedValueOnce(null);
 
     try {

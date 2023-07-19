@@ -5,16 +5,19 @@ import { PermissionsService } from '@src/permissions/services/permissions.servic
 import { PermissionsController } from '@src/permissions/controllers/permissions.controller';
 import { HttpStatus } from '@nestjs/common';
 import { GenericResponseTestDataBuilder } from '@test/utils/generic-response.testdatabuilder';
+import { ConfigService } from '@nestjs/config';
 
 let permissionsService: PermissionsService;
 let prismaService: PrismaService;
 let permissionsController: PermissionsController;
 
+// Inyeccion de dependencias y providers necesarios para ejecutar el servicio
 beforeEach(async () => {
   const module: TestingModule = await Test.createTestingModule({
     providers: [
       PermissionsService,
       PrismaService,
+      ConfigService,
       {
         provide: PermissionsController,
         useValue: createMock<PermissionsController>(),
@@ -35,8 +38,8 @@ describe('PermissionsService', () => {
   });
 });
 
-describe('PermissionsService', () => {
-  it('FindAll', async () => {
+describe('PermissionsService Permissions-findAl', () => {
+  it('deberia obtener los permisos del sistema.', async () => {
     const serviceResponse = await permissionsService.findAll();
 
     const genericResponseOK = new GenericResponseTestDataBuilder().build(
@@ -55,7 +58,7 @@ describe('PermissionsService', () => {
     expect(controlllerResponse.message).toStrictEqual('Permisos encontrados.');
   });
 
-  it('FindAll falla', async () => {
+  it('deberia de fallar al obtener los permisos del sistema.', async () => {
     jest.spyOn(prismaService.permissions, 'findMany').mockRejectedValue('error')
 
     try {
@@ -81,8 +84,9 @@ describe('PermissionsService', () => {
   });
 });
 
-describe('PermissionsService', () => {
-  it('findPermissionsByRole ', async () => {
+describe('PermissionsService Permissions-findPermissionsByRole', () => {
+  //jest.spyOn(configService, 'get').mockResolvedValue()
+  it('deberia obtrener los permisos asignados a un rol.', async () => {
     const serviceResponse = await permissionsService.findPermissionsByRole(1);
 
     const genericResponseOK = new GenericResponseTestDataBuilder().build(
@@ -101,7 +105,7 @@ describe('PermissionsService', () => {
     expect(controlllerResponse.message).toStrictEqual('Permisos encontrados.');
   });
 
-  it('findPermissionsByRole falla', async () => {
+  it('deberia fallar al obtener los permisos asignados a un rol.', async () => {
     jest.spyOn(prismaService.permissions, 'findMany').mockRejectedValue('error')
 
     try {
