@@ -4,6 +4,7 @@ import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { ConfigService, ConfigType } from '@nestjs/config';
 import config from 'src/config/config';
 import { PrismaService } from '@src/prisma/services/prisma.service';
+import { GetTokenDto } from '@src/auth/models/dto/get-token.dto';
 
 const confidentialClientConfig = {
     auth: {
@@ -66,7 +67,8 @@ export class AuthService {
     signout() {
         return this.configService.get('LOGOUT_ENDPOINT');
     }
-    async findUserAndTokenByCode(code: string, req, res) {
+    
+    async findUserAndTokenByCode(code: GetTokenDto, req, res) {
         tokenRequest.code = code;
         let userUid, email, idTokenClaims, token, isNew;
 
