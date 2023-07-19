@@ -7,7 +7,7 @@ import { IAuditAction } from '../interfaces/audit-logs.interface';
 import { ConfigService } from '@nestjs/config';
 import { AxiosAdapter } from '../adapters/axios.adapter';
 import { IReponseTokenMule } from '../interfaces/response-token-mule.interface';
-import { Logger } from '@nestjs/common';
+import { Logger, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class UtilsService {
@@ -48,7 +48,7 @@ export class UtilsService {
         try {
             await this.prismaService.logs.create({ data: log });
         } catch (error) {
-            throw new InternalServerErrorException(`Error al guardar el registro de logs. ${error}`)
+            throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error al guardar el registro de logs.');
         }
     }
 
@@ -63,7 +63,7 @@ export class UtilsService {
             return response;
         } catch (error) {
             this.logger.error(`Error del servidor enviando correo a mule. Error ${JSON.stringify(error)}`)
-
+            // TODO: validar acción si hay error al enviar el correo de invitación.
         }
     }
     private async generateTokenMule() {

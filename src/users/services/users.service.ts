@@ -89,11 +89,7 @@ export class UsersService {
         },
       });
     } catch (error) {
-      return new GenericResponse(
-        [],
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'Error del servidor.',
-      );
+      throw new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error de servidor al consultar usuarios.');
     }
   }
 
@@ -113,11 +109,7 @@ export class UsersService {
         },
       });
     } catch (error) {
-      return new GenericResponse(
-        [],
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'Error del servidor.',
-      );
+      throw new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error de servidor al consultar usuarios.');
     }
   }
 
@@ -130,81 +122,10 @@ export class UsersService {
         },
       });
     } catch (error) {
-      return new GenericResponse(
-        [],
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'Error del servidor.',
-      );
+      throw new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error de servidor al consultar usuarios.');
     }
-    if (!user) {
-      throw new NotFoundException({
-        title: 'Usuario no encontrado.',
-        status: 404,
-        error: 'Usuario no encontrado.',
-        details: 'Usuario no encontrado.',
-      });
-    }
+    if (!user) throw new GenericResponse([], HttpStatus.NOT_FOUND.valueOf(), 'Usuario no encontrado.');
     return user;
-  }
-
-  async findUserAndTokenByCode(code: string, req, res) {
-    tokenRequest.code = code;
-    let userUid, email, idTokenClaims, token, isNew;
-
-    try {
-      let response: any = await confidentialClientApplication.acquireTokenByCode(tokenRequest)
-      userUid = response?.idTokenClaims?.sub || null;
-      email = response?.idTokenClaims?.emails[0] || null;
-      token = response?.idToken || null;
-      idTokenClaims = response?.idTokenClaims || null;
-      isNew = response?.idTokenClaims?.newUser || false
-
-    } catch (error) {
-      throw new UnauthorizedException('No es posible validar la identidad del usuario.')
-    }
-
-    if (!userUid) {
-      throw new NotFoundException({
-        title: 'No existe id de usuario.',
-        status: 404,
-        error: 'No éxiste id de usuario.',
-        details: 'No éxiste id de usuario.'
-      })
-    }
-    if (!email) throw new UnauthorizedException('No es posible validar la identidad del usuario.')
-    const user = await this.prismaService.users.findUnique({
-      where: { email },
-      include: {
-        roles: true
-      }
-    });
-    const rolStatus: boolean = user.roles?.isActive || false;
-    if (!user) throw new UnauthorizedException('El usuario no se encuentra registrado.')
-    if (!rolStatus) throw new UnauthorizedException('El rol asignado al usuario no se encuentra activo.')
-
-    if (isNew) {
-      await this.prismaService.users.update({
-        where: {
-          id: user.id,
-        }, data: { uid: userUid }
-      })
-    }
-    const modules = await this.prismaService.modules.findMany({
-      where: { permissions: { some: {} } },
-      include: {
-        permissions: {
-          where: {
-            rolesPermission: {
-              some: {
-                roleId: user.roleId
-              }
-            }
-          }
-        }
-      }
-    });
-    const modulesToReturn = modules.filter(module => module.permissions.length > 0)
-    return { user, token, idTokenClaims, modules: modulesToReturn }
   }
 
   async update(id: number, updateUserDto: UpdateUserDto, userId: number) {
@@ -220,14 +141,7 @@ export class UsersService {
         },
         data: updateUserDto,
       });
-      if (!updatedUser) {
-        throw new NotFoundException({
-          title: 'Usuario no actualizado.',
-          status: 404,
-          error: 'Usuario no actualizado.',
-          details: 'Usuario no actualizado..',
-        });
-      }
+      if (!updatedUser) throw new GenericResponse({}, HttpStatus.NOT_FOUND.valueOf(), 'Usuario no actualizado.');
       await this.utilService.saveLogs(userId, updateUserDto, auditAction);
       return updatedUser;
     } catch (error) {
@@ -236,27 +150,10 @@ export class UsersService {
   }
 
   private handleExceptions(error: any): never {
-    if (error.code === '23505') {
-      throw new ConflictException({
-        status: HttpStatus.CONFLICT.valueOf(),
-        details: error.detail,
-        error: 'Error creando usuario',
-        title: 'Error creando usuario',
-      });
-    }
-
-    if (error.code === 'P2002') {
-      throw new ConflictException({
-        status: HttpStatus.CONFLICT.valueOf(),
-        details: `Ya existe un registro duplicado por el campo ${error.meta.target[0]}`,
-        error: 'Error creando usuario, el usuario ya se encuentra registrado.',
-        title: 'El usuario ya se encuentra registrado.',
-      });
-    }
+    if (error.code === '23505') throw new GenericResponse({}, HttpStatus.CONFLICT.valueOf(), 'Error gestionando usuario.');
+    if (error.code === 'P2002') throw new GenericResponse({}, HttpStatus.CONFLICT.valueOf(), 'El usuario ya se encuentra registrado, validar correo o identificación');
     this.logger.error(`Error inesperado, revise los logs del servidor. Error ${JSON.stringify(error)}`)
-    throw new BadRequestException(
-      'Error inesperado, revise los logs del servidor.',
-    );
+    throw new GenericResponse({}, HttpStatus.BAD_REQUEST.valueOf(), 'Error inesperado del servidor');
   }
 
   async getAuthCode(authority, scopes, state) {
@@ -267,7 +164,7 @@ export class UsersService {
     try {
       return await confidentialClientApplication.getAuthCodeUrl(authCodeRequest)
     } catch (error) {
-      throw new InternalServerErrorException('Error consultando url login.')
+      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error consultando url login.');
     }
   }
 

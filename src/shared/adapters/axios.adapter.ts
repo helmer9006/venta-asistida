@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, HttpStatus } from '@nestjs/common';
 import { IHttpAdapter } from '../interfaces/http-adapter.interface';
+import { GenericResponse } from '../models/generic-response.model';
 
 
 
@@ -14,7 +15,7 @@ export class AxiosAdapter implements IHttpAdapter {
       return data;
     } catch (error) {
       this.logger.error(`Ha ocurrido un error en la petición http. Error ${JSON.stringify(error)}`)
-      throw new Error('Ha ocurrido un error en la petición http.');
+      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Ha ocurrido un error en la petición http.')
     }
   }
   async post<T>(url: string, data: any, headers: object): Promise<T> {
@@ -23,7 +24,7 @@ export class AxiosAdapter implements IHttpAdapter {
       return response.data;
     } catch (error) {
       this.logger.error(`Ha ocurrido un error en la petición http. Error ${JSON.stringify(error)}`)
-      throw new Error('Ha ocurrido un error en la petición http.');
+      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Ha ocurrido un error en la petición http.');
     }
   }
 }

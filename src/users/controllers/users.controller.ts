@@ -50,23 +50,4 @@ export class UsersController {
     const data = await this.usersService.findByMail(email);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario encontrado.');
   }
-
-  // PUBLIC
-  @Post('/getUserAndTokenByCode')
-  async getToken(@Body('code') code: string, @Req() req: Request, @Res() res: Response) {
-    const data = await this.usersService.findUserAndTokenByCode(code, req, res)
-    res.status(200).json({ data: data, statusCode: 200, message: 'Usuario identificado.' })
-  }
-
-  @Get('/signin')
-  async signIn(@Req() req: Request, @Res() res: Response) {
-    const url = await this.usersService.signIn()
-    res.status(200).json({ data: url, statusCode: 200, message: 'Success' })
-  }
-
-  @Get('/signout')
-  async signout(@Req() req: Request, @Res() res: Response) {
-    const url = await this.usersService.signout()
-    res.status(200).json({ data: url, statusCode: 200, message: 'Success' })
-  }
 }
