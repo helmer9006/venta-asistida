@@ -84,7 +84,7 @@ export class RolesService {
         },
       });
     } catch (error) {
-      throw new InternalServerErrorException('Error al buscar roles.')
+      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error al consultar roles.');
     }
   }
 
@@ -96,7 +96,6 @@ export class RolesService {
         updateRoleDto.name.toLowerCase().trim()
       }
       delete updateRoleDto.permissions
-      console.log("id", id, updateRoleDto, userId);
 
       role = await this.prismaService.roles.update({
         where: {
@@ -122,32 +121,11 @@ export class RolesService {
   }
 
   private handleExceptions(error: any): never {
-    if (error.code === '23505') {
-      throw new ConflictException({
-        status: HttpStatus.CONFLICT.valueOf(),
-        details: error.detail,
-        error: 'Error creando rol',
-        title: 'Error creando rol'
-      })
-    }
+    if (error.code === '23505') throw new GenericResponse({}, HttpStatus.CONFLICT.valueOf(), 'Error gestionando rol.');
+    if (error.code === 'P2002') throw new GenericResponse({}, HttpStatus.CONFLICT.valueOf(), 'El rol ya se encuentra registrado, validar el nombre.');
+    if (error.code === 'P2003') throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'No se pudo gestionar el rol por error de comunicación con la base de datos.');
+    throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error inesperado del servidor.');
 
-    if (error.code === 'P2002') {
-      throw new ConflictException({
-        status: HttpStatus.CONFLICT.valueOf(),
-        details: `Ya existe un registro duplicado por el campo ${error.meta.target[0]}`,
-        error: 'Error, el rol ya se encuentra registrado.',
-        title: 'El rol ya se encuentra registrado.'
-      })
-    }
-    if (error.code === 'P2003') {
-      throw new ConflictException({
-        status: HttpStatus.CONFLICT.valueOf(),
-        details: `Error ${error.meta.field_name}`,
-        error: 'Error, no se pudo insertar el rol',
-        title: 'No se pudo insertar el rol.'
-      })
-    }
-    throw new InternalServerErrorException('Error inesperado del servidor.')
   }
 
   async updateRolePermission(roleId: number, permissions: number[]) {
@@ -179,7 +157,7 @@ export class RolesService {
 
       return res;
     } catch (error) {
-      throw new InternalServerErrorException(`El Rol fue actualizado pero Se presento un error al actualizar sus permisos. Error ${error}`)
+      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'El Rol fue actualizado pero Se presento un error al actualizar sus permisos.');
     }
   }
 
@@ -202,7 +180,7 @@ export class RolesService {
       const modulesToReturn = modules.filter(module => module.permissions.length > 0)
       return modulesToReturn;
     } catch (error) {
-      throw new InternalServerErrorException('Error consultando permisos del rol.')
+      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error consultando permisos del rol.');
     }
   }
 }

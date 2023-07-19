@@ -29,13 +29,13 @@ export class AADStrategy extends PassportStrategy(BearerStrategy) {
         if (!user) {
             throw new UnauthorizedException('Token no es válido');
         }
-        const rolStatus: boolean = user.roles?.isActive || false;
-        if (!rolStatus) {
-            throw new UnauthorizedException('El rol asignado al usuario se encuentra inactivo.');
-        }
-        if (!user.isActive) {
-            throw new UnauthorizedException('Usuario se encuentra inactivo.');
-        }
+        // const rolStatus: boolean = user.roles?.isActive || false;
+        // if (!rolStatus) {
+        //     throw new UnauthorizedException('El rol asignado al usuario se encuentra inactivo.');
+        // }
+        // if (!user.isActive) {
+        //     throw new UnauthorizedException('Usuario se encuentra inactivo.');
+        // }
         return user;
     }
 }

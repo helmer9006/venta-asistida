@@ -25,6 +25,8 @@ let createRoleDto: CreateRoleDto = testExpectValues.createRoleDto;
 let paginationDto: PaginationDto = testExpectValues.paginationDto;
 const updateRoleDto: UpdateRoleDto = testExpectValues.dataUpdateRoleDto;
 
+// Inyeccion de dependencias y providers necesarios para ejecutar el servicio
+
 beforeEach(async () => {
   const module: TestingModule = await Test.createTestingModule({
     providers: [
@@ -60,8 +62,8 @@ describe('RolesService', () => {
   });
 });
 
-describe('RolesService Create role', () => {
-  it('servicio crear rol correctamente', async () => {
+describe('RolesService Role-create', () => {
+  it('deberia crear un rol correctamente en el sistema.', async () => {
     try {
       const serviceResponse = await rolesService.create(createRoleDto, 1);
       const genericResponseOK = new GenericResponseTestDataBuilder().build(
@@ -75,6 +77,7 @@ describe('RolesService Create role', () => {
         .mockResolvedValue(genericResponseOK);
       const controlllerResponse = await rolesController.create(createRoleDto, 1);
 
+      // Se crea el rol en BD y luego se guarda junto con su Id para los test posteriores
       if (controlllerResponse.statusCode === 200) {
         roleId = controlllerResponse.data.id;
         role = controlllerResponse.data;
@@ -87,12 +90,11 @@ describe('RolesService Create role', () => {
         'Rol creado correctamente.',
       );
     } catch (error) {
-      console.log("error", error);
       return error;
     }
   });
 
-  it('servicio crear rol correctamente con permisos asociados', async () => {
+  it('deberia crear un rol con permisos asociados en el sistema.', async () => {
     try {
       createRoleDto.permissions = [999999, 888888];
       createRoleDto.name = 'role test 2';
@@ -130,7 +132,7 @@ describe('RolesService Create role', () => {
     }
   });
 
-  it('la creacion de ocurre pero hay un error de servidor', async () => {
+  it('deberia de fallar la creacion del rol.', async () => {
     try {
       await rolesService.create(createRoleDto, 1);
     } catch (error) {
@@ -155,8 +157,8 @@ describe('RolesService Create role', () => {
   });
 });
 
-describe('RolesService FindAll roles', () => {
-  it('servicio listar roles correctamente', async () => {
+describe('RolesService Role-findAll', () => {
+  it('deberia de obtener los roles registrados en el sistema.', async () => {
     const serviceResponse = await rolesService.findAll(paginationDto);
 
     const genericResponseOK = new GenericResponseTestDataBuilder().build(
@@ -173,7 +175,7 @@ describe('RolesService FindAll roles', () => {
     expect(controlllerResponse.message).toStrictEqual('Roles encontrados.');
   });
 
-  it('servicio listar roles falla', async () => {
+  it('deberia de fallar al obtener los roles del sistema.', async () => {
     jest.spyOn(prismaService.roles, 'findMany').mockRejectedValue('error');
 
     try {
@@ -199,8 +201,8 @@ describe('RolesService FindAll roles', () => {
   });
 });
 
-describe('RolesService Update role', () => {
-  it('servicio actualizar rol correctamente', async () => {
+describe('RolesService Role-update', () => {
+  it('deberia actualizar un rol correctamente en el sistema.', async () => {
     const serviceResponse = await rolesService.update(roleId, updateRoleDto, 1);
 
     const genericResponseOK = new GenericResponseTestDataBuilder().build(
@@ -224,7 +226,7 @@ describe('RolesService Update role', () => {
     );
   });
 
-  it('servicio actualizar rol correctamente con permisos asociados', async () => {
+  it('deberia de actualizar un rol correctamente con permisos asociados.', async () => {
     updateRoleDto.permissions = [5];
     updateRoleDto.name = 'admin_test';
 
@@ -252,7 +254,7 @@ describe('RolesService Update role', () => {
     );
   });
 
-  it('servicio actualizar rol correctamente eliminando e insertando permisos', async () => {
+  it('deberia actualizar un rol, eliminando e insertando permisos.', async () => {
 
     updateRoleDto.permissions = [1, 2];
 
@@ -273,6 +275,8 @@ describe('RolesService Update role', () => {
       1
     );
 
+    // Luego de crear los permisos del rol, se eliminan de BD atraves del roleId
+
     if (controlllerResponse.statusCode === 200) {
       const currentRolePermission =
         await prismaService.rolesPermissions.findMany({
@@ -292,7 +296,7 @@ describe('RolesService Update role', () => {
     );
   });
 
-  it('servicio actualizar rol falla por que el rol se encuentra registrado', async () => {
+  it('deberia de fallar la actualizacion de un rol que no esta registrado.', async () => {
     try {
       updateRoleDto.name = 'administrador';
       await rolesService.update(2, updateRoleDto,1);
@@ -321,7 +325,7 @@ describe('RolesService Update role', () => {
     }
   });
 
-  it('servicio de actualizar rol, falla la actualización de permisos pero actializa el rol', async () => {
+  it('deberia de fallar la actualizacion de permisos pero deberia actualizar el rol.', async () => {
     jest
       .spyOn(prismaService.rolesPermissions, 'findMany')
       .mockRejectedValue('error');
@@ -346,6 +350,7 @@ describe('RolesService Update role', () => {
         1
       );
 
+      // Luego de actualizar el rol, se elimina de BD atraves de su Id
       await prismaService.roles.delete({
         where: { id: roleId },
       });

@@ -17,10 +17,10 @@ export class PermissionsService {
           description: 'asc',
         },
       });
-      permissions = permissions.filter(permission => !permissionsOnlySuper.includes(permission.id))
+      if(permissionsOnlySuper != undefined) permissions = permissions.filter(permission => !permissionsOnlySuper.includes(permission.id))
       return permissions;
     } catch (error) {
-      throw new InternalServerErrorException('Error consultando permisos.')
+      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error consultando permisos.');
     }
   }
 
@@ -40,7 +40,7 @@ export class PermissionsService {
       });
       return permission;
     } catch (error) {
-      throw new InternalServerErrorException('Error consultando permisos del rol.')
+      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error consultando permisos del rol.');
     }
   }
 }
