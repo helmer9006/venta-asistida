@@ -12,16 +12,6 @@ import {
 } from 'class-validator';
 
 export class CreateUserDto {
-  @IsOptional()
-  @IsNumber()
-  @ApiProperty({
-    description: 'Identificador unico del usuario',
-    nullable: true,
-    example: 1
-  })
-  id: number;
-
-
   @IsString()
   @IsOptional()
   @ApiProperty({
