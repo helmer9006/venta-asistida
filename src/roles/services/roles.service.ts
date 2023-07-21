@@ -35,7 +35,7 @@ export class RolesService {
         })
       }
       // Insert log for audit
-      const auditAction =  {
+      const auditAction = {
         action: 'ROLES_CREATE',
         description: 'Nuevo usuario creado en el sistema.',
       }
@@ -68,7 +68,7 @@ export class RolesService {
 
   async findAll(paginationDto: PaginationDto) {
     try {
-      const { limit = 10, offset = 0 } = paginationDto;
+      const { limit = 10, offset = 1 } = paginationDto;
       return await this.prismaService.roles.findMany({
         include: {
           rolesPermissions: {
@@ -78,7 +78,7 @@ export class RolesService {
           },
         },
         take: limit,
-        skip: offset,
+        skip: (offset - 1) * limit,
         orderBy: {
           name: 'asc',
         },

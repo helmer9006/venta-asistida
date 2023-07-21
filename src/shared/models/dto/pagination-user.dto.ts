@@ -5,19 +5,19 @@ import { IsOptional, IsPositive, Min } from 'class-validator';
 export class PaginationDto {
   @ApiProperty({
     default: 10,
-    description: 'How many rows do you need',
+    description: 'Cuantas filas.',
   })
   @IsOptional()
   @IsPositive()
-  @Type(() => Number) // enableImplicitCOnversions: true
+  @Type(() => Number)
   limit?: number;
 
   @ApiProperty({
     default: 0,
-    description: 'How many rows do you want to skip',
+    description: 'Cuántas filas quieres saltar',
   })
   @IsOptional()
   @Min(0)
-  @Type(() => Number) // enableImplicitCOnversions: true
+  @Type(() => Number) 
   offset?: number;
 }

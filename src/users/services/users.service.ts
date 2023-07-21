@@ -79,10 +79,10 @@ export class UsersService {
 
   async findAll(paginationDto: PaginationDto) {
     try {
-      const { limit = 10, offset = 0 } = paginationDto;
+      const { limit = 10, offset = 1 } = paginationDto;
       return await this.prismaService.users.findMany({
         take: limit,
-        skip: offset,
+        skip: (offset - 1) * limit,
         include: { ally: true, roles: true },
         orderBy: {
           name: 'asc',
@@ -93,7 +93,8 @@ export class UsersService {
     }
   }
 
-  async findByterm(term: string) {
+  async findByterm(term: string, paginationDto: PaginationDto) {
+    const { limit = 10, offset = 1 } = paginationDto;
     let where;
     where = isNumber(term.trim()) ? { identification: term } : {
       OR: [
@@ -124,6 +125,8 @@ export class UsersService {
           ally: true,
           roles: true
         },
+        take: limit,
+        skip: (offset - 1) * limit,
         orderBy: {
           name: 'asc',
         },
@@ -237,14 +240,17 @@ export class UsersService {
     return await this.utilService.sendEmailMule(urlMule, formData, headers)
   }
 
-  async findByRoleId(roleId: number) {
+  async findByRoleId(roleId: number, paginationDto: PaginationDto) {
     try {
+      const { limit = 10, offset = 1 } = paginationDto;
       return await this.prismaService.users.findMany({
         where: { roleId: roleId },
         include: {
           ally: true,
           roles: true
         },
+        take: limit,
+        skip: (offset - 1) * limit,
         orderBy: {
           name: 'asc',
         },

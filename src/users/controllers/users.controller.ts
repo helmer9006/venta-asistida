@@ -44,8 +44,8 @@ export class UsersController {
   @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
   @ApiOkResponse(SW_RESPONSES.getTermUserOkResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
-  async getByterm(@Param('term') term: string, @GetUser('id') userId: number) {
-    const data = await this.usersService.findByterm(term);
+  async getByterm(@Param('term') term: string, @GetUser('id') userId: number, @Query() paginationDto: PaginationDto) {
+    const data = await this.usersService.findByterm(term, paginationDto);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario encontrado.');
   }
 
@@ -77,8 +77,8 @@ export class UsersController {
   @ApiOkResponse(SW_RESPONSES.getByRoleIdUserOkResponse)
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
-  async getByRolId(@Param('roleId') roleId: string) {
-    const data = await this.usersService.findByRoleId(+roleId);
+  async getByRolId(@Param('roleId') roleId: string, @Query() paginationDto: PaginationDto) {
+    const data = await this.usersService.findByRoleId(+roleId, paginationDto);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario encontrado.');
   }
 }
