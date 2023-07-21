@@ -10,7 +10,7 @@ async function bootstrap() {
   });
   const passSwagger = process.env.SWAGGER_PASS;
   const config = new DocumentBuilder()
-    .setTitle('CS-venta-asistida - Laboratorio digital')
+    .setTitle('CS-venta-asistida')
     .setDescription('venta-asistida descripción de servicios.')
     .setVersion('0.1')
     .addTag('venta-asistida')
