@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsOptional, IsPositive, Min } from 'class-validator';
+import { IsInt, IsOptional, IsPositive, Min } from 'class-validator';
 
 export class PaginationDto {
   @ApiProperty({
@@ -18,6 +18,8 @@ export class PaginationDto {
   })
   @IsOptional()
   @Min(0)
-  @Type(() => Number) 
+  @Type(() => Number)
+  @IsInt()
+  @Min(1, { message: 'La página debe ser un número positivo mayor a 0.' })
   offset?: number;
 }
