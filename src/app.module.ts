@@ -1,19 +1,15 @@
-import { DummyModule } from './dummy/dummy.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import config from './config/config';
 import * as Joi from 'joi';
 import { environments } from './config/environments';
-import { RouterModule } from '@nestjs/core';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
-import { PrismaService } from './prisma/services/prisma.service';
 import { PermissionsModule } from './permissions/permissions.module';
 
 @Module({
   imports: [
-    DummyModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: environments[process.env.NODE_ENV] || '.env',
@@ -27,17 +23,6 @@ import { PermissionsModule } from './permissions/permissions.module';
       }),
     }),
     AuthModule,
-    RouterModule.register([
-      {
-        path: 'api/v1',
-        children: [
-          {
-            path: 'dummy',
-            module: DummyModule,
-          },
-        ],
-      },
-    ]),
     UsersModule,
     RolesModule,
     PermissionsModule,
