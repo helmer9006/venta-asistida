@@ -140,7 +140,7 @@ export class UsersService {
         },
         data: updateUserDto,
       });
-      if (!updatedUser) throw new GenericResponse({}, HttpStatus.NOT_FOUND.valueOf(), 'Usuario no actualizado.');
+      if (!updatedUser) throw new GenericResponse({}, HttpStatus.NOT_FOUND.valueOf(), 'El usuario no pudo ser actualizado.');
       await this.utilService.saveLogs(userId, updateUserDto, auditAction);
       return updatedUser;
     } catch (error) {
