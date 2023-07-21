@@ -93,6 +93,15 @@ export class CreateUserDto {
   })
   roleId: number;
 
+  @IsNumber()
+  @IsOptional()
+  @ApiProperty({
+    description: 'Id del aliado asignado al usuario.',
+    nullable: false,
+    example: 1
+  })
+  allyId: number;
+
   @IsOptional()
   @IsDate()
   createdAt: Date;

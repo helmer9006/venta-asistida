@@ -83,6 +83,7 @@ export class UsersService {
       return await this.prismaService.users.findMany({
         take: limit,
         skip: offset,
+        include: { ally: true, roles: true },
         orderBy: {
           name: 'asc',
         },
@@ -94,19 +95,40 @@ export class UsersService {
 
   async findByterm(term: string) {
     let where;
-    where = isNumber(term.trim()) ? { id: Number(term) } : IsUUID(term) ? { uid: term.toString().trim().toLowerCase() } : {
-      name: {
-        contains: term,
-        mode: 'insensitive',
-      }
-    };
+    where = isNumber(term.trim()) ? { identification: term } : {
+      OR: [
+        {
+          name: {
+            contains: term,
+            mode: 'insensitive'
+          },
+        },
+        {
+          ally: {
+            OR: [
+              {
+                name: {
+                  contains: term,
+                  mode: 'insensitive'
+                },
+              },
+            ]
+          },
+        },
+      ],
+    }
     try {
       return await this.prismaService.users.findMany({
         where,
+        include: {
+          ally: true,
+          roles: true
+        },
         orderBy: {
           name: 'asc',
         },
       });
+
     } catch (error) {
       throw new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error de servidor al consultar usuarios.');
     }
@@ -119,6 +141,10 @@ export class UsersService {
         where: {
           email: email.toString().trim().toLowerCase(),
         },
+        include: {
+          ally: true,
+          roles: true
+        },
       });
     } catch (error) {
       throw new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error de servidor al consultar usuarios.');
@@ -128,7 +154,7 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto, userId: number) {
-    const auditAction =  this.configuration.AUDIT_ACTIONS ? this.configuration.AUDIT_ACTIONS.USER_UPDATE : null;
+    const auditAction = this.configuration.AUDIT_ACTIONS ? this.configuration.AUDIT_ACTIONS.USER_UPDATE : null;
     try {
       if (updateUserDto.email) updateUserDto.email = updateUserDto.email.toLowerCase().trim();
       if (updateUserDto.name) updateUserDto.name = updateUserDto.name.toLowerCase().trim();
@@ -209,5 +235,23 @@ export class UsersService {
     };
     const urlMule = this.configService.get('MULE_URL_SEND_EMAIL');
     return await this.utilService.sendEmailMule(urlMule, formData, headers)
+  }
+
+  async findByRoleId(roleId: number) {
+    try {
+      return await this.prismaService.users.findMany({
+        where: { roleId: roleId },
+        include: {
+          ally: true,
+          roles: true
+        },
+        orderBy: {
+          name: 'asc',
+        },
+      });
+
+    } catch (error) {
+      throw new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error de servidor al consultar usuarios.');
+    }
   }
 }

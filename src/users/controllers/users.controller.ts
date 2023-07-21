@@ -18,7 +18,6 @@ import { SW_RESPONSES } from '@src/shared/helpers/responses-swagger';
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
-  //#region POST /users/create
   @Post('create')
   @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
   @ApiBody({ type: CreateUserDto })
@@ -30,9 +29,7 @@ export class UsersController {
     const data = await this.usersService.create(createUserDto, userId, roleId);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario creado correctamente.');
   }
-  //#endregion
 
-  //#region GET /users
   @Get()
   @ApiOkResponse(SW_RESPONSES.getUserOkResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
@@ -41,9 +38,8 @@ export class UsersController {
     const data = await this.usersService.findAll(paginationDto);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuarios encontrados');
   }
-  //#endregion
 
-  //#region GET /users/getByterm/:term
+
   @Get('/getByterm/:term')
   @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
   @ApiOkResponse(SW_RESPONSES.getTermUserOkResponse)
@@ -52,9 +48,7 @@ export class UsersController {
     const data = await this.usersService.findByterm(term);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario encontrado.');
   }
-  //#endregion
 
-  //#region PATCH /users/update/:id
   @Patch('update/:id')
   @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
   @ApiBody({ type: UpdateUserDto })
@@ -67,16 +61,24 @@ export class UsersController {
     const data = await this.usersService.update(+id, updateUserDto, userId);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario actualizado correctamente.');
   }
-  //#endregion
 
-  //#region GET /users/getByMail/:email:
   @Get('/getByMail/:email')
   @Auth()
   @ApiOkResponse(SW_RESPONSES.getMailUserOkResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
-  async getById(@Param('email', EmailPipe) email: string, @GetUser('id') userId: number) {
+  @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
+  async getByEmail(@Param('email', EmailPipe) email: string, @GetUser('id') userId: number) {
     const data = await this.usersService.findByMail(email);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario encontrado.');
   }
-  //#endregion
+
+  @Get('/getByRoleId/:roleId')
+  @Auth()
+  @ApiOkResponse(SW_RESPONSES.getByRoleIdUserOkResponse)
+  @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
+  @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
+  async getByRolId(@Param('roleId') roleId: string) {
+    const data = await this.usersService.findByRoleId(+roleId);
+    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Usuario encontrado.');
+  }
 }
