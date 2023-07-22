@@ -102,6 +102,23 @@ export class CreateUserDto {
   })
   allyId: number;
 
+  @IsNumber()
+  @IsOptional()
+  @ApiProperty({
+    description: 'Id del supervisor asignado al usuario.',
+    nullable: false,
+    example: 1
+  })
+  supervisorId: number;
+
+  @IsOptional()
+  @IsDate()
+  advisorStartDate: Date;
+
+  @IsOptional()
+  @IsDate()
+  advisorEndDate: Date;
+
   @IsOptional()
   @IsDate()
   createdAt: Date;

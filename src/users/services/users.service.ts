@@ -59,7 +59,7 @@ export class UsersService {
   logger = new Logger('UserService');
 
   async create(createUserDto: CreateUserDto, userId: number, roleId) {
-    await this.utilService.validatePermission('USER001', roleId)
+    // await this.utilService.validatePermission('USE001', roleId)
     const auditAction = this.configuration.AUDIT_ACTIONS ? this.configuration.AUDIT_ACTIONS.USER_CREATE : null;
     try {
       createUserDto.email = createUserDto.email.toLowerCase().trim();
@@ -83,12 +83,13 @@ export class UsersService {
       return await this.prismaService.users.findMany({
         take: limit,
         skip: (offset - 1) * limit,
-        include: { ally: true, roles: true },
+        include: { ally: true, roles: true, supervisor: true },
         orderBy: {
           name: 'asc',
         },
       });
     } catch (error) {
+      console.log(error);
       throw new GenericResponse([], HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error de servidor al consultar usuarios.');
     }
   }
@@ -123,7 +124,8 @@ export class UsersService {
         where,
         include: {
           ally: true,
-          roles: true
+          roles: true,
+          supervisor: true
         },
         take: limit,
         skip: (offset - 1) * limit,
@@ -146,7 +148,8 @@ export class UsersService {
         },
         include: {
           ally: true,
-          roles: true
+          roles: true,
+          supervisor: true
         },
       });
     } catch (error) {
@@ -247,7 +250,8 @@ export class UsersService {
         where: { roleId: roleId },
         include: {
           ally: true,
-          roles: true
+          roles: true,
+          supervisor: true
         },
         take: limit,
         skip: (offset - 1) * limit,

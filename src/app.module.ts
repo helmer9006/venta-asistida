@@ -7,6 +7,7 @@ import { environments } from './config/environments';
 import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
+import { ConfigAllyModule } from './config-ally/config-ally.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PermissionsModule } from './permissions/permissions.module';
     UsersModule,
     RolesModule,
     PermissionsModule,
+    ConfigAllyModule,
   ],
   controllers: [],
 })

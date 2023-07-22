@@ -6,27 +6,35 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 //Entidades
 model Users {
-  id                 Int      @id @default(autoincrement())
-  uid                String?  @unique @db.VarChar
-  name               String   @db.VarChar
-  lastname           String   @db.VarChar
-  identificationType String   @db.VarChar
-  identification     String   @unique @db.VarChar
-  email              String   @unique @db.VarChar
-  address            String?  @db.VarChar
-  phone              String?  @db.VarChar
-  isActive           Boolean  @default(true)
-  roles              Roles?   @relation(fields: [roleId], references: [id])
-  allyOf             Users[]  @relation("AllyRelation")
-  ally               Users?   @relation("AllyRelation", fields: [allyId], references: [id])
+  id                 Int          @id @default(autoincrement())
+  uid                String?      @unique @db.VarChar
+  name               String       @db.VarChar
+  lastname           String       @db.VarChar
+  identificationType String       @db.VarChar
+  identification     String       @unique @db.VarChar
+  email              String       @unique @db.VarChar
+  address            String?      @db.VarChar
+  phone              String?      @db.VarChar
+  isActive           Boolean      @default(true)
+  roles              Roles?       @relation(fields: [roleId], references: [id])
+  allyOf             Users[]      @relation("AllyRelation")
+  ally               Users?       @relation("AllyRelation", fields: [allyId], references: [id])
   roleId             Int
   allyId             Int?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  supervisorOf       Users[]      @relation("SupervisorRelation")
+  supervisor         Users?       @relation("SupervisorRelation", fields: [supervisorId], references: [id])
+  supervisorId       Int?
+  advisorStartDate   DateTime?
+  advisorEndDate     DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
   Logs               Logs[]
+  configAlly         ConfigAlly[]
 }
+
 model Roles {
   id               Int                @id @default(autoincrement())
   name             String             @unique @db.VarChar
@@ -70,11 +78,24 @@ model RolesPermissions {
 }
 
 model Logs {
-  id          Int      @id @default(autoincrement())
-  users       Users?   @relation(fields: [userId], references: [id])
-  userId      Int
-  description String   @db.VarChar
-  typeAction  String   @db.VarChar
-  data        String   @db.VarChar
-  createdAt   DateTime @default(now())
+  id           Int      @id @default(autoincrement())
+  users        Users?   @relation(fields: [actionUserId], references: [id])
+  actionUserId Int
+  description  String   @db.VarChar
+  typeAction   String   @db.VarChar
+  data         String   @db.VarChar
+  model        String   @db.VarChar
+  modelId      Int
+  createdAt    DateTime @default(now())
+}
+
+model ConfigAlly {
+  id                    Int     @id @default(autoincrement())
+  ally                  Users?  @relation(fields: [allyId], references: [id])
+  allyId                Int?
+  formBase              Boolean
+  name                  String
+  attributes            String
+  dataPolicy            String
+  noEssentialDataPolicy String
 }
