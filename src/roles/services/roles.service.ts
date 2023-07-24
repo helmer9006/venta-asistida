@@ -9,6 +9,7 @@ import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
 import { UtilsService } from '../../shared/services/utils.service';
 import { ConfigType } from '@nestjs/config';
 import config from '@src/config/config';
+import { LogsService } from '@src/logs/services/logs.service';
 
 @Injectable()
 export class RolesService {
@@ -17,7 +18,8 @@ export class RolesService {
     private readonly prismaService: PrismaService,
     private readonly utilService: UtilsService,
     @Inject(config.KEY)
-    private readonly configuration: ConfigType<typeof config>
+    private readonly configuration: ConfigType<typeof config>,
+    private readonly logs: LogsService
   ) {
   }
   logger = new Logger('RolesService');
@@ -35,12 +37,17 @@ export class RolesService {
         })
       }
       // Insert log for audit
-      const auditAction = {
-        action: 'ROLES_CREATE',
-        description: 'Nuevo usuario creado en el sistema.',
+      const { action, description } = this.configuration.AUDIT_ACTIONS ? this.configuration.AUDIT_ACTIONS.ROLE_CREATE : null;
+      const dataObject = {
+        actionUserId: userId,
+        description: description,
+        typeAction: action,
+        data: JSON.stringify(createRoleDto),
+        model: this.configuration.MODELS.ROLES,
+        modelId: role.id,
+        createdAt: new Date(),
       }
-
-      await this.utilService.saveLogs(userId, createRoleDto, auditAction)
+      await this.logs.create(dataObject);
 
       const roleFound = await this.prismaService.roles.findUnique({
         where: { id: role.id },
@@ -104,11 +111,17 @@ export class RolesService {
       })
 
       // Insert log for audit
-      const auditAction = {
-        action: 'ROLE_UPDATE',
-        description: 'El Rol fue actualizado.',
+      const { action, description } = this.configuration.AUDIT_ACTIONS ? this.configuration.AUDIT_ACTIONS.ROLE_UPDATE : null;
+      const dataObject = {
+        actionUserId: userId,
+        description: description,
+        typeAction: action,
+        data: JSON.stringify(updateRoleDto),
+        model: this.configuration.MODELS.ROLES,
+        modelId: role.id,
+        createdAt: new Date(),
       }
-      await this.utilService.saveLogs(userId, updateRoleDto, auditAction)
+      await this.logs.create(dataObject);
 
       if (permissions.length > 0) {
         await this.updateRolePermission(role.id, permissions);

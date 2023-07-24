@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { ConfigAllyModule } from './config-ally/config-ally.module';
+import { LogsModule } from './logs/logs.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { ConfigAllyModule } from './config-ally/config-ally.module';
     RolesModule,
     PermissionsModule,
     ConfigAllyModule,
+    LogsModule,
   ],
   controllers: [],
 })

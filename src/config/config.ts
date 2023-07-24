@@ -43,5 +43,12 @@ export default registerAs('config', () => {
         description: 'El rol fue desabilitado en el sistema.',
       },
     },
+    MODELS: {
+      USERS: 'Users',
+      ROLES: 'Roles',
+      PERMISSIONS: 'Permissions',
+      PRODUCTS: 'Products',
+      SALES: 'Sales',
+    }
   };
 });

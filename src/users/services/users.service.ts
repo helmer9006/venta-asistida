@@ -13,6 +13,7 @@ import { UtilsService } from '../../shared/services/utils.service';
 import { AxiosAdapter } from '@src/shared/adapters/axios.adapter';
 import { readFileSync } from 'fs';
 import { IResponseSignIn } from '@src/shared/interfaces/response-signin.interface';
+import { LogsService } from '@src/logs/services/logs.service';
 const confidentialClientConfig = {
   auth: {
     clientId: process.env.APP_CLIENT_ID,
@@ -54,13 +55,14 @@ export class UsersService {
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService,
     private readonly utilService: UtilsService,
+    private readonly logs: LogsService
   ) { }
 
   logger = new Logger('UserService');
 
   async create(createUserDto: CreateUserDto, userId: number, roleId) {
     // await this.utilService.validatePermission('USE001', roleId)
-    const auditAction = this.configuration.AUDIT_ACTIONS ? this.configuration.AUDIT_ACTIONS.USER_CREATE : null;
+    const { description, action } = this.configuration.AUDIT_ACTIONS ? this.configuration.AUDIT_ACTIONS.USER_CREATE : null;
     try {
       createUserDto.email = createUserDto.email.toLowerCase().trim();
       createUserDto.name = createUserDto.name.toLowerCase().trim();
@@ -70,7 +72,16 @@ export class UsersService {
       // email sent to a new user to finish registration
       await this.sendEmailInvitationMule(userName, createUserDto.email);
       // Insert log for audit
-      await this.utilService.saveLogs(userId, createUserDto, auditAction)
+      const dataObject = {
+        actionUserId: userId,
+        description: description,
+        typeAction: action,
+        data: JSON.stringify(createUserDto),
+        model: this.configuration.MODELS.USERS,
+        modelId: userCreated.id,
+        createdAt: new Date(),
+      }
+      this.logs.create(dataObject)
       return userCreated;
     } catch (error) {
       this.handleExceptions(error);
@@ -160,7 +171,7 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto, userId: number) {
-    const auditAction = this.configuration.AUDIT_ACTIONS ? this.configuration.AUDIT_ACTIONS.USER_UPDATE : null;
+    const { description, action } = this.configuration.AUDIT_ACTIONS ? this.configuration.AUDIT_ACTIONS.USER_UPDATE : null;
     try {
       if (updateUserDto.email) updateUserDto.email = updateUserDto.email.toLowerCase().trim();
       if (updateUserDto.name) updateUserDto.name = updateUserDto.name.toLowerCase().trim();
@@ -173,7 +184,16 @@ export class UsersService {
         data: updateUserDto,
       });
       if (!updatedUser) throw new GenericResponse({}, HttpStatus.NOT_FOUND.valueOf(), 'El usuario no pudo ser actualizado.');
-      await this.utilService.saveLogs(userId, updateUserDto, auditAction);
+      const dataObject = {
+        actionUserId: userId,
+        description: description,
+        typeAction: action,
+        data: JSON.stringify(updateUserDto),
+        model: this.configuration.MODELS.USERS,
+        modelId: updatedUser.id,
+        createdAt: new Date(),
+      }
+      this.logs.create(dataObject)
       return updatedUser;
     } catch (error) {
       this.handleExceptions(error);
