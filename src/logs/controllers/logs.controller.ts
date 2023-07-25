@@ -35,8 +35,8 @@ export class LogsController {
   @ApiBadRequestResponse(SW_RESPONSES.badRequestResponse)
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
-  async findLogsUser(@Body() getUsersLogsDto: RequestGetLogsDto, @GetUser('roleId') roleId: number, @Query() paginationDto: PaginationDto) {
-    const data = await this.logsService.findLogsUser(getUsersLogsDto, roleId, paginationDto);
+  async findLogs(@Body() getUsersLogsDto: RequestGetLogsDto, @GetUser('roleId') roleId: number, @Query() paginationDto: PaginationDto) {
+    const data = await this.logsService.findLogs(getUsersLogsDto, roleId, paginationDto);
     return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Logs encontrados.');
   }
 }

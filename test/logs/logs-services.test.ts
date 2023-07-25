@@ -55,16 +55,16 @@ describe('LogsService getLogs', () => {
 
     it('retorna los logs consultados.', async () => {
         const roleId = 2;
-        const logs = await logsService.findLogsUser(payloadGetLogs, roleId, pagination);
+        const logs = await logsService.findLogs(payloadGetLogs, roleId, pagination);
 
         const genericResponseOK = new GenericResponseTestDataBuilder().build(
             logs,
             HttpStatus.OK,
             'Logs encontrados.',
         );
-        jest.spyOn(logsController, 'findLogsUser').mockResolvedValue(genericResponseOK);
+        jest.spyOn(logsController, 'findLogs').mockResolvedValue(genericResponseOK);
 
-        const controlllerResponse = await logsController.findLogsUser(payloadGetLogs, roleId, pagination);
+        const controlllerResponse = await logsController.findLogs(payloadGetLogs, roleId, pagination);
 
         expect(controlllerResponse.data).toStrictEqual(logs);
         expect(controlllerResponse.statusCode).toStrictEqual(200);
@@ -73,7 +73,7 @@ describe('LogsService getLogs', () => {
     it('retorna error porque fecha final del rango de busqueda es mayor a la fecha actual.', async () => {
         const roleId = 2;
         try {
-            const logs = await logsService.findLogsUser(errorDatePayloadGetLogs, roleId);
+            const logs = await logsService.findLogs(errorDatePayloadGetLogs, roleId);
         } catch (error) {
 
             const genericResponseError = new GenericResponseTestDataBuilder().build(
@@ -81,9 +81,9 @@ describe('LogsService getLogs', () => {
                 HttpStatus.BAD_REQUEST,
                 'La fecha no puede ser mayor que la fecha actual.',
             );
-            jest.spyOn(logsController, 'findLogsUser').mockResolvedValue(genericResponseError);
+            jest.spyOn(logsController, 'findLogs').mockResolvedValue(genericResponseError);
 
-            const controlllerResponse = await logsController.findLogsUser(errorDatePayloadGetLogs, roleId, pagination);
+            const controlllerResponse = await logsController.findLogs(errorDatePayloadGetLogs, roleId, pagination);
             expect(controlllerResponse.data).toStrictEqual({});
             expect(controlllerResponse.statusCode).toStrictEqual(400);
         }

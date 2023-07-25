@@ -30,7 +30,7 @@ export class LogsService {
     }
   }
 
-  async findLogsUser(getUsersLogsDto: RequestGetLogsDto, roleId: number, paginationDto?: PaginationDto) {
+  async findLogs(getUsersLogsDto: RequestGetLogsDto, roleId: number, paginationDto?: PaginationDto) {
     await this.utilsService.validatePermission('LOG001', roleId)
     const { limit = 10, offset = 1 } = paginationDto;
     const { model, modelId, startDate, endDate } = getUsersLogsDto;
