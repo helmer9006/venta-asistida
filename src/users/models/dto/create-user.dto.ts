@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsUUID,
   IsString,
@@ -113,10 +114,12 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsDate()
+  @Type(() => Date)
   advisorStartDate: Date;
 
   @IsOptional()
   @IsDate()
+  @Type(() => Date)
   advisorEndDate: Date;
 
   @IsOptional()
