@@ -757,5 +757,98 @@ export const SW_RESPONSES = {
         },
       },
     },
-  }
+  },
+  createLogsOkResponse: {
+    description: 'Creacion del log exitosa.',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              example: {
+                actionUserId: 1,
+                description: 'El Rol fue actualizado.',
+                typeAction: 'ROLE_UPDATE',
+                data: { "name": "administrador-", "description": "", "isActive": true },
+                model: 'Roles',
+                modelId: 1
+              },
+            },
+            statusCode: { type: 'number', example: 200 },
+            message: { type: 'string', example: 'Log creado correctamente.' },
+          },
+        },
+      },
+    },
+  },
+  badRequestResponse: {
+    description: `Solicitud incorrecta.`,
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            statusCode: { type: 'number', example: 400 },
+            message: {
+              type: 'array', example: [
+                "actionUserId must be a positive number",
+                "actionUserId must be a number conforming to the specified constraints",
+              ],
+            },
+            error: { type: 'string', example: 'Solicitud incorrecta, retorna parámetros incorrectos.' }
+          },
+        },
+      },
+    },
+  },
+  getLogsUsersOkResponse: {
+    description: 'Respuesta consulta de logs por usuario.',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'array',
+              example: [
+                {
+                  "id": 15,
+                  "actionUserId": 1,
+                  "description": "El usuario fue actualizado",
+                  "typeAction": "USER_UPDATE",
+                  "data": "{\"isActive\":true,\"advisorEndDate\":null}",
+                  "model": "Users",
+                  "modelId": 6,
+                  "createdAt": "2023-07-24T17:02:55.338Z",
+                  "users": {
+                    "id": 1,
+                    "uid": "108bf273-3184-4a08-925a-3ede1c8264e7",
+                    "name": "Jamer",
+                    "lastname": "Rodriguez",
+                    "identificationType": "CC",
+                    "identification": "12345678",
+                    "email": "jfrodriguez@fundaciongruposocial.co",
+                    "address": "alle 20",
+                    "phone": "626546116",
+                    "isActive": true,
+                    "roleId": 2,
+                    "allyId": 1,
+                    "supervisorId": null,
+                    "advisorStartDate": null,
+                    "advisorEndDate": null,
+                    "createdAt": "2023-07-21T18:35:22.315Z",
+                    "updatedAt": "2023-07-24T03:54:07.351Z"
+                  }
+                },
+              ],
+            },
+            statusCode: { type: 'number', example: 200 },
+            message: { type: 'string', example: 'Lista de logs.' },
+          },
+        },
+      },
+    },
+  },
 };

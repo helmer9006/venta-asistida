@@ -75,8 +75,14 @@ export class RolesService {
 
   async findAll(paginationDto: PaginationDto) {
     try {
-      const { limit = 10, offset = 1 } = paginationDto;
+      const { limit = 10, offset = 1, name } = paginationDto;
       return await this.prismaService.roles.findMany({
+        where: {
+          name: {
+            contains: name,
+            mode: 'insensitive'
+          }
+        },
         include: {
           rolesPermissions: {
             include: {

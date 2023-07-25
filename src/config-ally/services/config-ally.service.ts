@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateConfigAllyDto } from './dto/create-config-ally.dto';
-import { UpdateConfigAllyDto } from './dto/update-config-ally.dto';
+import { CreateConfigAllyDto } from '../models/dto/create-config-ally.dto';
+import { UpdateConfigAllyDto } from '../models/dto/update-config-ally.dto';
 
 @Injectable()
 export class ConfigAllyService {

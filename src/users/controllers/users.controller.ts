@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Res, HttpStatus, Query, UseGuards, SetMetadata } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { ApiBody, ApiConflictResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBody, ApiConflictResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiOkResponse, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../models/dto/create-user.dto';
@@ -22,6 +22,7 @@ export class UsersController {
   @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
   @ApiBody({ type: CreateUserDto })
   @ApiOkResponse(SW_RESPONSES.createUserOkResponse)
+  @ApiBadRequestResponse(SW_RESPONSES.badRequestResponse)
   @ApiUnauthorizedResponse(SW_RESPONSES.createUserUnauthorizeResponse)
   @ApiConflictResponse(SW_RESPONSES.userConflictResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
@@ -55,6 +56,7 @@ export class UsersController {
   @ApiOkResponse(SW_RESPONSES.updateUserOkResponse)
   @ApiConflictResponse(SW_RESPONSES.userConflictResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
+  @ApiBadRequestResponse(SW_RESPONSES.badRequestResponse)
   @ApiNotFoundResponse(SW_RESPONSES.updateUserNotFoundResponse)
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @GetUser('id') userId: number) {

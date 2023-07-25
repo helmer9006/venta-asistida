@@ -1,11 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ConfigAllyService } from './config-ally.service';
-import { CreateConfigAllyDto } from './dto/create-config-ally.dto';
-import { UpdateConfigAllyDto } from './dto/update-config-ally.dto';
+import { ConfigAllyService } from '../services/config-ally.service';
+import { CreateConfigAllyDto } from '../models/dto/create-config-ally.dto';
+import { UpdateConfigAllyDto } from '../models/dto/update-config-ally.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('config-ally')
+@ApiTags('Services allies configuration')
 export class ConfigAllyController {
-  constructor(private readonly configAllyService: ConfigAllyService) {}
+  constructor(private readonly configAllyService: ConfigAllyService) { }
 
   @Post()
   create(@Body() createConfigAllyDto: CreateConfigAllyDto) {

@@ -1,3 +1,5 @@
+import { CreateLogDto } from "@src/logs/models/dto/create-log.dto";
+
 export const GeneralTestConstant = {
   ONCE: 1,
   ZERO: 0,
@@ -25,7 +27,7 @@ export const testExpectValues = {
     roleId: 2,
     isActive: true,
     createdAt: new Date('2023-07-10T02:12:50.070Z'),
-    updatedAt: new Date('2023-07-10T02:12:50.070Z'), 
+    updatedAt: new Date('2023-07-10T02:12:50.070Z'),
   },
 
   userFake: {
@@ -84,7 +86,7 @@ export const testExpectValues = {
     updatedAt: undefined,
   },
 
-  rolesPermissions:[
+  rolesPermissions: [
     { roleId: 101, permissionId: 2 },
     { roleId: 101, permissionId: 3 },
     { roleId: 101, permissionId: 4 }
@@ -130,5 +132,28 @@ export const testExpectValues = {
       isActive: true
     }
   ],
+
+  payloadCreateLog: {
+    description: 'Nuevo rol creado en el sistema.',
+    typeAction: 'ROLE_CREATE',
+    data: '{"id":1000,"name":"Administrador test 2","description":"administra parte del sistema","permissions":[],"isActive":false,"createdAt":"2023-07-05 22:36:45.559","updatedAt":"2023-07-05 22:36:45.559"}',
+    createdAt: new Date(),
+    actionUserId: 1,
+    model: 'Roles',
+    modelId: 2,
+  },
+
+  payloadGetLogs: {
+    modelId: 1,
+    model: "Users",
+    startDate: new Date(),
+    endDate: new Date(),
+  },
+  ErrorDatePayloadGetLogs: {
+    modelId: 1,
+    model: "Users",
+    startDate: new Date(),
+    endDate: new Date(new Date().setDate(new Date().getDate() + 1)),// tomorrow
+  }
 
 };

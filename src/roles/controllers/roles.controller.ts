@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Query, UseGuards } from '@nestjs/common';
-import { ApiConflictResponse, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { RolesService } from '../services/roles.service';
 import { CreateRoleDto } from '../models/dto/create-role.dto';
@@ -18,6 +18,7 @@ export class RolesController {
   @Post('create')
   @Auth(RolesEnum.SUPERADMINISTRADOR)
   @ApiCreatedResponse(SW_RESPONSES.createRoleOkResponse)
+  @ApiBadRequestResponse(SW_RESPONSES.badRequestResponse)
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
   @ApiConflictResponse(SW_RESPONSES.conflictRoleResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
@@ -39,6 +40,7 @@ export class RolesController {
   @Patch(':id')
   @Auth(RolesEnum.SUPERADMINISTRADOR)
   @ApiOkResponse(SW_RESPONSES.updateRoleOkResponse)
+  @ApiBadRequestResponse(SW_RESPONSES.badRequestResponse)
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
   @ApiConflictResponse(SW_RESPONSES.conflictRoleResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
@@ -49,7 +51,7 @@ export class RolesController {
 
   @Get('/getModulesByRole/:idRol')
   @Auth()
-  @ApiOkResponse(SW_RESPONSES.getModulesByRoleResponse) 
+  @ApiOkResponse(SW_RESPONSES.getModulesByRoleResponse)
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
   async getModulesByRole(@Param('idRol') idRol: string) {

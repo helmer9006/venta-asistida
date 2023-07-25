@@ -1,11 +1,10 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { ConfigService } from '@nestjs/config';
 import { AxiosAdapter } from '../adapters/axios.adapter';
 import { IReponseTokenMule } from '../interfaces/response-token-mule.interface';
 import { Logger, HttpStatus } from '@nestjs/common';
-
 @Injectable()
 export class UtilsService {
     constructor(private prismaService: PrismaService,
@@ -16,15 +15,12 @@ export class UtilsService {
         try {
             const permission = await this.prismaService.permissions.findMany({
                 where: {
-                    code: code
-                },
-                include: {
+                    code: code,
                     rolesPermission: {
-                        where: {
-                            roleId: roleId
-                        },
-                    }
+                        some: { roleId: roleId }
+                    },
                 },
+                include: { rolesPermission: true }
             });
             if (permission.length == 0)
                 throw Error
