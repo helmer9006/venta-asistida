@@ -8,6 +8,7 @@ import config from '@src/config/config';
 import { ConfigType } from '@nestjs/config';
 import { BadRequestException } from '../../shared/exceptions/bad_request.exception';
 import { UtilsService } from '@src/shared/services/utils.service';
+import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
 
 @Injectable()
 export class LogsService {
@@ -19,19 +20,19 @@ export class LogsService {
   ) { }
   logger = new Logger('LogsService');
   async create(createLogDto: CreateLogDto) {
-    try {+
-      console.log("create Log",createLogDto);
+    try {
       const logCreated = await this.prismaService.logs.create({ data: createLogDto })
       return logCreated;
     } catch (error) {
-      this.logger.error('Error creando log', error);
+      // this.logger.error('Error creando log', error);
       return {}
       // throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error de servidor al crear log.');
     }
   }
 
-  async findLogsUser(getUsersLogsDto: RequestGetLogsDto, roleId: number) {
+  async findLogsUser(getUsersLogsDto: RequestGetLogsDto, roleId: number, paginationDto?: PaginationDto) {
     await this.utilsService.validatePermission('LOG001', roleId)
+    const { limit = 10, offset = 1 } = paginationDto;
     const { model, modelId, startDate, endDate } = getUsersLogsDto;
     if (startDate > new Date() || endDate > new Date()) {
       throw new GenericResponse({}, HttpStatus.BAD_REQUEST.valueOf(), 'La fecha no puede ser mayor que la fecha actual.');
@@ -46,6 +47,8 @@ export class LogsService {
         },
         include: { users: true },
         orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip: (offset - 1) * limit,
       });
     } catch (error) {
       throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error de servidor al consultando logs.');

@@ -13,7 +13,7 @@ export class PaginationDto {
   limit?: number;
 
   @ApiProperty({
-    default: 0,
+    default: 1,
     description: 'Cuántas filas quieres saltar',
   })
   @IsOptional()
@@ -26,9 +26,9 @@ export class PaginationDto {
   @IsString({ message: 'El nombre debe ser de tipo texto y es obligatorio' })
   @IsOptional()
   @ApiProperty({
-    description: 'Nombre del rol',
+    description: 'Nombre',
     nullable: false,
-    example: 'Administrador',
+    example: 'nombre',
   })
-  name: string;
+  name?: string;
 }
