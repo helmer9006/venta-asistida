@@ -102,26 +102,3 @@ model ConfigAlly {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime? @updatedAt
 }
-
-model ResponsesFormClients {
-  id                 Int       @id @default(autoincrement())
-  ally               Users?    @relation(fields: [allyId], references: [id])
-  allyId             Int?
-  firtsName          String?
-  secondName         String?
-  surname            String?
-  secondSurname      String?
-  birthdate          DateTime?
-  department         String?
-  municipality       String?
-  identificationType String?
-  identification     String?
-  expeditionDate     DateTime?
-  expeditionPlace    String?
-  gender             String?
-  address            String?
-  phoneNumber        Int?
-  email              String?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime? @updatedAt
-}

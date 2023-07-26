@@ -5,15 +5,9 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
-  Req,
-  Res,
   HttpStatus,
   Query,
-  UseGuards,
-  SetMetadata,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
 import {
   ApiBadRequestResponse,
   ApiBody,
@@ -21,7 +15,6 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-  ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
