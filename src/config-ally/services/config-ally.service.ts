@@ -18,7 +18,7 @@ export class ConfigAllyService {
   async create(createConfigAllyDto: CreateConfigAllyDto) {
     let allyFound;
     try {
-      allyFound = await this.prismaService.configAlly.findUnique({
+      allyFound = await this.prismaService.users.findUnique({
         where: { id: createConfigAllyDto.allyId },
       });
     } catch (error) {
