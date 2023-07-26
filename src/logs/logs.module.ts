@@ -7,6 +7,6 @@ import { AxiosAdapter } from '@src/shared/adapters/axios.adapter';
 
 @Module({
   controllers: [LogsController],
-  providers: [LogsService, PrismaService, UtilsService, AxiosAdapter]
+  providers: [LogsService, PrismaService, UtilsService, AxiosAdapter],
 })
-export class LogsModule { }
+export class LogsModule {}

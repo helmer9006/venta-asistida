@@ -10,6 +10,14 @@ import { LogsService } from '@src/logs/services/logs.service';
 
 @Module({
   controllers: [RolesController],
-  providers: [RolesService, PrismaService, JwtService, ConfigService, UtilsService, AxiosAdapter, LogsService]
+  providers: [
+    RolesService,
+    PrismaService,
+    JwtService,
+    ConfigService,
+    UtilsService,
+    AxiosAdapter,
+    LogsService,
+  ],
 })
-export class RolesModule { }
+export class RolesModule {}

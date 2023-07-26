@@ -90,12 +90,14 @@ model Logs {
 }
 
 model ConfigAlly {
-  id                    Int     @id @default(autoincrement())
-  ally                  Users?  @relation(fields: [allyId], references: [id])
+  id                    Int       @id @default(autoincrement())
+  ally                  Users?    @relation(fields: [allyId], references: [id])
   allyId                Int?
-  formBase              Boolean
+  formBase              Boolean   @default(false)
   name                  String
   attributes            String
   dataPolicy            String
   noEssentialDataPolicy String
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime? @updatedAt
 }

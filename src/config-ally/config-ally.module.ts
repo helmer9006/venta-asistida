@@ -5,6 +5,6 @@ import { PrismaService } from '@src/prisma/services/prisma.service';
 
 @Module({
   controllers: [ConfigAllyController],
-  providers: [ConfigAllyService, PrismaService]
+  providers: [ConfigAllyService, PrismaService],
 })
 export class ConfigAllyModule {}

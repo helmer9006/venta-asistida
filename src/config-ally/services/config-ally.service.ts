@@ -1,20 +1,71 @@
 import { CreateConfigAllyDto } from '../models/dto/create-config-ally.dto';
 import { UpdateConfigAllyDto } from '../models/dto/update-config-ally.dto';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, Inject } from '@nestjs/common';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
+import { IAttributes } from '../interfaces/format-attributes.interface';
+import config from '@src/config/config';
+import { ConfigModule, ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class ConfigAllyService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    @Inject(config.KEY)
+    private readonly configuracion: ConfigType<typeof config>,
+  ) {}
 
-  create(createConfigAllyDto: CreateConfigAllyDto) {
-    return 'This action adds a new configAlly';
+  async create(createConfigAllyDto: CreateConfigAllyDto) {
+    let allyFound;
+    try {
+      allyFound = await this.prismaService.configAlly.findUnique({
+        where: { id: createConfigAllyDto.allyId },
+      });
+    } catch (error) {
+      throw new GenericResponse(
+        {},
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Error interno del servidor.',
+      );
+    }
+
+    if (!allyFound) {
+      throw new GenericResponse(
+        null,
+        HttpStatus.NOT_FOUND,
+        'No se pudo encontrar el aliado.',
+      );
+    }
+    const fileNameform = `Formulario ${allyFound.name}`;
+    const attributes: IAttributes[] = JSON.parse(
+      createConfigAllyDto.attributes,
+    );
+    const allAttributesRequired =
+      this.configuracion.ATTRIBUTES_REQUIRED_FORM_BASE.every(
+        (attributeRequire) =>
+          attributes
+            .map((attribute) => attribute.name)
+            .includes(attributeRequire),
+      );
+    if (!allAttributesRequired)
+      throw new GenericResponse(
+        {},
+        HttpStatus.BAD_REQUEST,
+        'Se requieren todos los atributos del formulario base.',
+      );
+    createConfigAllyDto.name = fileNameform;
+    createConfigAllyDto.formBase = false;
+    const body: any = createConfigAllyDto;
+    try {
+      return await this.prismaService.configAlly.create({ data: body });
+    } catch (error) {
+      throw new GenericResponse(
+        {},
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        'Error interno del servidor.',
+      );
+    }
   }
-
-  // findAll() {
-  //   return `This action returns all configAlly`;
-  // }
 
   async findOne(idFormBase: number, idAlly: number) {
     if (idFormBase && idAlly)
@@ -33,7 +84,7 @@ export class ConfigAllyService {
         return configFormBase;
       }
 
-      let configAlly = await this.prismaService.configAlly.findMany({
+      const configAlly = await this.prismaService.configAlly.findMany({
         where: {
           allyId: idAlly,
         },
@@ -41,8 +92,7 @@ export class ConfigAllyService {
           ally: true,
         },
       });
-
-      if (!configAlly)
+      if (configAlly.length == 0)
         throw new GenericResponse(
           {},
           HttpStatus.NOT_FOUND.valueOf(),
@@ -50,7 +100,7 @@ export class ConfigAllyService {
         );
 
       configAlly[0].attributes = JSON.parse(configAlly[0].attributes);
-      return configAlly;
+      return configAlly[0];
     } catch (error) {
       throw new GenericResponse(
         [],

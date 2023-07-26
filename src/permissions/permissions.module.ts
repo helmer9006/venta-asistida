@@ -6,6 +6,6 @@ import { ConfigService } from '@nestjs/config';
 
 @Module({
   controllers: [PermissionsController],
-  providers: [PermissionsService, PrismaService, ConfigService]
+  providers: [PermissionsService, PrismaService, ConfigService],
 })
-export class PermissionsModule { }
+export class PermissionsModule {}

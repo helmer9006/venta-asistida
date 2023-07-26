@@ -10,7 +10,10 @@ import { Users } from '@prisma/client';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(@Inject(config.KEY) configService: ConfigType<typeof config>, private readonly prismaService: PrismaService) {
+  constructor(
+    @Inject(config.KEY) configService: ConfigType<typeof config>,
+    private readonly prismaService: PrismaService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -23,7 +26,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     if (!sub) {
       throw new UnauthorizedException('Usuario no identificado.');
     }
-    const user = await this.prismaService.users.findUnique({ where: { uid: sub } })
+    const user = await this.prismaService.users.findUnique({
+      where: { uid: sub },
+    });
     if (!user) {
       throw new UnauthorizedException('Token no es válido');
     }

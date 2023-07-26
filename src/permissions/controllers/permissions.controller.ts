@@ -1,15 +1,29 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpStatus,
+} from '@nestjs/common';
 import { PermissionsService } from '../services/permissions.service';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { Auth } from '@src/auth/decorators';
 import { RolesEnum } from '@src/auth/enums/roles.enum';
-import { ApiInternalServerErrorResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { SW_RESPONSES } from '@src/shared/helpers/responses-swagger';
 
 @Controller('permissions')
 @ApiTags('Services permissions')
 export class PermissionsController {
-  constructor(private readonly permissionsService: PermissionsService) { }
+  constructor(private readonly permissionsService: PermissionsService) {}
 
   @Get()
   @Auth()
@@ -18,7 +32,11 @@ export class PermissionsController {
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
   async findAll() {
     const data = await this.permissionsService.findAll();
-    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Permisos encontrados.');
+    return new GenericResponse(
+      data,
+      HttpStatus.OK.valueOf(),
+      'Permisos encontrados.',
+    );
   }
 
   @Get('/getPermissionsByRole/:idRol')
@@ -28,6 +46,10 @@ export class PermissionsController {
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
   async getPermissionsByRole(@Param('idRol') idRol: string) {
     const data = await this.permissionsService.findPermissionsByRole(+idRol);
-    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Permisos encontrados.');
+    return new GenericResponse(
+      data,
+      HttpStatus.OK.valueOf(),
+      'Permisos encontrados.',
+    );
   }
 }

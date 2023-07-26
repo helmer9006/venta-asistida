@@ -17,33 +17,43 @@ export class LogsService {
     @Inject(config.KEY)
     private readonly configuration: ConfigType<typeof config>,
     private readonly utilsService: UtilsService,
-  ) { }
+  ) {}
   logger = new Logger('LogsService');
   async create(createLogDto: CreateLogDto) {
     try {
-      const logCreated = await this.prismaService.logs.create({ data: createLogDto })
+      const logCreated = await this.prismaService.logs.create({
+        data: createLogDto,
+      });
       return logCreated;
     } catch (error) {
-      // this.logger.error('Error creando log', error);
-      return {}
-      // throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error de servidor al crear log.');
+      return {};
     }
   }
 
-  async findLogs(getUsersLogsDto: RequestGetLogsDto, roleId: number, paginationDto?: PaginationDto) {
-    await this.utilsService.validatePermission('LOG001', roleId)
+  async findLogs(
+    getUsersLogsDto: RequestGetLogsDto,
+    roleId: number,
+    paginationDto?: PaginationDto,
+  ) {
+    await this.utilsService.validatePermission('LOG001', roleId);
     const { limit = 10, offset = 1 } = paginationDto;
     const { model, modelId, startDate, endDate } = getUsersLogsDto;
     if (startDate > new Date() || endDate > new Date()) {
-      throw new GenericResponse({}, HttpStatus.BAD_REQUEST.valueOf(), 'La fecha no puede ser mayor que la fecha actual.');
+      throw new GenericResponse(
+        {},
+        HttpStatus.BAD_REQUEST.valueOf(),
+        'La fecha no puede ser mayor que la fecha actual.',
+      );
     }
     try {
       return await this.prismaService.logs.findMany({
         where: {
-          model: model, modelId: modelId, createdAt: {
+          model: model,
+          modelId: modelId,
+          createdAt: {
             gte: startDate,
             lte: endDate,
-          }
+          },
         },
         include: { users: true },
         orderBy: { createdAt: 'desc' },
@@ -51,8 +61,11 @@ export class LogsService {
         skip: (offset - 1) * limit,
       });
     } catch (error) {
-      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error de servidor al consultando logs.');
+      throw new GenericResponse(
+        {},
+        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+        'Error de servidor al consultando logs.',
+      );
     }
   }
-
 }

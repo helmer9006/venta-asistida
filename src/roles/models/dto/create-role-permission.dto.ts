@@ -1,13 +1,20 @@
-import { IsArray, IsBoolean, IsDate, IsNumber, IsOptional, IsString } from "class-validator";
+import {
+  IsArray,
+  IsBoolean,
+  IsDate,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateRolePermissionDto {
-    @IsNumber()
-    roleId: number
+  @IsNumber()
+  roleId: number;
 
-    @IsNumber()
-    permissionId: number
+  @IsNumber()
+  permissionId: number;
 
-    @IsOptional()
-    @IsDate({ message: 'La fecha de actualización debe ser de tipo fecha' })
-    updatedAt: Date;
+  @IsOptional()
+  @IsDate({ message: 'La fecha de actualización debe ser de tipo fecha' })
+  updatedAt: Date;
 }

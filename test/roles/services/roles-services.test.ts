@@ -21,8 +21,8 @@ let rolesController: RolesController;
 let roleId: number;
 let role;
 
-let createRoleDto: CreateRoleDto = testExpectValues.createRoleDto;
-let paginationDto: PaginationDto = testExpectValues.paginationDto;
+const createRoleDto: CreateRoleDto = testExpectValues.createRoleDto;
+const paginationDto: PaginationDto = testExpectValues.paginationDto;
 const updateRoleDto: UpdateRoleDto = testExpectValues.dataUpdateRoleDto;
 
 // Inyeccion de dependencias y providers necesarios para ejecutar el servicio
@@ -75,7 +75,10 @@ describe('RolesService Role-create', () => {
       jest
         .spyOn(rolesController, 'create')
         .mockResolvedValue(genericResponseOK);
-      const controlllerResponse = await rolesController.create(createRoleDto, 1);
+      const controlllerResponse = await rolesController.create(
+        createRoleDto,
+        1,
+      );
 
       // Se crea el rol en BD y luego se guarda junto con su Id para los test posteriores
       if (controlllerResponse.statusCode === 200) {
@@ -109,7 +112,10 @@ describe('RolesService Role-create', () => {
       jest
         .spyOn(rolesController, 'create')
         .mockResolvedValue(genericResponseOK);
-      const controlllerResponse = await rolesController.create(createRoleDto, 1);
+      const controlllerResponse = await rolesController.create(
+        createRoleDto,
+        1,
+      );
 
       if (controlllerResponse.statusCode === 200)
         roleId = controlllerResponse.data.id;
@@ -145,7 +151,10 @@ describe('RolesService Role-create', () => {
         .spyOn(rolesController, 'create')
         .mockResolvedValue(genericResponseOK);
 
-      const controlllerResponse = await rolesController.create(createRoleDto, 1);
+      const controlllerResponse = await rolesController.create(
+        createRoleDto,
+        1,
+      );
 
       expect(controlllerResponse.data).toStrictEqual({});
       expect(controlllerResponse.statusCode).toStrictEqual(500);
@@ -216,7 +225,7 @@ describe('RolesService Role-update', () => {
     const controlllerResponse = await rolesController.update(
       `${roleId}`,
       updateRoleDto,
-      1
+      1,
     );
 
     expect(controlllerResponse.data).toStrictEqual(genericResponseOK.data);
@@ -244,7 +253,7 @@ describe('RolesService Role-update', () => {
     const controlllerResponse = await rolesController.update(
       `${roleId}`,
       updateRoleDto,
-      1
+      1,
     );
 
     expect(controlllerResponse.data).toStrictEqual(genericResponseOK.data);
@@ -255,7 +264,6 @@ describe('RolesService Role-update', () => {
   });
 
   it('deberia actualizar un rol, eliminando e insertando permisos.', async () => {
-
     updateRoleDto.permissions = [1, 2];
 
     const serviceResponse = await rolesService.update(roleId, updateRoleDto, 1);
@@ -272,7 +280,7 @@ describe('RolesService Role-update', () => {
     const controlllerResponse = await rolesController.update(
       `${roleId}`,
       updateRoleDto,
-      1
+      1,
     );
 
     // Luego de crear los permisos del rol, se eliminan de BD atraves del roleId
@@ -299,7 +307,7 @@ describe('RolesService Role-update', () => {
   it('deberia de fallar la actualizacion de un rol que no esta registrado.', async () => {
     try {
       updateRoleDto.name = 'administrador';
-      await rolesService.update(2, updateRoleDto,1);
+      await rolesService.update(2, updateRoleDto, 1);
     } catch (error) {
       const genericResponseOK = new GenericResponseTestDataBuilder().build(
         [],
@@ -314,7 +322,7 @@ describe('RolesService Role-update', () => {
       const controlllerResponse = await rolesController.update(
         `${roleId}`,
         updateRoleDto,
-        1
+        1,
       );
 
       expect(controlllerResponse.data).toStrictEqual([]);
@@ -347,7 +355,7 @@ describe('RolesService Role-update', () => {
       const controlllerResponse = await rolesController.update(
         `${roleId}`,
         updateRoleDto,
-        1
+        1,
       );
 
       // Luego de actualizar el rol, se elimina de BD atraves de su Id

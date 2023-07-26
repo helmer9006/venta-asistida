@@ -9,13 +9,15 @@ import { AuthService } from './services/auth.service';
 import { AuthController } from './controllers/auth.controller';
 
 @Module({
-  imports: [PassportModule.register({ defaultStrategy: 'jwt', AADStrategy }),
-  JwtModule.register({
-    secret: process.env.JWT_SECRET,
-    signOptions: { expiresIn: '8h' },
-  }),],
+  imports: [
+    PassportModule.register({ defaultStrategy: 'jwt', AADStrategy }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '8h' },
+    }),
+  ],
   providers: [JwtStrategy, PrismaService, AADStrategy, AuthService],
   exports: [JwtStrategy, PassportModule, JwtModule, PrismaService],
-  controllers: [AuthController]
+  controllers: [AuthController],
 })
-export class AuthModule { }
+export class AuthModule {}

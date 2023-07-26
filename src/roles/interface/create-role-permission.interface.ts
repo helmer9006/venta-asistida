@@ -1,5 +1,4 @@
-
 export interface ICreateRolePermission {
-    roleId: number
-    permissionId: number
+  roleId: number;
+  permissionId: number;
 }

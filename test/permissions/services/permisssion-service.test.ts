@@ -59,7 +59,9 @@ describe('PermissionsService Permissions-findAl', () => {
   });
 
   it('deberia de fallar al obtener los permisos del sistema.', async () => {
-    jest.spyOn(prismaService.permissions, 'findMany').mockRejectedValue('error')
+    jest
+      .spyOn(prismaService.permissions, 'findMany')
+      .mockRejectedValue('error');
 
     try {
       await permissionsService.findAll();
@@ -69,18 +71,18 @@ describe('PermissionsService Permissions-findAl', () => {
         error.response.statusCode,
         error.response.message,
       );
-  
+
       jest
         .spyOn(permissionsController, 'findAll')
         .mockResolvedValue(genericResponseOK);
       const controlllerResponse = await permissionsController.findAll();
-  
+
       expect(controlllerResponse.data).toStrictEqual([]);
       expect(controlllerResponse.statusCode).toStrictEqual(500);
-      expect(controlllerResponse.message).toStrictEqual('Error consultando permisos.');
+      expect(controlllerResponse.message).toStrictEqual(
+        'Error consultando permisos.',
+      );
     }
-
-    
   });
 });
 
@@ -106,7 +108,9 @@ describe('PermissionsService Permissions-findPermissionsByRole', () => {
   });
 
   it('deberia fallar al obtener los permisos asignados a un rol.', async () => {
-    jest.spyOn(prismaService.permissions, 'findMany').mockRejectedValue('error')
+    jest
+      .spyOn(prismaService.permissions, 'findMany')
+      .mockRejectedValue('error');
 
     try {
       await permissionsService.findPermissionsByRole(1);
@@ -116,16 +120,18 @@ describe('PermissionsService Permissions-findPermissionsByRole', () => {
         error.response.statusCode,
         error.response.message,
       );
-  
+
       jest
         .spyOn(permissionsController, 'getPermissionsByRole')
         .mockResolvedValue(genericResponseOK);
-      const controlllerResponse = await permissionsController.getPermissionsByRole(`${1}`);
-  
+      const controlllerResponse =
+        await permissionsController.getPermissionsByRole(`${1}`);
+
       expect(controlllerResponse.data).toStrictEqual([]);
       expect(controlllerResponse.statusCode).toStrictEqual(500);
-      expect(controlllerResponse.message).toStrictEqual('Error consultando permisos del rol.');
+      expect(controlllerResponse.message).toStrictEqual(
+        'Error consultando permisos del rol.',
+      );
     }
-
   });
 });

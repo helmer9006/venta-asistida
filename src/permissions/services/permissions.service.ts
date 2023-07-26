@@ -1,4 +1,8 @@
-import { HttpStatus, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { Permission } from '../entities/permission.entity';
@@ -8,19 +12,31 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PermissionsService {
-  constructor(private readonly prismaService: PrismaService, private readonly configService: ConfigService) { }
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
   async findAll() {
-    const permissionsOnlySuper = this.configService.get('PERMISSIONS_DEFAULT_SUPERADMINISTRADOR');
+    const permissionsOnlySuper = this.configService.get(
+      'PERMISSIONS_DEFAULT_SUPERADMINISTRADOR',
+    );
     try {
       let permissions = await this.prismaService.permissions.findMany({
         orderBy: {
           description: 'asc',
         },
       });
-      if(permissionsOnlySuper != undefined) permissions = permissions.filter(permission => !permissionsOnlySuper.includes(permission.id))
+      if (permissionsOnlySuper != undefined)
+        permissions = permissions.filter(
+          (permission) => !permissionsOnlySuper.includes(permission.id),
+        );
       return permissions;
     } catch (error) {
-      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error consultando permisos.');
+      throw new GenericResponse(
+        {},
+        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+        'Error consultando permisos.',
+      );
     }
   }
 
@@ -30,9 +46,9 @@ export class PermissionsService {
         include: {
           rolesPermission: {
             where: {
-              roleId: roleId
+              roleId: roleId,
             },
-          }
+          },
         },
         orderBy: {
           description: 'asc',
@@ -40,7 +56,11 @@ export class PermissionsService {
       });
       return permission;
     } catch (error) {
-      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error consultando permisos del rol.');
+      throw new GenericResponse(
+        {},
+        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+        'Error consultando permisos del rol.',
+      );
     }
   }
 }

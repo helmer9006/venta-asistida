@@ -19,12 +19,12 @@ let utilService: UtilsService;
 let userController: UsersController;
 let userId: number;
 
-let createUserDto: CreateUserDto = testExpectValues.createUserDto;
-let paginationDto: PaginationDto = testExpectValues.paginationDto;
+const createUserDto: CreateUserDto = testExpectValues.createUserDto;
+const paginationDto: PaginationDto = testExpectValues.paginationDto;
 const dataUpdateDto: UpdateUserDto = testExpectValues.dataUpdateUserDto;
 
 let testUser: any;
-let isOk: boolean = false;
+let isOk = false;
 
 // Inyeccion de dependencias y providers necesarios para ejecutar el servicio
 
@@ -74,7 +74,7 @@ describe('UsersService User-create', () => {
       1,
       1,
     );
-    
+
     // Crea el usuario en la BD y obtiene su Id para usarlo en los test posteriores
     if (controlllerResponse.statusCode === 200)
       userId = controlllerResponse.data.id;
@@ -112,7 +112,6 @@ describe('UsersService User-create', () => {
         'Error creando usuario, el usuario ya se encuentra registrado.',
       );
     }
-
   });
 });
 
@@ -325,11 +324,7 @@ describe('UserService Users-update', () => {
     jest.spyOn(prismaService.users, 'update').mockResolvedValueOnce(null);
 
     try {
-      await usersService.update(
-        999999999999,
-        dataUpdateDto,
-        1,
-      );
+      await usersService.update(999999999999, dataUpdateDto, 1);
     } catch (error) {
       const genericResponseError = new GenericResponseTestDataBuilder().build(
         [],

@@ -1,4 +1,4 @@
-import { CreateLogDto } from "@src/logs/models/dto/create-log.dto";
+import { CreateLogDto } from '@src/logs/models/dto/create-log.dto';
 
 export const GeneralTestConstant = {
   ONCE: 1,
@@ -65,7 +65,6 @@ export const testExpectValues = {
     updatedAt: undefined,
   },
 
-
   paginationDto: {
     limit: 3,
     offset: 0,
@@ -89,7 +88,7 @@ export const testExpectValues = {
   rolesPermissions: [
     { roleId: 101, permissionId: 2 },
     { roleId: 101, permissionId: 3 },
-    { roleId: 101, permissionId: 4 }
+    { roleId: 101, permissionId: 4 },
   ],
 
   userUpdated: {
@@ -129,8 +128,8 @@ export const testExpectValues = {
       updatedAt: '2023-07-05 22:36:45.559',
       code: 'USER001',
       moduleId: 1,
-      isActive: true
-    }
+      isActive: true,
+    },
   ],
 
   payloadCreateLog: {
@@ -151,19 +150,18 @@ export const testExpectValues = {
 
   payloadGetLogs: {
     modelId: 1,
-    model: "Users",
+    model: 'Users',
     startDate: new Date(),
     endDate: new Date(),
   },
   ErrorDatePayloadGetLogs: {
     modelId: 1,
-    model: "Users",
+    model: 'Users',
     startDate: new Date(),
-    endDate: new Date(new Date().setDate(new Date().getDate() + 1)),// tomorrow
+    endDate: new Date(new Date().setDate(new Date().getDate() + 1)), // tomorrow
   },
   pagination: {
     limit: 10,
     offset: 1,
-  }
-
+  },
 };

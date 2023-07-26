@@ -1,5 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Query, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiInternalServerErrorResponse, ApiOkResponse, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpStatus,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiConflictResponse,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 import { RolesService } from '../services/roles.service';
 import { CreateRoleDto } from '../models/dto/create-role.dto';
@@ -13,7 +33,7 @@ import { SW_RESPONSES } from '@src/shared/helpers/responses-swagger';
 @Controller('roles')
 @ApiTags('Services roles')
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) { }
+  constructor(private readonly rolesService: RolesService) {}
 
   @Post('create')
   @Auth(RolesEnum.SUPERADMINISTRADOR)
@@ -22,9 +42,16 @@ export class RolesController {
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
   @ApiConflictResponse(SW_RESPONSES.conflictRoleResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
-  async create(@Body() createRoleDto: CreateRoleDto, @GetUser('id') userId: number) {
-    const data = await this.rolesService.create(createRoleDto, userId)
-    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Rol creado correctamente.');
+  async create(
+    @Body() createRoleDto: CreateRoleDto,
+    @GetUser('id') userId: number,
+  ) {
+    const data = await this.rolesService.create(createRoleDto, userId);
+    return new GenericResponse(
+      data,
+      HttpStatus.OK.valueOf(),
+      'Rol creado correctamente.',
+    );
   }
 
   @Get()
@@ -34,7 +61,11 @@ export class RolesController {
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
   async findAll(@Query() paginationDto: PaginationDto) {
     const data = await this.rolesService.findAll(paginationDto);
-    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Roles encontrados.');
+    return new GenericResponse(
+      data,
+      HttpStatus.OK.valueOf(),
+      'Roles encontrados.',
+    );
   }
 
   @Patch(':id')
@@ -44,9 +75,17 @@ export class RolesController {
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
   @ApiConflictResponse(SW_RESPONSES.conflictRoleResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
-  async update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto, @GetUser('id') userId: number) {
+  async update(
+    @Param('id') id: string,
+    @Body() updateRoleDto: UpdateRoleDto,
+    @GetUser('id') userId: number,
+  ) {
     const data = await this.rolesService.update(+id, updateRoleDto, userId);
-    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Rol actualizado correctamente.');
+    return new GenericResponse(
+      data,
+      HttpStatus.OK.valueOf(),
+      'Rol actualizado correctamente.',
+    );
   }
 
   @Get('/getModulesByRole/:idRol')
@@ -56,7 +95,10 @@ export class RolesController {
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
   async getModulesByRole(@Param('idRol') idRol: string) {
     const data = await this.rolesService.findModulesByRole(+idRol);
-    return new GenericResponse(data, HttpStatus.OK.valueOf(), 'Modulos encontrados.');
+    return new GenericResponse(
+      data,
+      HttpStatus.OK.valueOf(),
+      'Modulos encontrados.',
+    );
   }
-
 }

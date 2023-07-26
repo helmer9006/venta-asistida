@@ -8,6 +8,12 @@ import { LogsService } from '@src/logs/services/logs.service';
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService, PrismaService, UtilsService, AxiosAdapter, LogsService],
+  providers: [
+    UsersService,
+    PrismaService,
+    UtilsService,
+    AxiosAdapter,
+    LogsService,
+  ],
 })
-export class UsersModule { }
+export class UsersModule {}

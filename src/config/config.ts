@@ -49,6 +49,23 @@ export default registerAs('config', () => {
       PERMISSIONS: 'Permissions',
       PRODUCTS: 'Products',
       SALES: 'Sales',
-    }
+    },
+    ATTRIBUTES_REQUIRED_FORM_BASE: [
+      'firtsName',
+      'secondName',
+      'surname',
+      'secondSurname',
+      'birthdate',
+      'department',
+      'municipality',
+      'identificationType',
+      'identification',
+      'expeditionDate',
+      'expeditionPlace',
+      'gender',
+      'address',
+      'phoneNumber',
+      'email',
+    ],
   };
 });

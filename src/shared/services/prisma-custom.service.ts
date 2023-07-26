@@ -3,13 +3,13 @@ import { PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class PrismaServiceCustom {
-    constructor(private readonly prisma: PrismaClient) { }
+  constructor(private readonly prisma: PrismaClient) {}
 
-    async transaction<T>(fn: (prisma: PrismaClient) => Promise<T>): Promise<T> {
-        return this.prisma.$transaction(fn);
-    }
+  async transaction<T>(fn: (prisma: PrismaClient) => Promise<T>): Promise<T> {
+    return this.prisma.$transaction(fn);
+  }
 
-    get queryBuilder() {
-        return this.prisma;
-    }
+  get queryBuilder() {
+    return this.prisma;
+  }
 }

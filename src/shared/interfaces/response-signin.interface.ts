@@ -1,5 +1,5 @@
 export interface IResponseSignIn {
-    data: string;
-    statusCode: number;
-    message: string;
+  data: string;
+  statusCode: number;
+  message: string;
 }

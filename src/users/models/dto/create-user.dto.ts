@@ -18,21 +18,21 @@ export class CreateUserDto {
   @ApiProperty({
     description: 'Identificador unico del usuario en B2C',
     nullable: true,
-    example: "2f16c33b-73dc-4df1-9219-558540bcdf19"
+    example: '2f16c33b-73dc-4df1-9219-558540bcdf19',
   })
   uid: string;
   @IsString()
   @ApiProperty({
     description: 'Nombre del usuurio',
     nullable: true,
-    example: "Juan"
+    example: 'Juan',
   })
   name: string;
   @IsString()
   @ApiProperty({
     description: 'Apellido del usuario',
     nullable: false,
-    example: "Perez ramirez"
+    example: 'Perez ramirez',
   })
   lastname: string;
 
@@ -40,7 +40,7 @@ export class CreateUserDto {
   @ApiProperty({
     description: 'Tipo de identificación del usuario',
     nullable: false,
-    example: "CC"
+    example: 'CC',
   })
   identificationType: string;
 
@@ -48,7 +48,7 @@ export class CreateUserDto {
   @ApiProperty({
     description: 'Identificación del usuario',
     nullable: false,
-    example: "1051215141"
+    example: '1051215141',
   })
   identification;
 
@@ -56,7 +56,7 @@ export class CreateUserDto {
   @ApiProperty({
     description: 'Dirección residencia del usuario',
     nullable: false,
-    example: "Cra 30 # 20-51"
+    example: 'Cra 30 # 20-51',
   })
   address: string;
 
@@ -64,7 +64,7 @@ export class CreateUserDto {
   @ApiProperty({
     description: 'Telefono o celular del usuario',
     nullable: false,
-    example: "32031515542"
+    example: '32031515542',
   })
   phone: string;
 
@@ -73,7 +73,7 @@ export class CreateUserDto {
   @ApiProperty({
     description: 'Correo del usuario',
     nullable: false,
-    example: "juan123@gmail.com"
+    example: 'juan123@gmail.com',
   })
   email: string;
 
@@ -82,7 +82,7 @@ export class CreateUserDto {
   @ApiProperty({
     description: 'Estado del usuario',
     nullable: false,
-    example: true
+    example: true,
   })
   isActive: boolean;
 
@@ -90,7 +90,7 @@ export class CreateUserDto {
   @ApiProperty({
     description: 'Id del rol asignado al usuario.',
     nullable: false,
-    example: 1
+    example: 1,
   })
   roleId: number;
 
@@ -99,7 +99,7 @@ export class CreateUserDto {
   @ApiProperty({
     description: 'Id del aliado asignado al usuario.',
     nullable: false,
-    example: 1
+    example: 1,
   })
   allyId: number;
 
@@ -108,7 +108,7 @@ export class CreateUserDto {
   @ApiProperty({
     description: 'Id del supervisor asignado al usuario.',
     nullable: false,
-    example: 1
+    example: 1,
   })
   supervisorId: number;
 

@@ -1,4 +1,10 @@
-import { Injectable, HttpStatus, InternalServerErrorException, Logger, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  HttpStatus,
+  InternalServerErrorException,
+  Logger,
+  Inject,
+} from '@nestjs/common';
 import { CreateRoleDto } from '../models/dto/create-role.dto';
 import { UpdateRoleDto } from '../models/dto/update-role.dto';
 import { PrismaService } from '@src/prisma/services/prisma.service';
@@ -13,31 +19,35 @@ import { LogsService } from '@src/logs/services/logs.service';
 
 @Injectable()
 export class RolesService {
-
   constructor(
     private readonly prismaService: PrismaService,
     private readonly utilService: UtilsService,
     @Inject(config.KEY)
     private readonly configuration: ConfigType<typeof config>,
-    private readonly logs: LogsService
-  ) {
-  }
+    private readonly logs: LogsService,
+  ) {}
   logger = new Logger('RolesService');
   async create(createRoleDto: CreateRoleDto, userId: number) {
     let role;
     try {
       const permissions = createRoleDto.permissions;
       createRoleDto.name = createRoleDto.name.toLowerCase().trim();
-      delete createRoleDto.permissions
-      role = await this.prismaService.roles.create({ data: createRoleDto })
+      delete createRoleDto.permissions;
+      role = await this.prismaService.roles.create({ data: createRoleDto });
       if (permissions.length > 0) {
-        let rolesPermissions: ICreateRolePermission[] = permissions.map(permission => { return { roleId: role.id, permissionId: permission } })
+        const rolesPermissions: ICreateRolePermission[] = permissions.map(
+          (permission) => {
+            return { roleId: role.id, permissionId: permission };
+          },
+        );
         await this.prismaService.rolesPermissions.createMany({
           data: rolesPermissions,
-        })
+        });
       }
       // Insert log for audit
-      const { action, description } = this.configuration.AUDIT_ACTIONS ? this.configuration.AUDIT_ACTIONS.ROLE_CREATE : null;
+      const { action, description } = this.configuration.AUDIT_ACTIONS
+        ? this.configuration.AUDIT_ACTIONS.ROLE_CREATE
+        : null;
       const dataObject = {
         actionUserId: userId,
         description: description,
@@ -46,7 +56,7 @@ export class RolesService {
         model: this.configuration.MODELS.ROLES,
         modelId: role.id,
         createdAt: new Date(),
-      }
+      };
       await this.logs.create(dataObject);
 
       const roleFound = await this.prismaService.roles.findUnique({
@@ -55,21 +65,23 @@ export class RolesService {
           rolesPermissions: {
             select: {
               permissions: true,
-            }
+            },
           },
         },
       });
-      const permissionsByRole = roleFound.rolesPermissions.map(permission => permission.permissions)
+      const permissionsByRole = roleFound.rolesPermissions.map(
+        (permission) => permission.permissions,
+      );
       delete roleFound.rolesPermissions;
       return { ...roleFound, permissions: permissionsByRole };
       //return role;
     } catch (error) {
       if (role && role.id) {
         await this.prismaService.roles.delete({
-          where: { id: role.id }
-        })
+          where: { id: role.id },
+        });
       }
-      this.handleExceptions(error)
+      this.handleExceptions(error);
     }
   }
 
@@ -80,8 +92,8 @@ export class RolesService {
         where: {
           name: {
             contains: name,
-            mode: 'insensitive'
-          }
+            mode: 'insensitive',
+          },
         },
         include: {
           rolesPermissions: {
@@ -97,7 +109,11 @@ export class RolesService {
         },
       });
     } catch (error) {
-      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error al consultar roles.');
+      throw new GenericResponse(
+        {},
+        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+        'Error al consultar roles.',
+      );
     }
   }
 
@@ -106,18 +122,21 @@ export class RolesService {
     try {
       const permissions = updateRoleDto?.permissions || [];
       if (updateRoleDto && updateRoleDto.name) {
-        updateRoleDto.name.toLowerCase().trim()
+        updateRoleDto.name.toLowerCase().trim();
       }
-      delete updateRoleDto.permissions
+      delete updateRoleDto.permissions;
 
       role = await this.prismaService.roles.update({
         where: {
           id: id,
-        }, data: updateRoleDto
-      })
+        },
+        data: updateRoleDto,
+      });
 
       // Insert log for audit
-      const { action, description } = this.configuration.AUDIT_ACTIONS ? this.configuration.AUDIT_ACTIONS.ROLE_UPDATE : null;
+      const { action, description } = this.configuration.AUDIT_ACTIONS
+        ? this.configuration.AUDIT_ACTIONS.ROLE_UPDATE
+        : null;
       const dataObject = {
         actionUserId: userId,
         description: description,
@@ -126,7 +145,7 @@ export class RolesService {
         model: this.configuration.MODELS.ROLES,
         modelId: role.id,
         createdAt: new Date(),
-      }
+      };
       await this.logs.create(dataObject);
 
       if (permissions.length > 0) {
@@ -134,49 +153,86 @@ export class RolesService {
       }
       return role;
     } catch (error) {
-      this.logger.error(error)
-      this.handleExceptions(error)
+      this.logger.error(error);
+      this.handleExceptions(error);
     }
   }
 
   private handleExceptions(error: any): never {
-    if (error.code === '23505') throw new GenericResponse({}, HttpStatus.CONFLICT.valueOf(), 'Error gestionando rol.');
-    if (error.code === 'P2002') throw new GenericResponse({}, HttpStatus.CONFLICT.valueOf(), 'El rol ya se encuentra registrado, validar el nombre.');
-    if (error.code === 'P2003') throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'No se pudo gestionar el rol por error de comunicación con la base de datos.');
-    throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error inesperado del servidor.');
-
+    if (error.code === '23505')
+      throw new GenericResponse(
+        {},
+        HttpStatus.CONFLICT.valueOf(),
+        'Error gestionando rol.',
+      );
+    if (error.code === 'P2002')
+      throw new GenericResponse(
+        {},
+        HttpStatus.CONFLICT.valueOf(),
+        'El rol ya se encuentra registrado, validar el nombre.',
+      );
+    if (error.code === 'P2003')
+      throw new GenericResponse(
+        {},
+        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+        'No se pudo gestionar el rol por error de comunicación con la base de datos.',
+      );
+    throw new GenericResponse(
+      {},
+      HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+      'Error inesperado del servidor.',
+    );
   }
 
   async updateRolePermission(roleId: number, permissions: number[]) {
     try {
-      let currentPermissions = await this.prismaService.rolesPermissions.findMany({
-        where: { roleId: roleId }
-      })
-      const IdsCurrentRolesPermissions = currentPermissions.length > 0 ? currentPermissions.map(permission => permission.permissionId) : []
-      let permissionsToInsert = permissions.filter(permiso => !IdsCurrentRolesPermissions.includes(permiso))
-      let permissionsToDelete = IdsCurrentRolesPermissions.filter(permiso => !permissions.includes(permiso))
-      let IdsPermissionsToDelete = currentPermissions.filter(permission => permissionsToDelete.includes(permission.permissionId)).map(item => item.id)
+      const currentPermissions =
+        await this.prismaService.rolesPermissions.findMany({
+          where: { roleId: roleId },
+        });
+      const IdsCurrentRolesPermissions =
+        currentPermissions.length > 0
+          ? currentPermissions.map((permission) => permission.permissionId)
+          : [];
+      const permissionsToInsert = permissions.filter(
+        (permiso) => !IdsCurrentRolesPermissions.includes(permiso),
+      );
+      const permissionsToDelete = IdsCurrentRolesPermissions.filter(
+        (permiso) => !permissions.includes(permiso),
+      );
+      const IdsPermissionsToDelete = currentPermissions
+        .filter((permission) =>
+          permissionsToDelete.includes(permission.permissionId),
+        )
+        .map((item) => item.id);
 
       if (IdsPermissionsToDelete && IdsPermissionsToDelete.length > 0) {
         await this.prismaService.rolesPermissions.deleteMany({
           where: {
             id: {
               in: IdsPermissionsToDelete,
-            }
+            },
           },
         });
       }
       let res;
       if (permissionsToInsert && permissionsToInsert.length > 0) {
-        let rolesPermissions: ICreateRolePermission[] = permissionsToInsert.map(permission => { return { roleId: roleId, permissionId: permission } })
+        const rolesPermissions: ICreateRolePermission[] =
+          permissionsToInsert.map((permission) => {
+            return { roleId: roleId, permissionId: permission };
+          });
         res = await this.prismaService.rolesPermissions.createMany({
           data: rolesPermissions,
-        })
+        });
       }
 
       return res;
     } catch (error) {
-      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'El Rol fue actualizado pero Se presento un error al actualizar sus permisos.');
+      throw new GenericResponse(
+        {},
+        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+        'El Rol fue actualizado pero Se presento un error al actualizar sus permisos.',
+      );
     }
   }
 
@@ -189,17 +245,23 @@ export class RolesService {
             where: {
               rolesPermission: {
                 some: {
-                  roleId: roleId
-                }
-              }
-            }
-          }
-        }
+                  roleId: roleId,
+                },
+              },
+            },
+          },
+        },
       });
-      const modulesToReturn = modules.filter(module => module.permissions.length > 0)
+      const modulesToReturn = modules.filter(
+        (module) => module.permissions.length > 0,
+      );
       return modulesToReturn;
     } catch (error) {
-      throw new GenericResponse({}, HttpStatus.INTERNAL_SERVER_ERROR.valueOf(), 'Error consultando permisos del rol.');
+      throw new GenericResponse(
+        {},
+        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+        'Error consultando permisos del rol.',
+      );
     }
   }
 }

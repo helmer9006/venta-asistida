@@ -33,4 +33,4 @@ import { LogsModule } from './logs/logs.module';
   ],
   controllers: [],
 })
-export class AppModule { }
+export class AppModule {}
