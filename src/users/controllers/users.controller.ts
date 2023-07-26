@@ -43,7 +43,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('create')
-  @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
+  @Auth(RolesEnum.SUPERADMIN, RolesEnum.ADMIN)
   @ApiBody({ type: CreateUserDto })
   @ApiOkResponse(SW_RESPONSES.createUserOkResponse)
   @ApiBadRequestResponse(SW_RESPONSES.badRequestResponse)
@@ -66,7 +66,7 @@ export class UsersController {
   @Get()
   @ApiOkResponse(SW_RESPONSES.getUserOkResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
-  @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
+  @Auth(RolesEnum.SUPERADMIN, RolesEnum.ADMIN)
   async findAll(
     @Query() paginationDto: PaginationDto,
     @GetUser('id') userId: number,
@@ -80,7 +80,7 @@ export class UsersController {
   }
 
   @Get('/getByterm/:term')
-  @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
+  @Auth(RolesEnum.SUPERADMIN, RolesEnum.ADMIN)
   @ApiOkResponse(SW_RESPONSES.getTermUserOkResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
   async getByterm(
@@ -97,7 +97,7 @@ export class UsersController {
   }
 
   @Patch('update/:id')
-  @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
+  @Auth(RolesEnum.SUPERADMIN, RolesEnum.ADMIN)
   @ApiBody({ type: UpdateUserDto })
   @ApiOkResponse(SW_RESPONSES.updateUserOkResponse)
   @ApiConflictResponse(SW_RESPONSES.userConflictResponse)

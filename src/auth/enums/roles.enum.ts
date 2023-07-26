@@ -1,5 +1,7 @@
 export enum RolesEnum {
-  ADMINISTRADOR = Number(process.env.ID_ROL_ADMININISTRADOR),
-  SUPERADMINISTRADOR = Number(process.env.ID_ROL_SUPERADMININISTRADOR),
-  ASESOR = Number(process.env.ID_ROL_ASESOR),
+  ADMIN = Number(process.env.ID_ROLE_ADMIN),
+  SUPERADMIN = Number(process.env.ID_ROLE_SUPERADMIN),
+  ADVISOR = Number(process.env.ID_ROLE_ADVISOR),
+  ALLY = Number(process.env.ID_ROLE_ALLY),
+  SUPERVISOR = Number(process.env.ID_ROLE_SUPERVISOR),
 }

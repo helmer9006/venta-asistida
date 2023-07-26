@@ -21,7 +21,7 @@ export class ConfigAllyController {
   constructor(private readonly configAllyService: ConfigAllyService) {}
 
   @Post()
-  @Auth(RolesEnum.ADMINISTRADOR, RolesEnum.SUPERADMINISTRADOR)
+  // @Auth(RolesEnum.ADMIN, RolesEnum.SUPERADMIN)
   @ApiBody({ type: CreateConfigAllyDto })
   async create(@Body() createConfigAllyDto: CreateConfigAllyDto) {
     const data = await this.configAllyService.create(createConfigAllyDto);
@@ -33,7 +33,7 @@ export class ConfigAllyController {
   }
 
   @Get('/:idForm/:idAlly')
-  @Auth(RolesEnum.ADMINISTRADOR, RolesEnum.SUPERADMINISTRADOR)
+  @Auth(RolesEnum.ADMIN, RolesEnum.SUPERADMIN)
   async findOne(
     @Param('idForm') idFormBase: string,
     @Param('idAlly') idAlly: string,
@@ -47,7 +47,7 @@ export class ConfigAllyController {
   }
 
   @Patch(':id')
-  @Auth(RolesEnum.ADMINISTRADOR, RolesEnum.SUPERADMINISTRADOR)
+  // @Auth(RolesEnum.ADMIN, RolesEnum.SUPERADMIN)
   update(
     @Param('id') id: string,
     @Body() updateConfigAllyDto: UpdateConfigAllyDto,

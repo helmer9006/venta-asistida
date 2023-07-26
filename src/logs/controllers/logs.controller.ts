@@ -38,7 +38,7 @@ export class LogsController {
   @ApiBadRequestResponse(SW_RESPONSES.badRequestResponse)
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
-  @Auth(RolesEnum.SUPERADMINISTRADOR, RolesEnum.ADMINISTRADOR)
+  @Auth(RolesEnum.SUPERADMIN, RolesEnum.ADMIN)
   async create(@Body() createLogDto: CreateLogDto) {
     const data = await this.logsService.create(createLogDto);
     if (Object.keys(data).length == 0) {

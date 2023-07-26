@@ -127,30 +127,32 @@ export class UsersService {
   async findByterm(term: string, paginationDto: PaginationDto) {
     const { limit = 10, offset = 1 } = paginationDto;
     let where;
-    where = isNumber(term.trim())
-      ? { identification: term }
-      : {
-          OR: [
-            {
-              name: {
-                contains: term,
-                mode: 'insensitive',
-              },
+    if (isNumber(term.trim())) {
+      where = { identification: term };
+    } else {
+      where = {
+        OR: [
+          {
+            name: {
+              contains: term,
+              mode: 'insensitive',
             },
-            {
-              ally: {
-                OR: [
-                  {
-                    name: {
-                      contains: term,
-                      mode: 'insensitive',
-                    },
+          },
+          {
+            ally: {
+              OR: [
+                {
+                  name: {
+                    contains: term,
+                    mode: 'insensitive',
                   },
-                ],
-              },
+                },
+              ],
             },
-          ],
-        };
+          },
+        ],
+      };
+    }
     try {
       return await this.prismaService.users.findMany({
         where,

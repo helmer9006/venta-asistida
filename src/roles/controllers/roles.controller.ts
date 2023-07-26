@@ -36,7 +36,7 @@ export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
   @Post('create')
-  @Auth(RolesEnum.SUPERADMINISTRADOR)
+  @Auth(RolesEnum.SUPERADMIN)
   @ApiCreatedResponse(SW_RESPONSES.createRoleOkResponse)
   @ApiBadRequestResponse(SW_RESPONSES.badRequestResponse)
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
@@ -69,7 +69,7 @@ export class RolesController {
   }
 
   @Patch(':id')
-  @Auth(RolesEnum.SUPERADMINISTRADOR)
+  @Auth(RolesEnum.SUPERADMIN)
   @ApiOkResponse(SW_RESPONSES.updateRoleOkResponse)
   @ApiBadRequestResponse(SW_RESPONSES.badRequestResponse)
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)

@@ -9,30 +9,31 @@ datasource db {
 
 //Entidades
 model Users {
-  id                 Int          @id @default(autoincrement())
-  uid                String?      @unique @db.VarChar
-  name               String       @db.VarChar
-  lastname           String       @db.VarChar
-  identificationType String       @db.VarChar
-  identification     String       @unique @db.VarChar
-  email              String       @unique @db.VarChar
-  address            String?      @db.VarChar
-  phone              String?      @db.VarChar
-  isActive           Boolean      @default(true)
-  roles              Roles?       @relation(fields: [roleId], references: [id])
-  allyOf             Users[]      @relation("AllyRelation")
-  ally               Users?       @relation("AllyRelation", fields: [allyId], references: [id])
-  roleId             Int
-  allyId             Int?
-  supervisorOf       Users[]      @relation("SupervisorRelation")
-  supervisor         Users?       @relation("SupervisorRelation", fields: [supervisorId], references: [id])
-  supervisorId       Int?
-  advisorStartDate   DateTime?
-  advisorEndDate     DateTime?
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
-  Logs               Logs[]
-  configAlly         ConfigAlly[]
+  id                   Int                    @id @default(autoincrement())
+  uid                  String?                @unique @db.VarChar
+  name                 String                 @db.VarChar
+  lastname             String                 @db.VarChar
+  identificationType   String                 @db.VarChar
+  identification       String                 @unique @db.VarChar
+  email                String                 @unique @db.VarChar
+  address              String?                @db.VarChar
+  phone                String?                @db.VarChar
+  isActive             Boolean                @default(true)
+  roles                Roles?                 @relation(fields: [roleId], references: [id])
+  allyOf               Users[]                @relation("AllyRelation")
+  ally                 Users?                 @relation("AllyRelation", fields: [allyId], references: [id])
+  roleId               Int
+  allyId               Int?
+  supervisorOf         Users[]                @relation("SupervisorRelation")
+  supervisor           Users?                 @relation("SupervisorRelation", fields: [supervisorId], references: [id])
+  supervisorId         Int?
+  advisorStartDate     DateTime?
+  advisorEndDate       DateTime?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  Logs                 Logs[]
+  configAlly           ConfigAlly[]
+  ResponsesFormClients ResponsesFormClients[]
 }
 
 model Roles {
@@ -92,7 +93,7 @@ model Logs {
 model ConfigAlly {
   id                    Int       @id @default(autoincrement())
   ally                  Users?    @relation(fields: [allyId], references: [id])
-  allyId                Int?
+  allyId                Int?      @unique()
   formBase              Boolean   @default(false)
   name                  String
   attributes            String
@@ -100,4 +101,27 @@ model ConfigAlly {
   noEssentialDataPolicy String
   createdAt             DateTime  @default(now())
   updatedAt             DateTime? @updatedAt
+}
+
+model ResponsesFormClients {
+  id                 Int       @id @default(autoincrement())
+  ally               Users?    @relation(fields: [allyId], references: [id])
+  allyId             Int?
+  firtsName          String?
+  secondName         String?
+  surname            String?
+  secondSurname      String?
+  birthdate          DateTime?
+  department         String?
+  municipality       String?
+  identificationType String?
+  identification     String?
+  expeditionDate     DateTime?
+  expeditionPlace    String?
+  gender             String?
+  address            String?
+  phoneNumber        Int?
+  email              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime? @updatedAt
 }

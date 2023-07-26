@@ -1,11 +1,18 @@
 import { CreateConfigAllyDto } from '../models/dto/create-config-ally.dto';
 import { UpdateConfigAllyDto } from '../models/dto/update-config-ally.dto';
-import { HttpStatus, Injectable, Inject } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  Inject,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { IAttributes } from '../interfaces/format-attributes.interface';
 import config from '@src/config/config';
-import { ConfigModule, ConfigType } from '@nestjs/config';
+import { ConfigType } from '@nestjs/config';
+import { RolesEnum } from '../../auth/enums/roles.enum';
 
 @Injectable()
 export class ConfigAllyService {
@@ -16,54 +23,27 @@ export class ConfigAllyService {
   ) {}
 
   async create(createConfigAllyDto: CreateConfigAllyDto) {
-    let allyFound;
     try {
-      allyFound = await this.prismaService.users.findUnique({
-        where: { id: createConfigAllyDto.allyId },
-      });
-    } catch (error) {
-      throw new GenericResponse(
-        {},
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        'Error interno del servidor.',
-      );
-    }
+      const allyFound = await this.findAllyById(createConfigAllyDto.allyId);
+      const fileNameform = `Formulario ${allyFound.name}`;
+      await this.verifyRequiredAttributes(createConfigAllyDto.attributes);
+      createConfigAllyDto.name = fileNameform;
+      createConfigAllyDto.formBase = false;
+      const body: any = createConfigAllyDto;
 
-    if (!allyFound) {
-      throw new GenericResponse(
-        null,
-        HttpStatus.NOT_FOUND,
-        'No se pudo encontrar el aliado.',
-      );
-    }
-    const fileNameform = `Formulario ${allyFound.name}`;
-    const attributes: IAttributes[] = JSON.parse(
-      createConfigAllyDto.attributes,
-    );
-    const allAttributesRequired =
-      this.configuracion.ATTRIBUTES_REQUIRED_FORM_BASE.every(
-        (attributeRequire) =>
-          attributes
-            .map((attribute) => attribute.name)
-            .includes(attributeRequire),
-      );
-    if (!allAttributesRequired)
-      throw new GenericResponse(
-        {},
-        HttpStatus.BAD_REQUEST,
-        'Se requieren todos los atributos del formulario base.',
-      );
-    createConfigAllyDto.name = fileNameform;
-    createConfigAllyDto.formBase = false;
-    const body: any = createConfigAllyDto;
-    try {
       return await this.prismaService.configAlly.create({ data: body });
     } catch (error) {
-      throw new GenericResponse(
-        {},
-        HttpStatus.INTERNAL_SERVER_ERROR,
-        'Error interno del servidor.',
-      );
+      let msg = error.message ? error.message : 'Error interno del servidor';
+      let status = error.status
+        ? error.status
+        : error.statusCode
+        ? error.statusCode
+        : 500;
+      if (error.code == 'P2002') {
+        msg = 'El aliado ya tiene un registro de configuración creado.';
+        status = 409;
+      }
+      throw new GenericResponse({}, status, msg);
     }
   }
 
@@ -110,7 +90,62 @@ export class ConfigAllyService {
     }
   }
 
-  update(id: number, updateConfigAllyDto: UpdateConfigAllyDto) {
-    return `This action updates a #${id} configAlly`;
+  async update(id: number, updateConfigAllyDto: UpdateConfigAllyDto) {
+    try {
+      delete updateConfigAllyDto.name;
+      await this.findAllyById(updateConfigAllyDto.allyId);
+      await this.verifyRequiredAttributes(updateConfigAllyDto.attributes);
+      updateConfigAllyDto.formBase = false;
+      const configAllyUpdated = await this.prismaService.configAlly.update({
+        where: { id },
+        data: updateConfigAllyDto,
+      });
+
+      if (!configAllyUpdated)
+        throw new NotFoundException(
+          'No se pudo actualizar el registro de configuración para el aliado.',
+        );
+      return configAllyUpdated;
+    } catch (error) {
+      const msg = error.message ? error.message : 'Error interno del servidor';
+      const status = error.status
+        ? error.status
+        : error.statusCode
+        ? error.statusCode
+        : 500;
+      throw new GenericResponse({}, status, msg);
+    }
+  }
+
+  async findAllyById(allyId: number) {
+    try {
+      const allyFound = await this.prismaService.users.findMany({
+        where: { id: allyId, roleId: Number(process.env.ID_ROLE_ALLY) },
+      });
+      if (allyFound.length == 0) {
+        throw new NotFoundException('No se pudo encontrar el aliado');
+      }
+      return allyFound[0];
+    } catch (error) {
+      const msg = error.message ? error.message : 'Error interno del servidor';
+      throw new GenericResponse({}, error.status, `${msg}`);
+    }
+  }
+
+  private verifyRequiredAttributes(attributesParam): void {
+    const attributes: IAttributes[] = attributesParam
+      ? JSON.parse(attributesParam)
+      : [];
+    const hasAllAttributesRequired =
+      this.configuracion.ATTRIBUTES_REQUIRED_FORM_BASE.every(
+        (attributeRequire) =>
+          attributes
+            .map((attribute) => attribute.name)
+            .includes(attributeRequire),
+      );
+    if (!hasAllAttributesRequired && attributes.length > 0)
+      throw new BadRequestException(
+        'Se requieren todos los atributos del formulario base.',
+      );
   }
 }
