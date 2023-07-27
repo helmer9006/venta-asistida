@@ -31,32 +31,18 @@ export class ConfigAllyService {
       createConfigAllyDto.formBase = false;
       const body: any = createConfigAllyDto;
 
-      return await this.prismaService.configAlly.create({ data: body });
+      const config = await this.prismaService.configAlly.create({ data: body });
+      return config;
     } catch (error) {
-      let msg = error.message ? error.message : 'Error interno del servidor';
-      let status = error.status
-        ? error.status
-        : error.statusCode
-        ? error.statusCode
-        : 500;
-
       handleExceptions(error);
-      if (error.code == 'P2002') {
-        msg = 'El aliado ya tiene un registro de configuración creado.';
-        status = 409;
-      }
-      throw new GenericResponse({}, status, msg);
     }
   }
 
   async findOne(idFormBase: number, idAlly: number) {
-    if (idFormBase && idAlly)
-      throw new GenericResponse(
-        [],
-        HttpStatus.NOT_FOUND.valueOf(),
-        'Url invalida, por favor revisela.',
-      );
     try {
+      if (idFormBase && idAlly)
+        throw new NotFoundException('La url proporcionada no es valida.');
+
       if (Number.isNaN(idAlly)) {
         const formBase = await this.prismaService.configAlly.findMany({
           where: { id: idFormBase },
@@ -75,20 +61,14 @@ export class ConfigAllyService {
         },
       });
       if (configAlly.length == 0)
-        throw new GenericResponse(
-          {},
-          HttpStatus.NOT_FOUND.valueOf(),
+        throw new BadRequestException(
           'No se pudo obtener la configuracion del aliado',
         );
 
       configAlly[0].attributes = JSON.parse(configAlly[0].attributes);
       return configAlly[0];
     } catch (error) {
-      throw new GenericResponse(
-        [],
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'Error de servidor al consultar la configuracion del aliado',
-      );
+      handleExceptions(error);
     }
   }
 
@@ -102,11 +82,6 @@ export class ConfigAllyService {
         where: { id },
         data: updateConfigAllyDto,
       });
-
-      if (!configAllyUpdated)
-        throw new NotFoundException(
-          'No se pudo actualizar el registro de configuración para el aliado.',
-        );
       return configAllyUpdated;
     } catch (error) {
       handleExceptions(error);
@@ -123,12 +98,11 @@ export class ConfigAllyService {
       }
       return allyFound[0];
     } catch (error) {
-      const msg = error.message ? error.message : 'Error interno del servidor';
-      throw new GenericResponse({}, error.status, `${msg}`);
+      handleExceptions(error);
     }
   }
 
-  private verifyRequiredAttributes(attributesParam): void {
+  async verifyRequiredAttributes(attributesParam): Promise<void> {
     const attributes: IAttributes[] = attributesParam
       ? JSON.parse(attributesParam)
       : [];

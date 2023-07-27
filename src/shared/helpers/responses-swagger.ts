@@ -871,4 +871,758 @@ export const SW_RESPONSES = {
       },
     },
   },
+
+  createConfigAllyOkResponse: {
+    description: 'Respuesta de creacion de la configuracion para un aliado',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              example: {
+                id: 6,
+                allyId: 1,
+                formBase: false,
+                name: 'Formulario exito',
+                attributes: [
+                  {
+                    name: 'firtsName',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'secondName',
+                    required: false,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'surname',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'secondSurname',
+                    required: false,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'birthdate',
+                    required: true,
+                    disabled: false,
+                    type: 'date',
+                  },
+                  {
+                    name: 'department',
+                    required: true,
+                    disabled: false,
+                    type: 'select',
+                  },
+                  {
+                    name: 'municipality',
+                    required: true,
+                    disabled: false,
+                    type: 'select',
+                  },
+                  {
+                    name: 'identificationType',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'identification',
+                    required: true,
+                    disabled: false,
+                    type: 'number',
+                  },
+                  {
+                    name: 'expeditionDate',
+                    required: true,
+                    disabled: false,
+                    type: 'date',
+                  },
+                  {
+                    name: 'expeditionPlace',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'gender',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'address',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'phoneNumber',
+                    required: true,
+                    disabled: false,
+                    type: 'number',
+                  },
+                  {
+                    name: 'email',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                ],
+                dataPolicy:
+                  'En cumplimiento de las disposiciones de la Ley 1581 de 2012 y del Decreto reglamentario 1377 de 2013 que desarrollan el derecho de habeas data...',
+                noEssentialDataPolicy: [
+                  {
+                    name: 'Recibir notificaciones sms',
+                    disabled: true,
+                    type: 'text',
+                  },
+                  {
+                    name: 'Recibir notificaciones whatsApp',
+                    disabled: false,
+                    type: 'text',
+                  },
+                ],
+                createdAt: '2023-07-26T21:31:59.023Z',
+                updatedAt: '2023-07-26T21:31:59.023Z',
+              },
+            },
+            statusCode: { type: 'number', example: 200 },
+            message: {
+              type: 'string',
+              example: 'Configuracion creada correctamente.',
+            },
+          },
+        },
+      },
+    },
+  },
+
+  notFoundAllyConfigAlly: {
+    description: 'Respuesta cuando no se encuentra el aliado a configurar',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              example: {},
+            },
+            statusCode: { type: 'number', example: 404 },
+            message: {
+              type: 'string',
+              example: 'No se pudo encontrar el aliado',
+            },
+          },
+        },
+      },
+    },
+  },
+
+  conflictResponseConfigAlly: {
+    description:
+      'Respuesta cuando faltan atributos en la configuracion del formulario para el aliado',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              example: {},
+            },
+            statusCode: { type: 'number', example: 400 },
+            message: {
+              type: 'string',
+              example: 'Se requieren todos los atributos del formulario base',
+            },
+          },
+        },
+      },
+    },
+  },
+
+  badRequestUpdateConfigAlly: {
+    description:
+      'Respuesta cuando no se puede actualizar la configuracion del formulario para el aliado',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              example: {},
+            },
+            statusCode: { type: 'number', example: 400 },
+            message: {
+              type: 'string',
+              example:
+                'No se pudo actualizar el registro de configuración para el aliado.',
+            },
+          },
+        },
+      },
+    },
+  },
+
+  badRequestFindConfigAlly: {
+    description:
+      'Respuesta cuando no se puede obtener la configuracion del aliado',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              example: {},
+            },
+            statusCode: { type: 'number', example: 400 },
+            message: {
+              type: 'string',
+              example: 'No se pudo obtener la configuracion del aliado',
+            },
+          },
+        },
+      },
+    },
+  },
+
+  notFoundUrlGetConfigAlly: {
+    description: 'Respuesta cuando la url es erronea',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              example: {},
+            },
+            statusCode: { type: 'number', example: 404 },
+            message: {
+              type: 'string',
+              example: 'Url invalida, por favor revisela.',
+            },
+          },
+        },
+      },
+    },
+  },
+
+  findFormBaseConfigAlly: {
+    description:
+      'Respuesta cuando se obtiene el formulario base o la configuracion del formulario de un aliado',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'array',
+              example: [
+                {
+                  attributes: [
+                    {
+                      name: 'firtsName',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'secondName',
+                      required: false,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'surname',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'secondSurname',
+                      required: false,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'birthdate',
+                      required: true,
+                      disabled: false,
+                      type: 'date',
+                    },
+                    {
+                      name: 'department',
+                      required: true,
+                      disabled: false,
+                      type: 'select',
+                    },
+                    {
+                      name: 'municipality',
+                      required: true,
+                      disabled: false,
+                      type: 'select',
+                    },
+                    {
+                      name: 'identificationType',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'identification',
+                      required: true,
+                      disabled: false,
+                      type: 'number',
+                    },
+                    {
+                      name: 'expeditionDate',
+                      required: true,
+                      disabled: false,
+                      type: 'date',
+                    },
+                    {
+                      name: 'expeditionPlace',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'gender',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'address',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'phoneNumber',
+                      required: true,
+                      disabled: false,
+                      type: 'number',
+                    },
+                    {
+                      name: 'email',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                  ],
+                },
+                'OR',
+                {
+                  id: 6,
+                  allyId: 1,
+                  formBase: false,
+                  name: 'Formulario exito',
+                  attributes: [
+                    {
+                      name: 'firtsName',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'secondName',
+                      required: false,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'surname',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'secondSurname',
+                      required: false,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'birthdate',
+                      required: true,
+                      disabled: false,
+                      type: 'date',
+                    },
+                    {
+                      name: 'department',
+                      required: true,
+                      disabled: false,
+                      type: 'select',
+                    },
+                    {
+                      name: 'municipality',
+                      required: true,
+                      disabled: false,
+                      type: 'select',
+                    },
+                    {
+                      name: 'identificationType',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'identification',
+                      required: true,
+                      disabled: false,
+                      type: 'number',
+                    },
+                    {
+                      name: 'expeditionDate',
+                      required: true,
+                      disabled: false,
+                      type: 'date',
+                    },
+                    {
+                      name: 'expeditionPlace',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'gender',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'address',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                    {
+                      name: 'phoneNumber',
+                      required: true,
+                      disabled: false,
+                      type: 'number',
+                    },
+                    {
+                      name: 'email',
+                      required: true,
+                      disabled: false,
+                      type: 'text',
+                    },
+                  ],
+                  dataPolicy:
+                    'En cumplimiento de las disposiciones de la Ley 1581 de 2012 y del Decreto reglamentario 1377 de 2013 que desarrollan el derecho de habeas data...',
+                  noEssentialDataPolicy: [
+                    {
+                      name: 'Recibir notificaciones sms',
+                      disabled: true,
+                      type: 'text',
+                    },
+                    {
+                      name: 'Recibir notificaciones whatsApp',
+                      disabled: false,
+                      type: 'text',
+                    },
+                  ],
+                  createdAt: '2023-07-26T21:31:59.023Z',
+                  updatedAt: '2023-07-26T21:31:59.023Z',
+                },
+              ],
+            },
+            statusCode: { type: 'number', example: 200 },
+            message: {
+              type: 'string',
+              example: 'Configuracion encontrada.',
+            },
+          },
+        },
+      },
+    },
+  },
+
+  findConfigAllyById: {
+    description:
+      'Respuesta cuando se obtiene la configuracion del formulario de un aliado',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              example: {
+                id: 6,
+                allyId: 1,
+                formBase: false,
+                name: 'Formulario exito',
+                attributes: [
+                  {
+                    name: 'firtsName',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'secondName',
+                    required: false,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'surname',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'secondSurname',
+                    required: false,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'birthdate',
+                    required: true,
+                    disabled: false,
+                    type: 'date',
+                  },
+                  {
+                    name: 'department',
+                    required: true,
+                    disabled: false,
+                    type: 'select',
+                  },
+                  {
+                    name: 'municipality',
+                    required: true,
+                    disabled: false,
+                    type: 'select',
+                  },
+                  {
+                    name: 'identificationType',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'identification',
+                    required: true,
+                    disabled: false,
+                    type: 'number',
+                  },
+                  {
+                    name: 'expeditionDate',
+                    required: true,
+                    disabled: false,
+                    type: 'date',
+                  },
+                  {
+                    name: 'expeditionPlace',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'gender',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'address',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'phoneNumber',
+                    required: true,
+                    disabled: false,
+                    type: 'number',
+                  },
+                  {
+                    name: 'email',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                ],
+                dataPolicy:
+                  'En cumplimiento de las disposiciones de la Ley 1581 de 2012 y del Decreto reglamentario 1377 de 2013 que desarrollan el derecho de habeas data...',
+                noEssentialDataPolicy: [
+                  {
+                    name: 'Recibir notificaciones sms',
+                    disabled: true,
+                    type: 'text',
+                  },
+                  {
+                    name: 'Recibir notificaciones whatsApp',
+                    disabled: false,
+                    type: 'text',
+                  },
+                ],
+                createdAt: '2023-07-26T21:31:59.023Z',
+                updatedAt: '2023-07-26T21:31:59.023Z',
+              },
+            },
+            statusCode: { type: 'number', example: 200 },
+            message: {
+              type: 'string',
+              example: 'Configuracion encontrada.',
+            },
+          },
+        },
+      },
+    },
+  },
+
+  updateConfigAllyOkResponse: {
+    description:
+      'Respuesta de actualizacion de la configuracion para un aliado',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              example: {
+                id: 6,
+                allyId: 1,
+                formBase: false,
+                name: 'Formulario exito',
+                attributes: [
+                  {
+                    name: 'firtsName',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'secondName',
+                    required: false,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'surname',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'secondSurname',
+                    required: false,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'birthdate',
+                    required: false,
+                    disabled: false,
+                    type: 'date',
+                  },
+                  {
+                    name: 'department',
+                    required: true,
+                    disabled: false,
+                    type: 'select',
+                  },
+                  {
+                    name: 'municipality',
+                    required: true,
+                    disabled: true,
+                    type: 'select',
+                  },
+                  {
+                    name: 'identificationType',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'identification',
+                    required: true,
+                    disabled: false,
+                    type: 'number',
+                  },
+                  {
+                    name: 'expeditionDate',
+                    required: true,
+                    disabled: false,
+                    type: 'date',
+                  },
+                  {
+                    name: 'expeditionPlace',
+                    required: true,
+                    disabled: true,
+                    type: 'text',
+                  },
+                  {
+                    name: 'gender',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'address',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                  {
+                    name: 'phoneNumber',
+                    required: true,
+                    disabled: false,
+                    type: 'number',
+                  },
+                  {
+                    name: 'email',
+                    required: true,
+                    disabled: false,
+                    type: 'text',
+                  },
+                ],
+                dataPolicy:
+                  'En cumplimiento de las disposiciones de la Ley 1581 de 2012 y del Decreto reglamentario 1377 de 2013 que desarrollan el derecho de habeas data...',
+                noEssentialDataPolicy: [
+                  {
+                    name: 'Recibir notificaciones sms',
+                    disabled: true,
+                    type: 'text',
+                  },
+                  {
+                    name: 'Recibir notificaciones whatsApp',
+                    disabled: true,
+                    type: 'text',
+                  },
+                ],
+                createdAt: '2023-07-26T21:31:59.023Z',
+                updatedAt: '2023-07-26T21:31:59.023Z',
+              },
+            },
+            statusCode: { type: 'number', example: 200 },
+            message: {
+              type: 'string',
+              example: 'Configuracion actualizada correctamente.',
+            },
+          },
+        },
+      },
+    },
+  },
 };
