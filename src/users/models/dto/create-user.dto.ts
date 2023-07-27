@@ -1,15 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsUUID,
   IsString,
   IsBoolean,
   IsOptional,
   IsDate,
   IsNumber,
-  IsEmail,
-  IsPositive,
-  isNumber,
+  IsEmail
 } from 'class-validator';
 
 export class CreateUserDto {

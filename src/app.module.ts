@@ -9,6 +9,7 @@ import { RolesModule } from './roles/roles.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { ConfigAllyModule } from './config-ally/config-ally.module';
 import { LogsModule } from './logs/logs.module';
+import { AlliesAdvisorModule } from './allies-advisor/allies-advisor.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { LogsModule } from './logs/logs.module';
     PermissionsModule,
     ConfigAllyModule,
     LogsModule,
+    AlliesAdvisorModule,
   ],
   controllers: [],
 })

@@ -12,7 +12,7 @@ import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { IAttributes } from '../interfaces/format-attributes.interface';
 import config from '@src/config/config';
 import { ConfigType } from '@nestjs/config';
-import { RolesEnum } from '../../auth/enums/roles.enum';
+import { handleExceptions } from '@src/shared/helpers/general';
 
 @Injectable()
 export class ConfigAllyService {
@@ -39,6 +39,8 @@ export class ConfigAllyService {
         : error.statusCode
         ? error.statusCode
         : 500;
+
+      handleExceptions(error);
       if (error.code == 'P2002') {
         msg = 'El aliado ya tiene un registro de configuración creado.';
         status = 409;
@@ -107,13 +109,7 @@ export class ConfigAllyService {
         );
       return configAllyUpdated;
     } catch (error) {
-      const msg = error.message ? error.message : 'Error interno del servidor';
-      const status = error.status
-        ? error.status
-        : error.statusCode
-        ? error.statusCode
-        : 500;
-      throw new GenericResponse({}, status, msg);
+      handleExceptions(error);
     }
   }
 

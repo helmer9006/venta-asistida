@@ -258,6 +258,12 @@ export class UsersService {
         HttpStatus.CONFLICT.valueOf(),
         'El usuario ya se encuentra registrado, validar correo o identificación',
       );
+    if (error.code === 'P1001')
+      throw new GenericResponse(
+        {},
+        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+        'Ha ocurrido un error de conexión con la base de datos.',
+      );
     this.logger.error(
       `Error inesperado, revise los logs del servidor. Error ${JSON.stringify(
         error,
