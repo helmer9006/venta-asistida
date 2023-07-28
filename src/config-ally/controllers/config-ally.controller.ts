@@ -10,13 +10,14 @@ import {
 import { ConfigAllyService } from '../services/config-ally.service';
 import { CreateConfigAllyDto } from '../models/dto/create-config-ally.dto';
 import { UpdateConfigAllyDto } from '../models/dto/update-config-ally.dto';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { Auth, Roles } from '@src/auth/decorators';
 import { RolesEnum } from '@src/auth/enums/roles.enum';
 
 @Controller('config-ally')
 @ApiTags('Services allies configuration')
+@ApiBearerAuth()
 export class ConfigAllyController {
   constructor(private readonly configAllyService: ConfigAllyService) {}
 

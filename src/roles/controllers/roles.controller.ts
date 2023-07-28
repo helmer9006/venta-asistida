@@ -19,6 +19,7 @@ import {
   ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 
 import { RolesService } from '../services/roles.service';
@@ -32,6 +33,7 @@ import { SW_RESPONSES } from '@src/shared/helpers/responses-swagger';
 
 @Controller('roles')
 @ApiTags('Services roles')
+@ApiBearerAuth()
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 

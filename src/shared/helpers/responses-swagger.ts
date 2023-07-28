@@ -871,4 +871,101 @@ export const SW_RESPONSES = {
       },
     },
   },
+  createAlliesAdvisorOkResponse: {
+    description:
+      'Respuesta exitosa creación de registro de aliado asociado al asesor.',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: {
+              id: 9,
+              advisorId: 23,
+              allyId: 24,
+              createdAt: '2023-07-28T02:48:52.723Z',
+              updatedAt: '2023-07-28T02:48:52.723Z',
+            },
+            statusCode: { type: 'number', example: 200 },
+            message: {
+              type: 'string',
+              example: 'Registro creado correctamente.',
+            },
+          },
+        },
+      },
+    },
+  },
+  conflictResponse: {
+    description: `Respuesta para registros existentes.`,
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: { type: 'object', example: {} },
+            statusCode: { type: 'number', example: 409 },
+            message: {
+              type: 'string',
+              example: 'Existe un registro con la misma información.',
+            },
+          },
+        },
+      },
+    },
+  },
+  getAlliesAdvisorOkReponse: {
+    description: 'Respuesta exitosa para consulta de aliados por id de asesor.',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'array',
+              example: [
+                {
+                  id: 25,
+                  name: 'Exito',
+                  lastname: '',
+                  email: 'aliado4@aliado.com',
+                  phone: '3504664166',
+                },
+                {
+                  id: 24,
+                  name: 'aliado 2',
+                  lastname: 'aliado 3',
+                  email: 'aliado3@aliado.com',
+                  phone: '3504664166',
+                },
+              ],
+            },
+            statusCode: { type: 'number', example: 200 },
+            message: {
+              type: 'string',
+              example: 'Registros encontrados.',
+            },
+          },
+        },
+      },
+    },
+  },
+  deleteOkReponse: {
+    description: 'Respuesta exitosa eliminación de registros.',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          properties: {
+            data: {},
+            statusCode: { type: 'number', example: 200 },
+            message: {
+              type: 'string',
+              example: 'Registro eliminado correctamente.',
+            },
+          },
+        },
+      },
+    },
+  },
 };

@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { ConfigService } from '@nestjs/config';
 import { AxiosAdapter } from '../adapters/axios.adapter';
 import { IReponseTokenMule } from '../interfaces/response-token-mule.interface';
 import { Logger, HttpStatus } from '@nestjs/common';
+import { handleExceptions } from '../helpers/general';
 @Injectable()
 export class UtilsService {
   constructor(
@@ -53,6 +54,7 @@ export class UtilsService {
       // TODO: validar acción si hay error al enviar el correo de invitación.
     }
   }
+
   private async generateTokenMule() {
     const url = this.configService.get('MULE_URL_GENERATE_TOKEN');
     const headers = {
@@ -73,6 +75,20 @@ export class UtilsService {
         `Error al consultar token en mule. Error ${JSON.stringify(error)}`,
       );
       return '';
+    }
+  }
+
+  async findAllyById(allyId: number) {
+    try {
+      const allyFound = await this.prismaService.users.findMany({
+        where: { id: allyId, roleId: Number(process.env.ID_ROLE_ALLY) },
+      });
+      if (allyFound.length == 0) {
+        throw new NotFoundException('No se pudo encontrar el aliado');
+      }
+      return allyFound[0];
+    } catch (error) {
+      handleExceptions(error);
     }
   }
 }

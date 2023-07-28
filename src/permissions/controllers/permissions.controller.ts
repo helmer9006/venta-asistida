@@ -17,11 +17,13 @@ import {
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { SW_RESPONSES } from '@src/shared/helpers/responses-swagger';
 
 @Controller('permissions')
 @ApiTags('Services permissions')
+@ApiBearerAuth()
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 

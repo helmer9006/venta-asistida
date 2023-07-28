@@ -23,9 +23,7 @@ const payloadCreateLog: CreateLogDto = testExpectValues.payloadCreateLog;
 const payloadCreateLogError: any = testExpectValues.payloadCreateLogError;
 const pagination: PaginationDto = testExpectValues.pagination;
 let prismaService: PrismaService;
-describe('LogsService getLogs', () => {
-  let service: LogsService;
-
+describe('LogsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
