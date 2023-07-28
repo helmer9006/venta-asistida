@@ -6,7 +6,7 @@ import {
   IsOptional,
   IsDate,
   IsNumber,
-  IsEmail
+  IsEmail,
 } from 'class-validator';
 
 export class CreateUserDto {

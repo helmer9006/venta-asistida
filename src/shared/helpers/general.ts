@@ -9,7 +9,7 @@ export const handleExceptions = (error: any): never => {
     throw new GenericResponse(
       {},
       HttpStatus.CONFLICT.valueOf(),
-      'Existe un registra con la misma información.',
+      'Existe un registro con la misma información.',
     );
   if (error.code === 'P2002')
     throw new GenericResponse(

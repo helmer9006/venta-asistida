@@ -14,6 +14,7 @@ async function bootstrap() {
     .setDescription('venta-asistida descripción de servicios.')
     .setVersion('0.1')
     .addTag('venta-asistida')
+    .addBearerAuth()
     .build();
   app.setGlobalPrefix('api');
   app.useGlobalPipes(

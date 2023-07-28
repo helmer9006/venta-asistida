@@ -24,11 +24,13 @@ import {
   ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { SW_RESPONSES } from '@src/shared/helpers/responses-swagger';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
 @Controller('logs')
 @ApiTags('Services Logs')
+@ApiBearerAuth()
 export class LogsController {
   constructor(private readonly logsService: LogsService) {}
 

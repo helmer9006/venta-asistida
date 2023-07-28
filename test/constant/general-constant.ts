@@ -163,6 +163,14 @@ export const testExpectValues = {
     limit: 10,
     offset: 1,
   },
+  payloadCreateAlliesAdvisor: {
+    advisorId: 23,
+    allyId: 2,
+  },
+  payloadCreateAlliesAdvisorError: {
+    advisorId: 23,
+    allyId: 222255555,
+  },
 
   payloadAllyFound: {
     id: 1,

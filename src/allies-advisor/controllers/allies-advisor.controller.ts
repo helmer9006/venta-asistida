@@ -3,41 +3,73 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
   Delete,
+  HttpStatus,
+  Param,
 } from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiConflictResponse,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+
+import { RolesEnum } from '@src/auth/enums/roles.enum';
+import { Auth } from '@src/auth/decorators';
+import { SW_RESPONSES } from '@src/shared/helpers/responses-swagger';
 import { AlliesAdvisorService } from '../services/allies-advisor.service';
 import { CreateAlliesAdvisorDto } from '../models/dto/create-allies-advisor.dto';
-import { UpdateAlliesAdvisorDto } from '../models/dto/update-allies-advisor.dto';
-import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { Auth } from '@src/auth/decorators';
-import { RolesEnum } from '@src/auth/enums/roles.enum';
-
+import { GenericResponse } from '@src/shared/models/generic-response.model';
 @ApiTags('Services Allies Advisor')
 @Controller('allies-advisor')
+@ApiBearerAuth()
 export class AlliesAdvisorController {
   constructor(private readonly alliesAdvisorService: AlliesAdvisorService) {}
 
-  @Post()
+  @Post('/create')
   @Auth(RolesEnum.SUPERADMIN, RolesEnum.ADMIN)
   @ApiBody({ type: CreateAlliesAdvisorDto })
-  create(@Body() createAlliesAdvisorDto: CreateAlliesAdvisorDto) {
-    return this.alliesAdvisorService.create(createAlliesAdvisorDto);
+  @ApiOkResponse(SW_RESPONSES.createUserOkResponse)
+  @ApiBadRequestResponse(SW_RESPONSES.badRequestResponse)
+  @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
+  @ApiConflictResponse(SW_RESPONSES.conflictResponse)
+  @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
+  async create(@Body() createAlliesAdvisorDto: CreateAlliesAdvisorDto) {
+    const data = await this.alliesAdvisorService.create(createAlliesAdvisorDto);
+    return new GenericResponse(
+      data,
+      HttpStatus.OK.valueOf(),
+      'Registro creado correctamente.',
+    );
   }
 
-  @Get()
-  findAll() {
-    return this.alliesAdvisorService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.alliesAdvisorService.findOne(+id);
+  @Get('/:advisorId')
+  @ApiOkResponse(SW_RESPONSES.getAlliesAdvisorOkReponse)
+  @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
+  async findAll(@Param('advisorId') advisorId: string) {
+    const data = await this.alliesAdvisorService.findAll(+advisorId);
+    return new GenericResponse(
+      data,
+      HttpStatus.OK.valueOf(),
+      'Registros encontrados.',
+    );
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.alliesAdvisorService.remove(+id);
+  @Auth(RolesEnum.SUPERADMIN, RolesEnum.ADMIN)
+  @ApiOkResponse(SW_RESPONSES.deleteOkReponse)
+  @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
+  @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
+  async remove(@Param('id') id: string) {
+    await this.alliesAdvisorService.remove(+id);
+    return new GenericResponse(
+      {},
+      HttpStatus.OK.valueOf(),
+      'Registro eliminado correctamente.',
+    );
   }
 }
