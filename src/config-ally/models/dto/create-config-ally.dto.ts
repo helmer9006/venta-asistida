@@ -29,21 +29,21 @@ export class CreateConfigAllyDto {
 
   @IsOptional()
   @IsBoolean()
-  @ApiProperty({
-    description:
-      'Campo que define si el registro corresponde a la configuración del formulario base.',
-    nullable: true,
-    example: 1,
-  })
+  // @ApiProperty({
+  //   description:
+  //     'Campo que define si el registro corresponde a la configuración del formulario base.',
+  //   nullable: true,
+  //   example: 1,
+  // })
   formBase?: boolean;
 
   @IsOptional()
   @IsString()
-  @ApiProperty({
-    description: 'Nombre definido para el registro de configuración.',
-    nullable: false,
-    example: 'Formulario exito',
-  })
+  // @ApiProperty({
+  //   description: 'Nombre definido para el registro de configuración.',
+  //   nullable: false,
+  //   example: 'Formulario exito',
+  // })
   name?: string;
 
   @IsString({
