@@ -94,15 +94,6 @@ export class CreateUserDto {
   @IsNumber()
   @IsOptional()
   @ApiProperty({
-    description: 'Id del aliado asignado al usuario.',
-    nullable: false,
-    example: 1,
-  })
-  allyId: number;
-
-  @IsNumber()
-  @IsOptional()
-  @ApiProperty({
     description: 'Id del supervisor asignado al usuario.',
     nullable: false,
     example: 1,

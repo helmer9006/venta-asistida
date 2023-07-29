@@ -84,9 +84,23 @@ export class UtilsService {
         where: { id: allyId, roleId: Number(process.env.ID_ROLE_ALLY) },
       });
       if (allyFound.length == 0) {
-        throw new NotFoundException('No se pudo encontrar el aliado');
+        throw new NotFoundException('No se pudo encontrar el aliado.');
       }
       return allyFound[0];
+    } catch (error) {
+      handleExceptions(error);
+    }
+  }
+
+  async findAdvisorById(advisorId: number) {
+    try {
+      const advisorFound = await this.prismaService.users.findMany({
+        where: { id: advisorId, roleId: Number(process.env.ID_ROLE_ADVISOR) },
+      });
+      if (advisorFound.length == 0) {
+        throw new NotFoundException('No se pudo encontrar el asesor.');
+      }
+      return advisorFound[0];
     } catch (error) {
       handleExceptions(error);
     }

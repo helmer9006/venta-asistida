@@ -109,7 +109,7 @@ export class UsersService {
       return await this.prismaService.users.findMany({
         take: limit,
         skip: (offset - 1) * limit,
-        include: { ally: true, roles: true, supervisor: true },
+        include: { roles: true, supervisor: true },
         orderBy: {
           name: 'asc',
         },
@@ -124,6 +124,7 @@ export class UsersService {
     }
   }
 
+  // TODO: terminar consulta para devolver usuarios que correspodnan al nombre del aliado
   async findByterm(term: string, paginationDto: PaginationDto) {
     const { limit = 10, offset = 1 } = paginationDto;
     let where;
@@ -138,18 +139,6 @@ export class UsersService {
               mode: 'insensitive',
             },
           },
-          {
-            ally: {
-              OR: [
-                {
-                  name: {
-                    contains: term,
-                    mode: 'insensitive',
-                  },
-                },
-              ],
-            },
-          },
         ],
       };
     }
@@ -157,7 +146,6 @@ export class UsersService {
       return await this.prismaService.users.findMany({
         where,
         include: {
-          ally: true,
           roles: true,
           supervisor: true,
         },
@@ -184,7 +172,6 @@ export class UsersService {
           email: email.toString().trim().toLowerCase(),
         },
         include: {
-          ally: true,
           roles: true,
           supervisor: true,
         },
@@ -353,7 +340,6 @@ export class UsersService {
       return await this.prismaService.users.findMany({
         where: { roleId: roleId },
         include: {
-          ally: true,
           roles: true,
           supervisor: true,
         },

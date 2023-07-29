@@ -20,10 +20,7 @@ model Users {
   phone              String?         @db.VarChar
   isActive           Boolean         @default(true)
   roles              Roles?          @relation(fields: [roleId], references: [id])
-  allyOf             Users[]         @relation("AllyRelation")
-  ally               Users?          @relation("AllyRelation", fields: [allyId], references: [id])
   roleId             Int
-  allyId             Int?
   supervisorOf       Users[]         @relation("SupervisorRelation")
   supervisor         Users?          @relation("SupervisorRelation", fields: [supervisorId], references: [id])
   supervisorId       Int?

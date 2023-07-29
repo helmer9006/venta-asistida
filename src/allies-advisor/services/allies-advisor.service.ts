@@ -12,6 +12,7 @@ export class AlliesAdvisorService {
   async create(createAlliesAdvisorDto: CreateAlliesAdvisorDto) {
     try {
       await this.utils.findAllyById(createAlliesAdvisorDto.allyId);
+      await this.utils.findAdvisorById(createAlliesAdvisorDto.advisorId);
       return await this.prismaService.alliesAdvisor.create({
         data: createAlliesAdvisorDto,
       });
@@ -23,7 +24,7 @@ export class AlliesAdvisorService {
   async findAll(advisorId: number) {
     try {
       const recordsFound = await this.prismaService
-        .$queryRaw`SELECT u.id, u."name", u.lastname, u.email , u.phone  FROM "Users" u 
+        .$queryRaw`SELECT aa."id", u."name", u."lastname", u."email" , u."phone", aa."allyId", aa."advisorId"  FROM "Users" u 
         INNER JOIN "AlliesAdvisor" aa ON u.id = aa."allyId" 
         WHERE aa."advisorId" = ${advisorId}`;
       return recordsFound;

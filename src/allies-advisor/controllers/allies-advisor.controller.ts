@@ -48,6 +48,7 @@ export class AlliesAdvisorController {
   }
 
   @Get('/:advisorId')
+  @Auth()
   @ApiOkResponse(SW_RESPONSES.getAlliesAdvisorOkReponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
   async findAll(@Param('advisorId') advisorId: string) {

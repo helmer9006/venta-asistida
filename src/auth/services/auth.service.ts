@@ -1,10 +1,16 @@
-import { Injectable, HttpStatus, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  HttpStatus,
+  Inject,
+  UnauthorizedException,
+} from '@nestjs/common';
 import * as msal from '@azure/msal-node';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { ConfigService, ConfigType } from '@nestjs/config';
 import config from 'src/config/config';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { GetTokenDto } from '@src/auth/models/dto/get-token.dto';
+import { handleExceptions } from '@src/shared/helpers/general';
 
 const confidentialClientConfig = {
   auth: {
@@ -81,85 +87,73 @@ export class AuthService {
   async findUserAndTokenByCode(code: GetTokenDto, req, res) {
     tokenRequest.code = code;
     let userUid, email, idTokenClaims, token, isNew;
-
     try {
       const response: any =
         await confidentialClientApplication.acquireTokenByCode(tokenRequest);
       userUid = response?.idTokenClaims?.sub || null;
-      email = response?.idTokenClaims?.emails[0] || null;
+      email =
+        response?.idTokenClaims?.emails?.length > 0
+          ? response.idTokenClaims.emails[0]
+          : null;
       token = response?.idToken || null;
       idTokenClaims = response?.idTokenClaims || null;
       isNew = response?.idTokenClaims?.newUser || false;
-    } catch (error) {
-      throw new GenericResponse(
-        {},
-        HttpStatus.UNAUTHORIZED.valueOf(),
-        'No es posible validar la identidad del usuario.',
-      );
-    }
 
-    if (!userUid)
-      throw new GenericResponse(
-        {},
-        HttpStatus.UNAUTHORIZED.valueOf(),
-        'No es posible validar la identidad del usuario.',
-      );
-    if (!email)
-      throw new GenericResponse(
-        {},
-        HttpStatus.UNAUTHORIZED.valueOf(),
-        'No es posible validar la identidad del usuario.',
-      );
-    const user = await this.prismaService.users.findUnique({
-      where: { email },
-      include: {
-        roles: true,
-      },
-    });
-    const rolStatus: boolean = user.roles?.isActive || false;
-    if (!user)
-      throw new GenericResponse(
-        {},
-        HttpStatus.UNAUTHORIZED.valueOf(),
-        'El usuario no se encuentra registrado.',
-      );
-    if (!rolStatus)
-      throw new GenericResponse(
-        {},
-        HttpStatus.UNAUTHORIZED.valueOf(),
-        'El rol asignado al usuario se encuentra inactivo.',
-      );
-    if (!user.isActive)
-      throw new GenericResponse(
-        {},
-        HttpStatus.UNAUTHORIZED.valueOf(),
-        'El usuario se encuentra inactivo.',
-      );
-    if (isNew || user?.uid === '') {
-      await this.prismaService.users.update({
-        where: {
-          id: user.id,
+      if (!userUid)
+        throw new UnauthorizedException(
+          'No es posible validar la identidad del usuario.',
+        );
+      if (!email)
+        throw new UnauthorizedException(
+          'No es posible validar la identidad del usuario.',
+        );
+      const user = await this.prismaService.users.findUnique({
+        where: { email },
+        include: {
+          roles: true,
         },
-        data: { uid: userUid },
       });
-    }
-    const modules = await this.prismaService.modules.findMany({
-      where: { permissions: { some: {} } },
-      include: {
-        permissions: {
+      const rolStatus: boolean = user.roles?.isActive || false;
+      if (!user)
+        throw new UnauthorizedException(
+          'El usuario no se encuentra registrado.',
+        );
+      if (!rolStatus)
+        throw new UnauthorizedException(
+          'El rol asignado al usuario se encuentra inactivo.',
+        );
+      if (!user.isActive)
+        throw new UnauthorizedException('El usuario se encuentra inactivo.');
+      // validar Si usario exite por el correo recibido y el uid / sub es diferente al alamacena
+      // en la base de datos denegar acceso, decir que ya usuario se encuentra logueado con otro provedor de identifad.
+      if (isNew || user?.uid === '') {
+        await this.prismaService.users.update({
           where: {
-            rolesPermission: {
-              some: {
-                roleId: user.roleId,
+            id: user.id,
+          },
+          data: { uid: userUid },
+        });
+      }
+      const modules = await this.prismaService.modules.findMany({
+        where: { permissions: { some: {} } },
+        include: {
+          permissions: {
+            where: {
+              rolesPermission: {
+                some: {
+                  roleId: user.roleId,
+                },
               },
             },
           },
         },
-      },
-    });
-    const modulesToReturn = modules.filter(
-      (module) => module.permissions.length > 0,
-    );
-    return { user, token, idTokenClaims, modules: modulesToReturn };
+      });
+      const modulesToReturn = modules.filter(
+        (module) => module.permissions.length > 0,
+      );
+      return { user, token, idTokenClaims, modules: modulesToReturn };
+    } catch (error) {
+      handleExceptions(error);
+    }
   }
 }
