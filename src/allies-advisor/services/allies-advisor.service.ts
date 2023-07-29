@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateAlliesAdvisorDto } from '../models/dto/create-allies-advisor.dto';
 import { handleExceptions } from '@src/shared/helpers/general';
 import { PrismaService } from '../../prisma/services/prisma.service';

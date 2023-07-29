@@ -1,33 +1,23 @@
+import { Controller, Post, Body, HttpStatus, Query } from '@nestjs/common';
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  HttpStatus,
-  UsePipes,
-  Query,
-} from '@nestjs/common';
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiInternalServerErrorResponse,
+  ApiOkResponse,
+  ApiTags,
+  ApiUnauthorizedResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+
 import { LogsService } from '../services/logs.service';
 import { CreateLogDto } from '../models/dto/create-log.dto';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { Auth, GetUser } from '@src/auth/decorators';
 import { RolesEnum } from '@src/auth/enums/roles.enum';
 import { RequestGetLogsDto } from '../models/dto/request-get-logs.dto';
-import {
-  ApiBadRequestResponse,
-  ApiBody,
-  ApiInternalServerErrorResponse,
-  ApiOkResponse,
-  ApiResponse,
-  ApiTags,
-  ApiUnauthorizedResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger';
 import { SW_RESPONSES } from '@src/shared/helpers/responses-swagger';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
+
 @Controller('logs')
 @ApiTags('Services Logs')
 @ApiBearerAuth()

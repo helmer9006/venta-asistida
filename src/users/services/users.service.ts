@@ -1,30 +1,16 @@
-import {
-  Injectable,
-  HttpStatus,
-  Logger,
-  InternalServerErrorException,
-  Inject,
-} from '@nestjs/common';
+import { Injectable, HttpStatus, Logger, Inject } from '@nestjs/common';
 import * as msal from '@azure/msal-node';
 import { ConfigService, ConfigType } from '@nestjs/config';
-import { validate as IsUUID } from 'uuid';
-import { CreateUserDto, RequestUserDto, UpdateUserDto } from '../models/dto';
+import { CreateUserDto, UpdateUserDto } from '../models/dto';
 import { PrismaService } from '@src/prisma/services/prisma.service';
-import {
-  ConflictException,
-  BadRequestException,
-  UnauthorizedException,
-  NotFoundException,
-} from '@src/shared/exceptions';
 import config from '@src/config/config';
 import { isNumber } from '@src/shared/helpers/general';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
 import { UtilsService } from '../../shared/services/utils.service';
-import { AxiosAdapter } from '@src/shared/adapters/axios.adapter';
 import { readFileSync } from 'fs';
-import { IResponseSignIn } from '@src/shared/interfaces/response-signin.interface';
 import { LogsService } from '@src/logs/services/logs.service';
+import { handleExceptions } from '../../shared/helpers/general';
 const confidentialClientConfig = {
   auth: {
     clientId: process.env.APP_CLIENT_ID,
@@ -99,7 +85,7 @@ export class UsersService {
       this.logs.create(dataObject);
       return userCreated;
     } catch (error) {
-      this.handleExceptions(error);
+      handleExceptions(error);
     }
   }
 
@@ -228,39 +214,8 @@ export class UsersService {
       this.logs.create(dataObject);
       return updatedUser;
     } catch (error) {
-      this.handleExceptions(error);
+      handleExceptions(error);
     }
-  }
-
-  private handleExceptions(error: any): never {
-    if (error.code === '23505')
-      throw new GenericResponse(
-        {},
-        HttpStatus.CONFLICT.valueOf(),
-        'Error gestionando usuario.',
-      );
-    if (error.code === 'P2002')
-      throw new GenericResponse(
-        {},
-        HttpStatus.CONFLICT.valueOf(),
-        'El usuario ya se encuentra registrado, validar correo o identificación',
-      );
-    if (error.code === 'P1001')
-      throw new GenericResponse(
-        {},
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'Ha ocurrido un error de conexión con la base de datos.',
-      );
-    this.logger.error(
-      `Error inesperado, revise los logs del servidor. Error ${JSON.stringify(
-        error,
-      )}`,
-    );
-    throw new GenericResponse(
-      {},
-      HttpStatus.BAD_REQUEST.valueOf(),
-      'Error inesperado del servidor',
-    );
   }
 
   async getAuthCode(authority, scopes, state) {

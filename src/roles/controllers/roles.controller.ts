@@ -5,10 +5,8 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   HttpStatus,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
@@ -16,7 +14,6 @@ import {
   ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
-  ApiResponse,
   ApiTags,
   ApiUnauthorizedResponse,
   ApiBearerAuth,

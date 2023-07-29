@@ -4,7 +4,7 @@ import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { ConfigService } from '@nestjs/config';
 import { AxiosAdapter } from '../adapters/axios.adapter';
 import { IReponseTokenMule } from '../interfaces/response-token-mule.interface';
-import { Logger, HttpStatus } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { handleExceptions } from '../helpers/general';
 @Injectable()
 export class UtilsService {

@@ -1,36 +1,17 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Req,
-  Res,
-  Delete,
-  HttpStatus,
-  Query,
-  UseGuards,
-  SetMetadata,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Req, Res } from '@nestjs/common';
 import { Request, Response } from 'express';
-
-import { AuthService } from '@src/auth/services/auth.service';
 import {
   ApiBody,
-  ApiResponse,
   ApiTags,
   ApiOkResponse,
-  ApiOperation,
-  ApiBadRequestResponse,
   ApiInternalServerErrorResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+
 import { GetTokenDto } from '@src/auth/models/dto/get-token.dto';
-import { Users } from '@prisma/client';
 import { PrismaService } from '@src/prisma/services/prisma.service';
-import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { SW_RESPONSES } from '@src/shared/helpers/responses-swagger';
+import { AuthService } from '@src/auth/services/auth.service';
 
 @Controller('auth')
 @ApiTags('Services Authentication')

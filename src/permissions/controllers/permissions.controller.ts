@@ -1,17 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  HttpStatus,
-} from '@nestjs/common';
-import { PermissionsService } from '../services/permissions.service';
-import { GenericResponse } from '@src/shared/models/generic-response.model';
-import { Auth } from '@src/auth/decorators';
-import { RolesEnum } from '@src/auth/enums/roles.enum';
+import { Controller, Get, Param, HttpStatus } from '@nestjs/common';
 import {
   ApiInternalServerErrorResponse,
   ApiOkResponse,
@@ -19,6 +6,10 @@ import {
   ApiUnauthorizedResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+
+import { PermissionsService } from '../services/permissions.service';
+import { GenericResponse } from '@src/shared/models/generic-response.model';
+import { Auth } from '@src/auth/decorators';
 import { SW_RESPONSES } from '@src/shared/helpers/responses-swagger';
 
 @Controller('permissions')

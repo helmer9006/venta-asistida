@@ -1,12 +1,10 @@
 import { Injectable, Logger, HttpStatus, Inject } from '@nestjs/common';
 import { CreateLogDto } from '../models/dto/create-log.dto';
-import { UpdateLogDto } from '../models/dto/update-log.dto';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { RequestGetLogsDto } from '../models/dto/request-get-logs.dto';
 import config from '@src/config/config';
 import { ConfigType } from '@nestjs/config';
-import { BadRequestException } from '../../shared/exceptions/bad_request.exception';
 import { UtilsService } from '@src/shared/services/utils.service';
 import { PaginationDto } from '@src/shared/models/dto/pagination-user.dto';
 

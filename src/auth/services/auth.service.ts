@@ -124,7 +124,6 @@ export class AuthService {
         );
       if (!user.isActive)
         throw new UnauthorizedException('El usuario se encuentra inactivo.');
-      console.log('vali', user.uid.length);
       if (user.uid.length > 0 && userUid !== user.uid)
         throw new UnauthorizedException(
           `El usuario ${user.name} ${user.lastname} se encuentra registrado con otro proveedor de identidad.`,

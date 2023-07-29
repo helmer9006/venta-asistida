@@ -1,14 +1,12 @@
 import { CreateConfigAllyDto } from '../models/dto/create-config-ally.dto';
 import { UpdateConfigAllyDto } from '../models/dto/update-config-ally.dto';
 import {
-  HttpStatus,
   Injectable,
   Inject,
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '@src/prisma/services/prisma.service';
-import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { IAttributes } from '../interfaces/format-attributes.interface';
 import config from '@src/config/config';
 import { ConfigType } from '@nestjs/config';
