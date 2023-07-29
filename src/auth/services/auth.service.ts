@@ -124,8 +124,11 @@ export class AuthService {
         );
       if (!user.isActive)
         throw new UnauthorizedException('El usuario se encuentra inactivo.');
-      // validar Si usario exite por el correo recibido y el uid / sub es diferente al alamacena
-      // en la base de datos denegar acceso, decir que ya usuario se encuentra logueado con otro provedor de identifad.
+      console.log('vali', user.uid.length);
+      if (user.uid.length > 0 && userUid !== user.uid)
+        throw new UnauthorizedException(
+          `El usuario ${user.name} ${user.lastname} se encuentra registrado con otro proveedor de identidad.`,
+        );
       if (isNew || user?.uid === '') {
         await this.prismaService.users.update({
           where: {
