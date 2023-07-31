@@ -14,6 +14,7 @@ let alliesAdvController: AlliesAdvisorController;
 let alliesAdvService: AlliesAdvisorService;
 let prismaService: PrismaService;
 const payloadCreateAlliesAdvisor = testExpectValues.payloadCreateAlliesAdvisor;
+const payloadAdvisorId = testExpectValues.payloadAdvisorId;
 const payloadCreateAlliesAdvisorError =
   testExpectValues.payloadCreateAlliesAdvisorError;
 beforeEach(async () => {
@@ -81,8 +82,8 @@ describe('AlliesAdvisorService /create', () => {
     }
   });
 
-  it('Error cuando se intenta agregar un aliado a un asesor pero el aliado no existe.', async () => {
-    let serviceResponse, id, genericResponseOK, controlllerResponse;
+  it('Error cuando se intenta agregar un aliado a un asesor que ya está agregado.', async () => {
+    let serviceResponse, genericResponseOK;
     try {
       serviceResponse = await alliesAdvService.create(
         payloadCreateAlliesAdvisorError,
@@ -90,20 +91,7 @@ describe('AlliesAdvisorService /create', () => {
       genericResponseOK = new GenericResponseTestDataBuilder().build(
         serviceResponse,
         HttpStatus.NOT_FOUND,
-        'No se pudo encontrar el aliado.',
-      );
-      jest
-        .spyOn(alliesAdvController, 'create')
-        .mockResolvedValue(genericResponseOK);
-      controlllerResponse = await alliesAdvController.create(
-        payloadCreateAlliesAdvisorError,
-      );
-    } catch (error) {
-      console.log('genericResponseOKg', genericResponseOK);
-      console.log('controlllerResponse', controlllerResponse);
-      //validation response of service with response controller.
-      expect(controlllerResponse.statusCode).toStrictEqual(
-        genericResponseOK.statusCode,
+        'Existe un registro con la misma información.',
       );
       const id =
         genericResponseOK && genericResponseOK.data
@@ -115,6 +103,60 @@ describe('AlliesAdvisorService /create', () => {
           where: { id: id },
         });
       }
+    } catch (error) {
+      //validation response error
+      expect(error.statusCode).toStrictEqual(409);
+      expect(error.message).toStrictEqual(
+        'Existe un registro con la misma información.',
+      );
     }
+  });
+});
+
+describe('AlliesAdvisorService FindAll by advisorId', () => {
+  it('Obtener el listado de aliados asociados al asesor.', async () => {
+    const responseService = await alliesAdvService.findAll(
+      Number(payloadAdvisorId),
+    );
+    const genericResponseOK = new GenericResponseTestDataBuilder().build(
+      responseService,
+      HttpStatus.OK,
+      'Registros encontrados.',
+    );
+    jest
+      .spyOn(alliesAdvController, 'findAll')
+      .mockResolvedValue(genericResponseOK);
+
+    const controllerResponse = await alliesAdvController.findAll(
+      payloadAdvisorId,
+    );
+
+    expect(controllerResponse.data).toStrictEqual(responseService);
+    expect(controllerResponse.statusCode).toStrictEqual(200);
+    expect(controllerResponse.message).toStrictEqual('Registros encontrados.');
+  });
+});
+
+describe('AlliesAdvisorService Delete by advisorId', () => {
+  it('Eliminar registor de aliado asociado a asesor.', async () => {
+    const responseService = await alliesAdvService.remove(
+      Number(payloadAdvisorId),
+    );
+    const genericResponseOK = new GenericResponseTestDataBuilder().build(
+      responseService,
+      HttpStatus.OK,
+      'Registros encontrados.',
+    );
+    jest
+      .spyOn(alliesAdvController, 'findAll')
+      .mockResolvedValue(genericResponseOK);
+
+    const controllerResponse = await alliesAdvController.findAll(
+      payloadAdvisorId,
+    );
+
+    expect(controllerResponse.data).toStrictEqual(responseService);
+    expect(controllerResponse.statusCode).toStrictEqual(200);
+    expect(controllerResponse.message).toStrictEqual('Registros encontrados.');
   });
 });

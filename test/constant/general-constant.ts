@@ -1,4 +1,3 @@
-
 export const GeneralTestConstant = {
   ONCE: 1,
   ZERO: 0,
@@ -164,12 +163,12 @@ export const testExpectValues = {
     offset: 1,
   },
   payloadCreateAlliesAdvisor: {
-    advisorId: 23,
+    advisorId: 31,
     allyId: 2,
   },
   payloadCreateAlliesAdvisorError: {
-    advisorId: 23,
-    allyId: 222255555,
+    advisorId: 31,
+    allyId: 3,
   },
 
   payloadAllyFound: {
@@ -194,18 +193,23 @@ export const testExpectValues = {
 
   payloadCreateConfigAlly: {
     allyId: 6,
-    attributes: "[{\"name\":\"firtsName\",\"required\":true,\"disabled\":false,\"type\":\"text\"},{\"name\":\"secondName\",\"required\":false,\"disabled\":false,\"type\":\"text\"},{\"name\":\"surname\",\"required\":true,\"disabled\":false,\"type\":\"text\"},{\"name\":\"secondSurname\",\"required\":false,\"disabled\":false,\"type\":\"text\"},{\"name\":\"birthdate\",\"required\":true,\"disabled\":false,\"type\":\"date\"},{\"name\":\"department\",\"required\":true,\"disabled\":false,\"type\":\"select\"},{\"name\":\"municipality\",\"required\":true,\"disabled\":false,\"type\":\"select\"},{\"name\":\"identificationType\",\"required\":true,\"disabled\":false,\"type\":\"text\"},{\"name\":\"identification\",\"required\":true,\"disabled\":false,\"type\":\"number\"},{\"name\":\"expeditionDate\",\"required\":true,\"disabled\":false,\"type\":\"date\"},{\"name\":\"expeditionPlace\",\"required\":true,\"disabled\":false,\"type\":\"text\"},{\"name\":\"gender\",\"required\":true,\"disabled\":false,\"type\":\"text\"},{\"name\":\"address\",\"required\":true,\"disabled\":false,\"type\":\"text\"},{\"name\":\"phoneNumber\",\"required\":true,\"disabled\":false,\"type\":\"number\"},{\"name\":\"email\",\"required\":true,\"disabled\":false,\"type\":\"text\"}]",
-    dataPolicy: 'En cumplimiento de las disposiciones de la Ley 1581 de 2012 y del Decreto reglamentario 1377 de 2013 que desarrollan el derecho de habeas data...',
-    noEssentialDataPolicy: "[{\"name\":\"Recibir notificaciones sms\",\"disabled\":true,\"type\":\"text\"},{\"name\":\"Recibir notificaciones whatsApp\",\"disabled\":false,\"type\":\"text\"}]",
+    attributes:
+      '[{"name":"firtsName","required":true,"disabled":false,"type":"text"},{"name":"secondName","required":false,"disabled":false,"type":"text"},{"name":"surname","required":true,"disabled":false,"type":"text"},{"name":"secondSurname","required":false,"disabled":false,"type":"text"},{"name":"birthdate","required":true,"disabled":false,"type":"date"},{"name":"department","required":true,"disabled":false,"type":"select"},{"name":"municipality","required":true,"disabled":false,"type":"select"},{"name":"identificationType","required":true,"disabled":false,"type":"text"},{"name":"identification","required":true,"disabled":false,"type":"number"},{"name":"expeditionDate","required":true,"disabled":false,"type":"date"},{"name":"expeditionPlace","required":true,"disabled":false,"type":"text"},{"name":"gender","required":true,"disabled":false,"type":"text"},{"name":"address","required":true,"disabled":false,"type":"text"},{"name":"phoneNumber","required":true,"disabled":false,"type":"number"},{"name":"email","required":true,"disabled":false,"type":"text"}]',
+    dataPolicy:
+      'En cumplimiento de las disposiciones de la Ley 1581 de 2012 y del Decreto reglamentario 1377 de 2013 que desarrollan el derecho de habeas data...',
+    noEssentialDataPolicy:
+      '[{"name":"Recibir notificaciones sms","disabled":true,"type":"text"},{"name":"Recibir notificaciones whatsApp","disabled":false,"type":"text"}]',
   },
 
   payloadUpdateConfigAlly: {
     allyId: 6,
-    attributes: "[{\"name\":\"firtsName\",\"required\":false,\"disabled\":false,\"type\":\"text\"},{\"name\":\"secondName\",\"required\":false,\"disabled\":false,\"type\":\"text\"},{\"name\":\"surname\",\"required\":false,\"disabled\":false,\"type\":\"text\"},{\"name\":\"secondSurname\",\"required\":false,\"disabled\":false,\"type\":\"text\"},{\"name\":\"birthdate\",\"required\":false,\"disabled\":false,\"type\":\"date\"},{\"name\":\"department\",\"required\":false,\"disabled\":false,\"type\":\"select\"},{\"name\":\"municipality\",\"required\":false,\"disabled\":false,\"type\":\"select\"},{\"name\":\"identificationType\",\"required\":false,\"disabled\":false,\"type\":\"text\"},{\"name\":\"identification\",\"required\":false,\"disabled\":false,\"type\":\"number\"},{\"name\":\"expeditionDate\",\"required\":false,\"disabled\":false,\"type\":\"date\"},{\"name\":\"expeditionPlace\",\"required\":false,\"disabled\":false,\"type\":\"text\"},{\"name\":\"gender\",\"required\":false,\"disabled\":false,\"type\":\"text\"},{\"name\":\"address\",\"required\":false,\"disabled\":false,\"type\":\"text\"},{\"name\":\"phoneNumber\",\"required\":false,\"disabled\":false,\"type\":\"number\"},{\"name\":\"email\",\"required\":false,\"disabled\":false,\"type\":\"text\"}]",
+    attributes:
+      '[{"name":"firtsName","required":false,"disabled":false,"type":"text"},{"name":"secondName","required":false,"disabled":false,"type":"text"},{"name":"surname","required":false,"disabled":false,"type":"text"},{"name":"secondSurname","required":false,"disabled":false,"type":"text"},{"name":"birthdate","required":false,"disabled":false,"type":"date"},{"name":"department","required":false,"disabled":false,"type":"select"},{"name":"municipality","required":false,"disabled":false,"type":"select"},{"name":"identificationType","required":false,"disabled":false,"type":"text"},{"name":"identification","required":false,"disabled":false,"type":"number"},{"name":"expeditionDate","required":false,"disabled":false,"type":"date"},{"name":"expeditionPlace","required":false,"disabled":false,"type":"text"},{"name":"gender","required":false,"disabled":false,"type":"text"},{"name":"address","required":false,"disabled":false,"type":"text"},{"name":"phoneNumber","required":false,"disabled":false,"type":"number"},{"name":"email","required":false,"disabled":false,"type":"text"}]',
   },
 
-  payloadAttributesIncomplete: "[{\"name\":\"secondName\",\"required\":false,\"disabled\":false,\"type\":\"text\"},{\"name\":\"surname\",\"required\":true,\"disabled\":false,\"type\":\"text\"},{\"name\":\"secondSurname\",\"required\":false,\"disabled\":false,\"type\":\"text\"},{\"name\":\"birthdate\",\"required\":true,\"disabled\":false,\"type\":\"date\"},{\"name\":\"department\",\"required\":true,\"disabled\":false,\"type\":\"select\"},{\"name\":\"municipality\",\"required\":true,\"disabled\":false,\"type\":\"select\"},{\"name\":\"identificationType\",\"required\":true,\"disabled\":false,\"type\":\"text\"},{\"name\":\"identification\",\"required\":true,\"disabled\":false,\"type\":\"number\"},{\"name\":\"expeditionDate\",\"required\":true,\"disabled\":false,\"type\":\"date\"},{\"name\":\"expeditionPlace\",\"required\":true,\"disabled\":false,\"type\":\"text\"},{\"name\":\"gender\",\"required\":true,\"disabled\":false,\"type\":\"text\"},{\"name\":\"address\",\"required\":true,\"disabled\":false,\"type\":\"text\"},{\"name\":\"phoneNumber\",\"required\":true,\"disabled\":false,\"type\":\"number\"},{\"name\":\"email\",\"required\":true,\"disabled\":false,\"type\":\"text\"}]",
-  
+  payloadAttributesIncomplete:
+    '[{"name":"secondName","required":false,"disabled":false,"type":"text"},{"name":"surname","required":true,"disabled":false,"type":"text"},{"name":"secondSurname","required":false,"disabled":false,"type":"text"},{"name":"birthdate","required":true,"disabled":false,"type":"date"},{"name":"department","required":true,"disabled":false,"type":"select"},{"name":"municipality","required":true,"disabled":false,"type":"select"},{"name":"identificationType","required":true,"disabled":false,"type":"text"},{"name":"identification","required":true,"disabled":false,"type":"number"},{"name":"expeditionDate","required":true,"disabled":false,"type":"date"},{"name":"expeditionPlace","required":true,"disabled":false,"type":"text"},{"name":"gender","required":true,"disabled":false,"type":"text"},{"name":"address","required":true,"disabled":false,"type":"text"},{"name":"phoneNumber","required":true,"disabled":false,"type":"number"},{"name":"email","required":true,"disabled":false,"type":"text"}]',
+
   ATTRIBUTES_REQUIRED_FORM_BASE: [
     'firtsName',
     'secondName',
@@ -223,6 +227,5 @@ export const testExpectValues = {
     'phoneNumber',
     'email',
   ],
+  payloadAdvisorId: '31',
 };
-
-

@@ -33,10 +33,10 @@ export class AlliesAdvisorController {
   @Post('/create')
   @Auth(RolesEnum.SUPERADMIN, RolesEnum.ADMIN)
   @ApiBody({ type: CreateAlliesAdvisorDto })
-  @ApiOkResponse(SW_RESPONSES.createUserOkResponse)
+  @ApiOkResponse(SW_RESPONSES.createAlliesAdvisorOkResponse)
   @ApiBadRequestResponse(SW_RESPONSES.badRequestResponse)
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
-  @ApiConflictResponse(SW_RESPONSES.conflictResponse)
+  @ApiConflictResponse(SW_RESPONSES.conflictRoleResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
   async create(@Body() createAlliesAdvisorDto: CreateAlliesAdvisorDto) {
     const data = await this.alliesAdvisorService.create(createAlliesAdvisorDto);

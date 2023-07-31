@@ -182,7 +182,7 @@ describe('ConfigAlly Services Create', () => {
 });
 
 describe('ConfigAllyService FindOne', () => {
-  it('deberia obtener el forumario base correctamente', async () => {
+  it('deberia obtener el formulario base correctamente', async () => {
     const responseService = await configAllyService.findOne(1, NaN);
     const genericResponseOK = new GenericResponseTestDataBuilder().build(
       responseService,
@@ -418,5 +418,5 @@ describe('ConfigAllyService Update', () => {
 describe('ConfigAllyService FindAllyById', () => {
   it('deberia obtener el usuario aliado corectamente.', async () => {
     const response = await configAllyService.findAllyById(2);
-  })
-})
+  });
+});

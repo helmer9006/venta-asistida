@@ -11,6 +11,10 @@ import { UtilsService } from '../../shared/services/utils.service';
 import { readFileSync } from 'fs';
 import { LogsService } from '@src/logs/services/logs.service';
 import { handleExceptions } from '../../shared/helpers/general';
+import { AlliesAdvisor } from '../../allies-advisor/entities/allies-advisor.entity';
+import { GetResult } from '@prisma/client/runtime';
+import { User } from '../entities/user.entity';
+import { Users } from '@prisma/client';
 const confidentialClientConfig = {
   auth: {
     clientId: process.env.APP_CLIENT_ID,
@@ -110,37 +114,42 @@ export class UsersService {
     }
   }
 
-  // TODO: terminar consulta para devolver usuarios que correspodnan al nombre del aliado
   async findByterm(term: string, paginationDto: PaginationDto) {
     const { limit = 10, offset = 1 } = paginationDto;
     let where;
-    if (isNumber(term.trim())) {
-      where = { identification: term };
-    } else {
-      where = {
-        OR: [
-          {
-            name: {
-              contains: term,
-              mode: 'insensitive',
-            },
-          },
-        ],
-      };
-    }
+    term = term.toLowerCase();
     try {
-      return await this.prismaService.users.findMany({
+      if (isNumber(term.trim())) {
+        where = { identification: { contains: term, mode: 'insensitive' } };
+      } else {
+        where = {
+          OR: [
+            { name: { contains: term, mode: 'insensitive' } },
+            { identification: { contains: term, mode: 'insensitive' } },
+            {
+              AlliesAdvisor: {
+                some: {
+                  advisor: { name: { contains: term } },
+                },
+              },
+            },
+          ],
+        };
+      }
+      const users: Users[] = await this.prismaService.users.findMany({
         where,
-        include: {
-          roles: true,
-          supervisor: true,
-        },
-        take: limit,
-        skip: (offset - 1) * limit,
-        orderBy: {
-          name: 'asc',
-        },
       });
+      const advisorByAlly: Users[] = await this.prismaService.$queryRawUnsafe(
+        `
+      SELECT "Users".*
+      FROM "Users"
+      INNER JOIN "AlliesAdvisor" ON "Users"."id" = "AlliesAdvisor"."advisorId"
+      INNER JOIN "Users" AS "Aliado" ON "AlliesAdvisor"."allyId" = "Aliado"."id"
+      WHERE LOWER("Aliado"."name") like $1
+    `,
+        `%${term}%`,
+      );
+      return [...users, ...advisorByAlly];
     } catch (error) {
       throw new GenericResponse(
         [],

@@ -856,11 +856,14 @@ export const SW_RESPONSES = {
           type: 'object',
           properties: {
             data: {
-              id: 9,
-              advisorId: 23,
-              allyId: 24,
-              createdAt: '2023-07-28T02:48:52.723Z',
-              updatedAt: '2023-07-28T02:48:52.723Z',
+              type: 'object',
+              example: {
+                id: 9,
+                advisorId: 23,
+                allyId: 24,
+                createdAt: '2023-07-28T02:48:52.723Z',
+                updatedAt: '2023-07-28T02:48:52.723Z',
+              },
             },
             statusCode: { type: 'number', example: 200 },
             message: {
