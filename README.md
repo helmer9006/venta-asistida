@@ -1,23 +1,73 @@
-## 📗 CS - venta-asistida
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
+</p>
 
-🥼🧪 LABORATORIO DIGITAL COLMENA
+🥼🧪 PROYECTO DE VENTA ASISTIDA COLMENA
 
-Plantilla base para proyectos de laboratorio digital, compuesto de los siguientes componentes
+Proyecto de venta asistida para la ejecución y gestión de ventas de productos de afinidad.
 
-- 🛡️ **Autenticación**: Se tiene guard para validación sencilla de token JWT
+# Ejecutar proyecto
 
-- 👮‍♂️ **Autorización**: Se implementa validación de rol a partir de un JWT a través de un módulo para registrar roles que se necesiten.
+1. Clonar el repositorio
 
-- **Feature Flags**:
+```
+https://github.com/helmer9006/venta-asistida.git
+```
 
-'''
-docker run -e POSTGRES_PASSWORD=some_password -e POSTGRES_USER=unleash_user -e POSTGRES_DB=unleash --network unleash --name postgres postgres
-docker run -p 4242:4242 -e DATABASE_HOST=postgres -e DATABASE_NAME=unleash -e DATABASE_USERNAME=unleash_user -e DATABASE_PASSWORD=some_password -e DATABASE_SSL=false --network unleash unleashorg/unleash-server
-'''
+2. Ejecutar
+
+```
+npm install
+```
+
+3. Tener Nest CLI instalado
+
+```
+npm install -g @nestjs/cli
+```
+
+4. Validar variables de entorno para conexión a la base de datos.
+
+```
+DATABASE_URL=uriconexiondbaquí
+```
+
+5. Generar contenedor de api
+
+```
+docker-compose up -d
+```
+
+5. Clonar el archivo `.env.template` y renombrar la copia a `.env`
+
+6. Llenar las variables de entorno definidas en el `.env`
+
+7. Ejecutar aplicación en dev:
+   ```
+   npm start:dev
+   ```
+
+## Stack usado
+
+- PostgreSQL
+- NestJS
+- Prisma ORM
+
+# Build de producción 
+
+1. Crear el archivo `.env.prod`
+2. Llenar las variables de entorno
+3. Crear la nueva imagen
+
+```
+docker-compose -f docker-compose.prod.yaml --env-file .env.prod up --build
+```
+
+# Notas
 
 - **Modulo de prisma**:
 
-Para acceso a base de datos, recordar ejecutar el comando de generacion antes de trabajar con los dtos y clases del cliente de prisma 
+Para acceso a base de datos, recordar ejecutar el comando de generacion antes de trabajar con los dtos y clases del cliente de prisma
 
 ```sh
 npx prisma generate
@@ -29,7 +79,3 @@ importante que cuando se haga cambios al modelo, regenerar las migraciones con l
 npx prisma generate
 npx prisma db push
 ```
-
-- **Modulo para consumos externo**:
-
-Aqui se aloja un ejemplo de como hacer consumo externo hacia algun servicio en particular
