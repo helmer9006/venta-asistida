@@ -38,7 +38,7 @@ export class AlliesAdvisorController {
   @ApiUnauthorizedResponse(SW_RESPONSES.unauthorizeResponse)
   @ApiConflictResponse(SW_RESPONSES.conflictRoleResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
-  async create(@Body() createAlliesAdvisorDto: CreateAlliesAdvisorDto) {
+  async create(@Body() createAlliesAdvisorDto: CreateAlliesAdvisorDto[]) {
     const data = await this.alliesAdvisorService.create(createAlliesAdvisorDto);
     return new GenericResponse(
       data,

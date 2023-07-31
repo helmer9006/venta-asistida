@@ -9,11 +9,12 @@ export class AlliesAdvisorService {
     private readonly prismaService: PrismaService,
     private readonly utils: UtilsService,
   ) {}
-  async create(createAlliesAdvisorDto: CreateAlliesAdvisorDto) {
+  async create(createAlliesAdvisorDto: CreateAlliesAdvisorDto[]) {
     try {
-      await this.utils.findAllyById(createAlliesAdvisorDto.allyId);
-      await this.utils.findAdvisorById(createAlliesAdvisorDto.advisorId);
-      return await this.prismaService.alliesAdvisor.create({
+      await this.utils.findAdvisorById(createAlliesAdvisorDto[0].advisorId);
+      const alliesId = createAlliesAdvisorDto.map((advisor) => advisor.allyId);
+      await this.utils.findAllyById(alliesId);
+      return await this.prismaService.alliesAdvisor.createMany({
         data: createAlliesAdvisorDto,
       });
     } catch (error) {

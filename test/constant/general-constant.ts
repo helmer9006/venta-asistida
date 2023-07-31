@@ -162,14 +162,18 @@ export const testExpectValues = {
     limit: 10,
     offset: 1,
   },
-  payloadCreateAlliesAdvisor: {
-    advisorId: 31,
-    allyId: 2,
-  },
-  payloadCreateAlliesAdvisorError: {
-    advisorId: 31,
-    allyId: 3,
-  },
+  payloadCreateAlliesAdvisor: [
+    {
+      advisorId: 31,
+      allyId: 2,
+    },
+  ],
+  payloadCreateAlliesAdvisorError: [
+    {
+      advisorId: 31,
+      allyId: 3,
+    },
+  ],
 
   payloadAllyFound: {
     id: 1,

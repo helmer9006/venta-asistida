@@ -78,15 +78,18 @@ export class UtilsService {
     }
   }
 
-  async findAllyById(allyId: number) {
+  async findAllyById(alliesId: number[]) {
     try {
       const allyFound = await this.prismaService.users.findMany({
-        where: { id: allyId, roleId: Number(process.env.ID_ROLE_ALLY) },
+        where: {
+          id: { in: alliesId },
+          roleId: Number(process.env.ID_ROLE_ALLY),
+        },
       });
-      if (allyFound.length == 0) {
+      if (allyFound.length == 0 || allyFound.length < alliesId.length) {
         throw new NotFoundException('No se pudo encontrar el aliado.');
       }
-      return allyFound[0];
+      return allyFound;
     } catch (error) {
       handleExceptions(error);
     }
