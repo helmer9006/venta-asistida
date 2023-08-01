@@ -3,7 +3,6 @@ import * as msal from '@azure/msal-node';
 export default registerAs('config', () => {
   return {
     jwtSecret: process.env.JWT_SECRET,
-    exampleProviderGetService: process.env.EXAMPLE_PROVIDER_GET_SERVICE,
     unleash: {
       apiUrl: process.env.UNLEASH_API_URL,
       apiKey: process.env.UNLEASH_API_KEY,

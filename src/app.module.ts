@@ -10,7 +10,6 @@ import { PermissionsModule } from './permissions/permissions.module';
 import { ConfigAllyModule } from './config-ally/config-ally.module';
 import { LogsModule } from './logs/logs.module';
 import { AlliesAdvisorModule } from './allies-advisor/allies-advisor.module';
-import { AxiosAdapter } from './shared/adapters/axios.adapter';
 
 @Module({
   imports: [
@@ -20,10 +19,33 @@ import { AxiosAdapter } from './shared/adapters/axios.adapter';
       load: [config],
       validationSchema: Joi.object({
         JWT_SECRET: Joi.string().required(),
-        EXAMPLE_PROVIDER_GET_SERVICE: Joi.string().required(),
         DATABASE_URL: Joi.string().required(),
-
         SWAGGER_PASS: Joi.string().required(),
+        PORT: Joi.string().required(),
+        APP_CLIENT_ID: Joi.string().required(),
+        SESSION_SECRET: Joi.string().required(),
+        APP_CLIENT_SECRET: Joi.string().required(),
+        SIGN_UP_SIGN_IN_POLICY_AUTHORITY: Joi.string().required(),
+        RESET_PASSWORD_POLICY_AUTHORITY: Joi.string().required(),
+        EDIT_PROFILE_POLICY_AUTHORITY: Joi.string().required(),
+        AUTHORITY_DOMAIN: Joi.string().required(),
+        APP_REDIRECT_URI: Joi.string().required(),
+        LOGOUT_ENDPOINT: Joi.string().required(),
+        IDENTITY_METADATA: Joi.string().required(),
+        ID_ROLE_ADMIN: Joi.string().required(),
+        ID_ROLE_SUPERADMIN: Joi.string().required(),
+        ID_ROLE_ADVISOR: Joi.string().required(),
+        ID_ROLE_ALLY: Joi.string().required(),
+        ID_ROLE_SUPERVISOR: Joi.string().required(),
+        MULE_URL_SEND_EMAIL: Joi.string().required(),
+        MULE_URL_SEND_SMS_OTP: Joi.string().required(),
+        MULE_URL_SEND_SMS_OTP_VALIDATE: Joi.string().required(),
+        MULE_URL_GENERATE_TOKEN: Joi.string().required(),
+        MULE_CLIENT_ID: Joi.string().required(),
+        MULE_CLIENT_SECRET: Joi.string().required(),
+        MULE_GRANT_TYPE: Joi.string().required(),
+        MULE_CLIENT_ID_METHOD: Joi.string().required(),
+        MULE_CLIENT_SECRET_METHOD: Joi.string().required(),
       }),
     }),
     AuthModule,

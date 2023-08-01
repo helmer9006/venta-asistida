@@ -1,0 +1,5 @@
+node_modules/
+!nodes_modules/.prisma
+dist/
+.git/
+.gitignore

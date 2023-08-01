@@ -1,34 +1,43 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: postgres
-    environment:
-      POSTGRES_PASSWORD: default
-      POSTGRES_USER: user
-      POSTGRES_DB: unleash
+  ventaasistida:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: venta-asistida
+    container_name: ventaasistida
+    restart: always
     ports:
-      - "5432:5432"
-    networks:
-      - unleash
-    container_name: postgres
-
-  unleash:
-    image: unleashorg/unleash-server
-    ports:
-      - "4242:4242"
+      - "${PORT}:${PORT}"
     environment:
-      DATABASE_HOST: postgres
-      DATABASE_NAME: unleash
-      DATABASE_USERNAME: user
-      DATABASE_PASSWORD: default
-      DATABASE_SSL: "false"
-      INIT_CLIENT_API_TOKENS: "default:development.unleash-insecure-api-token"
-    networks:
-      - unleash
-    depends_on:
-      - postgres
-    container_name: unleash-server
-
+      PORT: ${PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: ${DATABASE_URL}
+      SWAGGER_PASS: ${SWAGGER_PASS}
+      APP_CLIENT_ID: ${APP_CLIENT_ID}
+      SESSION_SECRET:  ${SESSION_SECRET}
+      APP_CLIENT_SECRET: ${APP_CLIENT_SECRET}
+      SIGN_UP_SIGN_IN_POLICY_AUTHORITY:  ${SIGN_UP_SIGN_IN_POLICY_AUTHORITY}
+      RESET_PASSWORD_POLICY_AUTHORITY: ${RESET_PASSWORD_POLICY_AUTHORITY}
+      EDIT_PROFILE_POLICY_AUTHORITY: ${EDIT_PROFILE_POLICY_AUTHORITY}
+      AUTHORITY_DOMAIN: ${AUTHORITY_DOMAIN}
+      APP_REDIRECT_URI: ${APP_REDIRECT_URI}
+      LOGOUT_ENDPOINT: ${LOGOUT_ENDPOINT}
+      IDENTITY_METADATA: ${IDENTITY_METADATA}
+      ID_ROLE_ADMIN: ${ID_ROLE_ADMIN}
+      ID_ROLE_SUPERADMIN: ${ID_ROLE_SUPERADMIN}
+      ID_ROLE_ADVISOR: ${ID_ROLE_ADVISOR}
+      ID_ROLE_ALLY: ${ID_ROLE_ALLY}
+      ID_ROLE_SUPERVISOR: ${ID_ROLE_SUPERVISOR}
+      MULE_URL_SEND_EMAIL: ${MULE_URL_SEND_EMAIL}
+      MULE_URL_SEND_SMS_OTP: ${MULE_URL_SEND_SMS_OTP}
+      MULE_URL_SEND_SMS_OTP_VALIDATE: ${MULE_URL_SEND_SMS_OTP_VALIDATE}
+      MULE_URL_GENERATE_TOKEN: ${MULE_URL_GENERATE_TOKEN}
+      MULE_CLIENT_ID: ${MULE_CLIENT_ID}
+      MULE_CLIENT_SECRET: ${MULE_CLIENT_SECRET}
+      MULE_GRANT_TYPE: ${MULE_GRANT_TYPE}
+      MULE_CLIENT_ID_METHOD: ${MULE_CLIENT_ID_METHOD}
+      MULE_CLIENT_SECRET_METHOD: ${MULE_CLIENT_SECRET_METHOD}
 networks:
-  unleash:
+  ventaasistida:
