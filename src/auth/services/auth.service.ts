@@ -90,7 +90,6 @@ export class AuthService {
     try {
       const response: any =
         await confidentialClientApplication.acquireTokenByCode(tokenRequest);
-        console.log("object", response);
       userUid = response?.idTokenClaims?.sub || null;
       email =
         response?.idTokenClaims?.emails?.length > 0
@@ -114,7 +113,7 @@ export class AuthService {
           roles: true,
         },
       });
-      
+
       const rolStatus: boolean = user.roles?.isActive || false;
       if (!user)
         throw new UnauthorizedException(
@@ -130,7 +129,6 @@ export class AuthService {
         throw new UnauthorizedException(
           `El usuario ${user.name} ${user.lastname} se encuentra registrado con otro proveedor de identidad.`,
         );
-        console.log("object", user?.uid === '');
       if (isNew || user?.uid === '' || user.uid === null) {
         await this.prismaService.users.update({
           where: {

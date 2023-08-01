@@ -45,7 +45,6 @@ export class ConfigAllyService {
         const formBase = await this.prismaService.configAlly.findMany({
           where: { id: idFormBase },
         });
-        console.log("object", formBase);
         const configFormBase = JSON.parse(formBase[0].attributes);
         return configFormBase;
       }

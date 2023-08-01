@@ -66,7 +66,7 @@ export const testExpectValues = {
   paginationDto: {
     limit: 3,
     offset: 1,
-    name: 'administrador'
+    name: 'administrador',
   },
 
   createUserDto: {
@@ -88,12 +88,12 @@ export const testExpectValues = {
   },
 
   rolesUserfindByEmail: {
-    createdAt: new Date("2023-07-21T18:27:04.982Z"),
+    createdAt: new Date('2023-07-21T18:27:04.982Z'),
     description: null,
     id: 2,
     isActive: true,
     name: 'superadministrador',
-    updatedAt: new Date("2023-07-21T18:25:43.177Z"),
+    updatedAt: new Date('2023-07-21T18:25:43.177Z'),
   },
 
   rolesPermissions: [
@@ -177,14 +177,14 @@ export const testExpectValues = {
   },
   payloadCreateAlliesAdvisor: [
     {
-      advisorId: 31,
-      allyId: 2,
+      advisorId: 85,
+      allyId: 88,
     },
   ],
   payloadCreateAlliesAdvisorError: [
     {
-      advisorId: 31,
-      allyId: 3,
+      advisorId: 85,
+      allyId: 23,
     },
   ],
 

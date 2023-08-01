@@ -68,7 +68,7 @@ export class ConfigAllyController {
   }
 
   @Patch(':id')
-  // @Auth(RolesEnum.ADMIN, RolesEnum.SUPERADMIN)
+  @Auth(RolesEnum.ADMIN, RolesEnum.SUPERADMIN)
   @ApiOkResponse(SW_RESPONSES.updateConfigAllyOkResponse)
   @ApiNotFoundResponse(SW_RESPONSES.notFoundAllyConfigAlly)
   @ApiConflictResponse(SW_RESPONSES.conflictResponseConfigAlly)

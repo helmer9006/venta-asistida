@@ -364,21 +364,17 @@ describe('RolesService Role-update', () => {
     try {
       await rolesService.update(roleId, updateRoleDto, 1);
     } catch (error) {
-      console.log('object', error);
       // const genericResponseOK = new GenericResponseTestDataBuilder().build(
       //   serviceResponse,
       //   HttpStatus.OK,
       //   'Rol actualizado correctamente.',
       // );
-
       // jest.spyOn(rolesController, 'update').mockResolvedValue(genericResponseOK);
-
       // const controlllerResponse = await rolesController.update(
       //   `${roleId}`,
       //   updateRoleDto,
       //   1,
       // );
-
       // expect(controlllerResponse.data).toStrictEqual(genericResponseOK.data);
       // expect(controlllerResponse.statusCode).toStrictEqual(200);
       // expect(controlllerResponse.message).toStrictEqual(

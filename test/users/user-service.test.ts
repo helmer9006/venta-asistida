@@ -123,7 +123,6 @@ describe('UsersService User-create', () => {
     // Crea el usuario en la BD y obtiene su Id para usarlo en los test posteriores
     userId = controlllerResponse.data.id;
     testUser = controlllerResponse.data;
-      console.log(userId, testUser);
     const log = await prismaService.logs.findMany({
       where: { modelId: userId },
     });
