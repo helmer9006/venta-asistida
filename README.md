@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
+  <a href="http://nestjs.com/" target="blank"><img src="https://seeklogo.com/images/C/colmena-seguros-logo-5CB9AA6612-seeklogo.com.png" width="200" alt="Nest Logo" /></a>
 </p>
 
 🥼🧪 PROYECTO DE VENTA ASISTIDA COLMENA
@@ -26,7 +26,7 @@ npm install
 npm install -g @nestjs/cli
 ```
 
-4. Validar variables de entorno para conexión a la base de datos.
+4. Validar variables de entorno para conexión a la base de datos según ambiente.
 
 ```
 DATABASE_URL=uriconexiondbaquí
@@ -47,33 +47,33 @@ docker-compose up -d
    npm start:dev
    ```
 
-## Stack usado
+# Build de producción
 
-- PostgreSQL
-- NestJS
-- Prisma ORM
-
-# Build de producción 
-
-1. Crear el archivo `.env.prod`
-2. Llenar las variables de entorno
+1. Crear el archivo `.env.prod` y `docker-compose.prod.yaml`
+2. Diligenciar los archivos según corresponda con las variables de entorno
 3. Crear la nueva imagen
 
 ```
 docker-compose -f docker-compose.prod.yaml --env-file .env.prod up --build
 ```
 
+# Stack usado
+
+- PostgreSQL
+- NestJS
+- Prisma ORM
+
 # Notas
 
 - **Modulo de prisma**:
 
-Para acceso a base de datos, recordar ejecutar el comando de generacion antes de trabajar con los dtos y clases del cliente de prisma
+Para acceso a base de datos, recordar ejecutar el comando de generacion antes de trabajar con los dtos y clases del cliente de prisma.
 
 ```sh
 npx prisma generate
 ```
 
-importante que cuando se haga cambios al modelo, regenerar las migraciones con los siguiente
+importante que cuando se haga cambios al modelo, regenerar las migraciones con los siguiente comandos:
 
 ```sh
 npx prisma generate
