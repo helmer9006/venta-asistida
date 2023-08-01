@@ -67,9 +67,9 @@ describe('PermissionsService Permissions-findAl', () => {
       await permissionsService.findAll();
     } catch (error) {
       const genericResponseOK = new GenericResponseTestDataBuilder().build(
-        [],
-        error.response.statusCode,
-        error.response.message,
+        error.data,
+        error.statusCode,
+        error.message,
       );
 
       jest
@@ -77,10 +77,10 @@ describe('PermissionsService Permissions-findAl', () => {
         .mockResolvedValue(genericResponseOK);
       const controlllerResponse = await permissionsController.findAll();
 
-      expect(controlllerResponse.data).toStrictEqual([]);
+      expect(controlllerResponse.data).toStrictEqual({});
       expect(controlllerResponse.statusCode).toStrictEqual(500);
       expect(controlllerResponse.message).toStrictEqual(
-        'Error consultando permisos.',
+        'Error interno del servidor',
       );
     }
   });
@@ -116,9 +116,9 @@ describe('PermissionsService Permissions-findPermissionsByRole', () => {
       await permissionsService.findPermissionsByRole(1);
     } catch (error) {
       const genericResponseOK = new GenericResponseTestDataBuilder().build(
-        [],
-        error.response.statusCode,
-        error.response.message,
+        error.data,
+        error.statusCode,
+        error.message,
       );
 
       jest
@@ -127,10 +127,10 @@ describe('PermissionsService Permissions-findPermissionsByRole', () => {
       const controlllerResponse =
         await permissionsController.getPermissionsByRole(`${1}`);
 
-      expect(controlllerResponse.data).toStrictEqual([]);
+      expect(controlllerResponse.data).toStrictEqual({});
       expect(controlllerResponse.statusCode).toStrictEqual(500);
       expect(controlllerResponse.message).toStrictEqual(
-        'Error consultando permisos del rol.',
+        'Error interno del servidor',
       );
     }
   });

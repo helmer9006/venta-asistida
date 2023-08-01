@@ -23,7 +23,7 @@ export default registerAs('config', () => {
       },
       USER_UPDATE: {
         action: 'USER_UPDATE',
-        description: 'El usuario fue actualizado',
+        description: 'La información del usuario fue actualizada.',
       },
       USER_DISABLE: {
         action: 'USER_DISABLE',

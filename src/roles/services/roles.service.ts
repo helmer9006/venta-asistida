@@ -16,6 +16,7 @@ import { UtilsService } from '../../shared/services/utils.service';
 import { ConfigType } from '@nestjs/config';
 import config from '@src/config/config';
 import { LogsService } from '@src/logs/services/logs.service';
+import { handleExceptions } from '@src/shared/helpers/general';
 
 @Injectable()
 export class RolesService {
@@ -34,12 +35,14 @@ export class RolesService {
       createRoleDto.name = createRoleDto.name.toLowerCase().trim();
       delete createRoleDto.permissions;
       role = await this.prismaService.roles.create({ data: createRoleDto });
+
       if (permissions.length > 0) {
         const rolesPermissions: ICreateRolePermission[] = permissions.map(
           (permission) => {
             return { roleId: role.id, permissionId: permission };
           },
         );
+
         await this.prismaService.rolesPermissions.createMany({
           data: rolesPermissions,
         });
@@ -109,11 +112,7 @@ export class RolesService {
         },
       });
     } catch (error) {
-      throw new GenericResponse(
-        {},
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'Error al consultar roles.',
-      );
+      handleExceptions(error);
     }
   }
 
@@ -228,11 +227,7 @@ export class RolesService {
 
       return res;
     } catch (error) {
-      throw new GenericResponse(
-        {},
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'El Rol fue actualizado pero Se presento un error al actualizar sus permisos.',
-      );
+      handleExceptions(error);
     }
   }
 

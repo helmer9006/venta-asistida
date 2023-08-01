@@ -45,7 +45,7 @@ export const testExpectValues = {
   },
 
   createRoleDto: {
-    name: 'test_role',
+    name: 'Role test',
     description: 'test admistrador del sistema',
     permissions: [],
     isActive: false,
@@ -65,7 +65,8 @@ export const testExpectValues = {
 
   paginationDto: {
     limit: 3,
-    offset: 0,
+    offset: 1,
+    name: 'administrador'
   },
 
   createUserDto: {
@@ -79,8 +80,20 @@ export const testExpectValues = {
     email: 'test123@vasscompany.com',
     roleId: 2,
     isActive: false,
+    supervisorId: null,
+    advisorStartDate: undefined,
+    advisorEndDate: undefined,
     createdAt: undefined,
     updatedAt: undefined,
+  },
+
+  rolesUserfindByEmail: {
+    createdAt: new Date("2023-07-21T18:27:04.982Z"),
+    description: null,
+    id: 2,
+    isActive: true,
+    name: 'superadministrador',
+    updatedAt: new Date("2023-07-21T18:25:43.177Z"),
   },
 
   rolesPermissions: [

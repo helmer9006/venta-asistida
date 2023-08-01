@@ -22,9 +22,10 @@ export class LogsService {
       const logCreated = await this.prismaService.logs.create({
         data: createLogDto,
       });
+
       return logCreated;
     } catch (error) {
-      return {};
+      console.log(error);
     }
   }
 

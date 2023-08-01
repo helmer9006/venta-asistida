@@ -7,7 +7,7 @@ import {
 import * as msal from '@azure/msal-node';
 import { GenericResponse } from '@src/shared/models/generic-response.model';
 import { ConfigService, ConfigType } from '@nestjs/config';
-import config from 'src/config/config';
+import config from '@src/config/config';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { GetTokenDto } from '@src/auth/models/dto/get-token.dto';
 import { handleExceptions } from '@src/shared/helpers/general';
@@ -90,6 +90,7 @@ export class AuthService {
     try {
       const response: any =
         await confidentialClientApplication.acquireTokenByCode(tokenRequest);
+        console.log("object", response);
       userUid = response?.idTokenClaims?.sub || null;
       email =
         response?.idTokenClaims?.emails?.length > 0
@@ -113,6 +114,7 @@ export class AuthService {
           roles: true,
         },
       });
+      
       const rolStatus: boolean = user.roles?.isActive || false;
       if (!user)
         throw new UnauthorizedException(
@@ -124,11 +126,12 @@ export class AuthService {
         );
       if (!user.isActive)
         throw new UnauthorizedException('El usuario se encuentra inactivo.');
-      if (user.uid.length > 0 && userUid !== user.uid)
+      if (user.uid && user.uid.length > 0 && userUid !== user.uid)
         throw new UnauthorizedException(
           `El usuario ${user.name} ${user.lastname} se encuentra registrado con otro proveedor de identidad.`,
         );
-      if (isNew || user?.uid === '') {
+        console.log("object", user?.uid === '');
+      if (isNew || user?.uid === '' || user.uid === null) {
         await this.prismaService.users.update({
           where: {
             id: user.id,

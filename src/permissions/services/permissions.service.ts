@@ -9,6 +9,7 @@ import { Permission } from '../entities/permission.entity';
 import { Role } from '../../roles/entities/role.entity';
 import { ConflictException } from '@src/shared/exceptions';
 import { ConfigService } from '@nestjs/config';
+import { handleExceptions } from '@src/shared/helpers/general';
 
 @Injectable()
 export class PermissionsService {
@@ -32,11 +33,7 @@ export class PermissionsService {
         );
       return permissions;
     } catch (error) {
-      throw new GenericResponse(
-        {},
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'Error consultando permisos.',
-      );
+      handleExceptions(error);
     }
   }
 
@@ -56,11 +53,7 @@ export class PermissionsService {
       });
       return permission;
     } catch (error) {
-      throw new GenericResponse(
-        {},
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'Error consultando permisos del rol.',
-      );
+      handleExceptions(error);
     }
   }
 }

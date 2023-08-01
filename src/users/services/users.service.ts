@@ -1,4 +1,10 @@
-import { Injectable, HttpStatus, Logger, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  HttpStatus,
+  Logger,
+  Inject,
+  NotFoundException,
+} from '@nestjs/common';
 import * as msal from '@azure/msal-node';
 import { ConfigService, ConfigType } from '@nestjs/config';
 import { CreateUserDto, UpdateUserDto } from '../models/dto';
@@ -15,6 +21,7 @@ import { AlliesAdvisor } from '../../allies-advisor/entities/allies-advisor.enti
 import { GetResult } from '@prisma/client/runtime';
 import { User } from '../entities/user.entity';
 import { Users } from '@prisma/client';
+import { AuthService } from '@src/auth/services/auth.service';
 const confidentialClientConfig = {
   auth: {
     clientId: process.env.APP_CLIENT_ID,
@@ -55,6 +62,7 @@ export class UsersService {
     private readonly configuration: ConfigType<typeof config>,
     private readonly prismaService: PrismaService,
     private readonly configService: ConfigService,
+    private readonly authService: AuthService,
     private readonly utilService: UtilsService,
     private readonly logs: LogsService,
   ) {}
@@ -70,12 +78,14 @@ export class UsersService {
       createUserDto.email = createUserDto.email.toLowerCase().trim();
       createUserDto.name = createUserDto.name.toLowerCase().trim();
       createUserDto.lastname = createUserDto.lastname.toLowerCase().trim();
+
       const userCreated = await this.prismaService.users.create({
         data: createUserDto,
       });
+
       const userName = `${userCreated.name} ${userCreated.lastname}`;
       // email sent to a new user to finish registration
-      await this.sendEmailInvitationMule(userName, createUserDto.email);
+      this.sendEmailInvitationMule(userName, createUserDto.email);
       // Insert log for audit
       const dataObject = {
         actionUserId: userId,
@@ -105,12 +115,7 @@ export class UsersService {
         },
       });
     } catch (error) {
-      console.log(error);
-      throw new GenericResponse(
-        [],
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'Error de servidor al consultar usuarios.',
-      );
+      handleExceptions(error);
     }
   }
 
@@ -151,11 +156,7 @@ export class UsersService {
       );
       return [...users, ...advisorByAlly];
     } catch (error) {
-      throw new GenericResponse(
-        [],
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'Error de servidor al consultar usuarios.',
-      );
+      handleExceptions(error);
     }
   }
 
@@ -171,20 +172,11 @@ export class UsersService {
           supervisor: true,
         },
       });
+      if (!user) throw new NotFoundException('Usuario no encontrado');
+      return user;
     } catch (error) {
-      throw new GenericResponse(
-        [],
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'Error de servidor al consultar usuarios.',
-      );
+      handleExceptions(error);
     }
-    if (!user)
-      throw new GenericResponse(
-        [],
-        HttpStatus.NOT_FOUND.valueOf(),
-        'Usuario no encontrado.',
-      );
-    return user;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto, userId: number) {
@@ -206,11 +198,7 @@ export class UsersService {
         data: updateUserDto,
       });
       if (!updatedUser)
-        throw new GenericResponse(
-          {},
-          HttpStatus.NOT_FOUND.valueOf(),
-          'El usuario no pudo ser actualizado.',
-        );
+        throw new NotFoundException('El usuario no pudo ser actualizado.');
       const dataObject = {
         actionUserId: userId,
         description: description,
@@ -227,43 +215,43 @@ export class UsersService {
     }
   }
 
-  async getAuthCode(authority, scopes, state) {
-    authCodeRequest.authority = authority;
-    authCodeRequest.scopes = scopes;
-    authCodeRequest.state = state;
-    tokenRequest.authority = authority;
-    try {
-      return await confidentialClientApplication.getAuthCodeUrl(
-        authCodeRequest,
-      );
-    } catch (error) {
-      throw new GenericResponse(
-        {},
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'Error consultando url login.',
-      );
-    }
-  }
+  // async getAuthCode(authority, scopes, state) {
+  //   authCodeRequest.authority = authority;
+  //   authCodeRequest.scopes = scopes;
+  //   authCodeRequest.state = state;
+  //   tokenRequest.authority = authority;
+  //   try {
+  //     return await confidentialClientApplication.getAuthCodeUrl(
+  //       authCodeRequest,
+  //     );
+  //   } catch (error) {
+  //     throw new GenericResponse(
+  //       {},
+  //       HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+  //       'Error consultando url login.',
+  //     );
+  //   }
+  // }
 
-  signIn() {
-    const LOGIN = this.configuration.APP_B2C_STATES
-      ? this.configuration.APP_B2C_STATES.LOGIN
-      : null;
-    const url = this.getAuthCode(
-      this.configService.get('SIGN_UP_SIGN_IN_POLICY_AUTHORITY'),
-      [],
-      this.configuration.APP_B2C_STATES.LOGIN,
-    );
-    return url;
-  }
+  // signIn() {
+  //   const LOGIN = this.configuration.APP_B2C_STATES
+  //     ? this.configuration.APP_B2C_STATES.LOGIN
+  //     : null;
+  //   const url = this.getAuthCode(
+  //     this.configService.get('SIGN_UP_SIGN_IN_POLICY_AUTHORITY'),
+  //     [],
+  //     this.configuration.APP_B2C_STATES.LOGIN,
+  //   );
+  //   return url;
+  // }
 
-  signout() {
-    return this.configService.get('LOGOUT_ENDPOINT');
-  }
+  // signout() {
+  //   return this.configService.get('LOGOUT_ENDPOINT');
+  // }
 
   async sendEmailInvitationMule(nameUser: string, email: string) {
     const formData = new FormData();
-    const url: string = await this.signIn();
+    const url: string = await this.authService.signIn();
     const fileData = readFileSync(
       './src/shared/templates/invitation-new-user.html',
       'utf-8',

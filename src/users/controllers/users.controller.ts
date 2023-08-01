@@ -43,7 +43,7 @@ export class UsersController {
   @ApiOkResponse(SW_RESPONSES.createUserOkResponse)
   @ApiBadRequestResponse(SW_RESPONSES.badRequestResponse)
   @ApiUnauthorizedResponse(SW_RESPONSES.createUserUnauthorizeResponse)
-  @ApiConflictResponse(SW_RESPONSES.userConflictResponse)
+  @ApiConflictResponse(SW_RESPONSES.conflictResponse)
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
   async create(
     @Body() createUserDto: CreateUserDto,
@@ -80,7 +80,6 @@ export class UsersController {
   @ApiInternalServerErrorResponse(SW_RESPONSES.errorServerResponse)
   async getByterm(
     @Param('term') term: string,
-    @GetUser('id') userId: number,
     @Query() paginationDto: PaginationDto,
   ) {
     const data = await this.usersService.findByterm(term, paginationDto);
