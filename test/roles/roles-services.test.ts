@@ -87,26 +87,51 @@ describe('RolesService Role-create', () => {
     );
 
     jest.spyOn(rolesController, 'create').mockResolvedValue(genericResponseOK);
-    const controlllerResponse = await rolesController.create(createRoleDto, 1);
+    const controllerResponse = await rolesController.create(createRoleDto, 1);
 
-    expect(controlllerResponse.data).toStrictEqual(genericResponseOK.data);
-    expect(controlllerResponse.statusCode).toStrictEqual(
-      genericResponseOK.statusCode,
-    );
-    expect(controlllerResponse.message).toStrictEqual(
+    expect(controllerResponse.data).toStrictEqual(serviceResponse);
+    expect(controllerResponse.statusCode).toStrictEqual(200);
+    expect(controllerResponse.message).toStrictEqual(
       'Rol creado correctamente.',
     );
-    expect(controlllerResponse.data.id).toBeDefined();
+    expect(controllerResponse.data.id).toBeDefined();
 
     // Se crea el rol en BD y luego se guarda junto con su Id para los test posteriores
-
-    roleId = controlllerResponse.data.id;
+    roleId = controllerResponse.data.id;
     const log = await prismaService.logs.findMany({
       where: { modelId: roleId },
     });
     await prismaService.logs.delete({ where: { id: log[0].id } });
 
     await prismaService.roles.delete({ where: { id: roleId } });
+    roleId = 0;
+  });
+
+  it('deberia de fallar el proceso pero crear el role y luego eliminarlo.', async () => {
+    jest.spyOn(prismaService.roles, 'findUnique').mockRejectedValue('error');
+    
+    try {
+      createRoleDto.name = 'test Role create';
+      await rolesService.create(createRoleDto, 1);
+
+    } catch (error) {
+      const genericResponseOK = new GenericResponseTestDataBuilder().build(
+        error.data,
+        error.statusCode,
+        error.message,
+      );
+
+      jest
+        .spyOn(rolesController, 'create')
+        .mockResolvedValue(genericResponseOK);
+      const controllerResponse = await rolesController.create(createRoleDto, 1);
+
+      expect(controllerResponse.data).toStrictEqual({});
+      expect(controllerResponse.statusCode).toStrictEqual(500);
+      expect(controllerResponse.message).toStrictEqual(
+        'Error interno del servidor',
+      );
+    }
   });
 
   it('deberia crear un rol con permisos asociados en el sistema.', async () => {
@@ -120,63 +145,29 @@ describe('RolesService Role-create', () => {
     );
 
     jest.spyOn(rolesController, 'create').mockResolvedValue(genericResponseOK);
-    const controlllerResponse = await rolesController.create(createRoleDto, 1);
+    const controllerResponse = await rolesController.create(createRoleDto, 1);
 
-    // if (controlllerResponse.statusCode === 200)
-    //   roleId = controlllerResponse.data.id;
-
-    // if (roleId !== undefined) {
-    //   await prismaService.roles.delete({
-    //     where: { id: roleId },
-    //   });
-    // }
-
-    expect(controlllerResponse.data).toStrictEqual(serviceResponse);
-    expect(controlllerResponse.statusCode).toStrictEqual(
-      genericResponseOK.statusCode,
-    );
-    expect(controlllerResponse.message).toStrictEqual(
+    expect(controllerResponse.data).toStrictEqual(serviceResponse);
+    expect(controllerResponse.statusCode).toStrictEqual(200);
+    expect(controllerResponse.message).toStrictEqual(
       'Rol creado correctamente.',
     );
-    expect(controlllerResponse.data.id).toBeDefined();
+    expect(controllerResponse.data.id).toBeDefined();
+
+    // se buscan los logs de auditoria creados por el modelId y se eliminan del sistema.
+    roleId = controllerResponse.data.id;
+    const log = await prismaService.logs.findMany({
+      where: { modelId: roleId },
+    });
+    await prismaService.logs.delete({ where: { id: log[0].id } });
 
     // Se crea el rol en BD y luego se guarda junto con su Id para los test posteriores
-    roleId = controlllerResponse.data.id;
-    role = controlllerResponse.data;
+    role = controllerResponse.data;
   });
 
   it('deberia fallar al crear un rol ya registrado en el sistema.', async () => {
     try {
-      const serviceResponse = await rolesService.create(createRoleDto, 1);
-    } catch (error) {
-      const genericResponseOK = new GenericResponseTestDataBuilder().build(
-        error.data,
-        error.statusCode,
-        error.message,
-      );
-
-      jest
-        .spyOn(rolesController, 'create')
-        .mockResolvedValue(genericResponseOK);
-      const controlllerResponse = await rolesController.create(
-        createRoleDto,
-        1,
-      );
-
-      expect(controlllerResponse.data).toStrictEqual({});
-      expect(controlllerResponse.statusCode).toStrictEqual(409);
-      expect(controlllerResponse.message).toStrictEqual(
-        'El rol ya se encuentra registrado, validar el nombre.',
-      );
-    }
-  });
-
-  it('deberia de fallar el proceso pero crear el role y luego eliminarlo.', async () => {
-    try {
-      createRoleDto.name = 'test Role create';
       await rolesService.create(createRoleDto, 1);
-
-      jest.spyOn(rolesService, 'create').mockRejectedValue('error');
     } catch (error) {
       const genericResponseOK = new GenericResponseTestDataBuilder().build(
         error.data,
@@ -187,15 +178,12 @@ describe('RolesService Role-create', () => {
       jest
         .spyOn(rolesController, 'create')
         .mockResolvedValue(genericResponseOK);
-      const controlllerResponse = await rolesController.create(
-        createRoleDto,
-        1,
-      );
+      const controllerResponse = await rolesController.create(createRoleDto, 1);
 
-      expect(controlllerResponse.data).toStrictEqual({});
-      expect(controlllerResponse.statusCode).toStrictEqual(500);
-      expect(controlllerResponse.message).toStrictEqual(
-        'Error inesperado del servidor.',
+      expect(controllerResponse.data).toStrictEqual({});
+      expect(controllerResponse.statusCode).toStrictEqual(409);
+      expect(controllerResponse.message).toStrictEqual(
+        'Existe un registro con la misma información.',
       );
     }
   });
@@ -214,64 +202,61 @@ describe('RolesService Role-create', () => {
         .spyOn(rolesController, 'create')
         .mockResolvedValue(genericResponseOK);
 
-      const controlllerResponse = await rolesController.create(
-        createRoleDto,
-        1,
-      );
+      const controllerResponse = await rolesController.create(createRoleDto, 1);
 
-      expect(controlllerResponse.data).toStrictEqual({});
-      expect(controlllerResponse.statusCode).toStrictEqual(500);
-      expect(controlllerResponse.message).toStrictEqual(
-        'Error inesperado del servidor.',
+      expect(controllerResponse.data).toStrictEqual({});
+      expect(controllerResponse.statusCode).toStrictEqual(500);
+      expect(controllerResponse.message).toStrictEqual(
+        'Error interno del servidor',
       );
     }
     jest.spyOn(prismaService.roles, 'create').mockRejectedValue('error');
   });
 });
 
-// describe('RolesService Role-findAll', () => {
-//   it('deberia de obtener los roles registrados en el sistema.', async () => {
-//     const serviceResponse = await rolesService.findAll(paginationDto);
+describe('RolesService Role-findAll', () => {
+  it('deberia de obtener los roles registrados en el sistema.', async () => {
+    const serviceResponse = await rolesService.findAll(paginationDto);
 
-//     const genericResponseOK = new GenericResponseTestDataBuilder().build(
-//       serviceResponse,
-//       HttpStatus.OK,
-//       'Roles encontrados.',
-//     );
+    const genericResponseOK = new GenericResponseTestDataBuilder().build(
+      serviceResponse,
+      HttpStatus.OK,
+      'Roles encontrados.',
+    );
 
-//     jest.spyOn(rolesController, 'findAll').mockResolvedValue(genericResponseOK);
-//     const controlllerResponse = await rolesController.findAll(paginationDto);
+    jest.spyOn(rolesController, 'findAll').mockResolvedValue(genericResponseOK);
+    const controllerResponse = await rolesController.findAll(paginationDto);
 
-//     expect(controlllerResponse.data).toStrictEqual(serviceResponse);
-//     expect(controlllerResponse.statusCode).toStrictEqual(200);
-//     expect(controlllerResponse.message).toStrictEqual('Roles encontrados.');
-//   });
+    expect(controllerResponse.data).toStrictEqual(serviceResponse);
+    expect(controllerResponse.statusCode).toStrictEqual(200);
+    expect(controllerResponse.message).toStrictEqual('Roles encontrados.');
+  });
 
-//   it('deberia de fallar al obtener los roles del sistema.', async () => {
-//     jest.spyOn(prismaService.roles, 'findMany').mockRejectedValue('error');
+  it('deberia de fallar al obtener los roles del sistema.', async () => {
+    jest.spyOn(prismaService.roles, 'findMany').mockRejectedValue('error');
 
-//     try {
-//       await rolesService.findAll(paginationDto);
-//     } catch (error) {
-//       const genericResponseOK = new GenericResponseTestDataBuilder().build(
-//         error.data,
-//         error.statusCode,
-//         error.message,
-//       );
+    try {
+      await rolesService.findAll(paginationDto);
+    } catch (error) {
+      const genericResponseOK = new GenericResponseTestDataBuilder().build(
+        error.data,
+        error.statusCode,
+        error.message,
+      );
 
-//       jest
-//         .spyOn(rolesController, 'findAll')
-//         .mockResolvedValue(genericResponseOK);
-//       const controlllerResponse = await rolesController.findAll(paginationDto);
+      jest
+        .spyOn(rolesController, 'findAll')
+        .mockResolvedValue(genericResponseOK);
+      const controllerResponse = await rolesController.findAll(paginationDto);
 
-//       expect(controlllerResponse.data).toStrictEqual({});
-//       expect(controlllerResponse.statusCode).toStrictEqual(500);
-//       expect(controlllerResponse.message).toStrictEqual(
-//         'Error interno del servidor',
-//       );
-//     }
-//   });
-// });
+      expect(controllerResponse.data).toStrictEqual({});
+      expect(controllerResponse.statusCode).toStrictEqual(500);
+      expect(controllerResponse.message).toStrictEqual(
+        'Error interno del servidor',
+      );
+    }
+  });
+});
 
 describe('RolesService Role-update', () => {
   it('deberia actualizar un rol correctamente en el sistema.', async () => {
@@ -285,15 +270,15 @@ describe('RolesService Role-update', () => {
 
     jest.spyOn(rolesController, 'update').mockResolvedValue(genericResponseOK);
 
-    const controlllerResponse = await rolesController.update(
+    const controllerResponse = await rolesController.update(
       `${roleId}`,
       updateRoleDto,
       1,
     );
 
-    expect(controlllerResponse.data).toStrictEqual(genericResponseOK.data);
-    expect(controlllerResponse.statusCode).toStrictEqual(200);
-    expect(controlllerResponse.message).toStrictEqual(
+    expect(controllerResponse.data).toStrictEqual(genericResponseOK.data);
+    expect(controllerResponse.statusCode).toStrictEqual(200);
+    expect(controllerResponse.message).toStrictEqual(
       'Rol actualizado correctamente.',
     );
   });
@@ -313,21 +298,95 @@ describe('RolesService Role-update', () => {
 
     jest.spyOn(rolesController, 'update').mockResolvedValue(genericResponseOK);
 
-    const controlllerResponse = await rolesController.update(
+    const controllerResponse = await rolesController.update(
       `${roleId}`,
       updateRoleDto,
       1,
     );
 
-    expect(controlllerResponse.data).toStrictEqual(genericResponseOK.data);
-    expect(controlllerResponse.statusCode).toStrictEqual(200);
-    expect(controlllerResponse.message).toStrictEqual(
+    expect(controllerResponse.data).toStrictEqual(genericResponseOK.data);
+    expect(controllerResponse.statusCode).toStrictEqual(200);
+    expect(controllerResponse.message).toStrictEqual(
       'Rol actualizado correctamente.',
     );
   });
 
+  it('deberia de fallar la actualizacion de un rol que ya se encuentra registrado.', async () => {
+    try {
+      updateRoleDto.name = 'administrador';
+      await rolesService.update(roleId, updateRoleDto, 1);
+    } catch (error) {
+      const genericResponseOK = new GenericResponseTestDataBuilder().build(
+        error.data,
+        error.statusCode,
+        error.message,
+      );
+
+      jest
+        .spyOn(rolesController, 'update')
+        .mockResolvedValue(genericResponseOK);
+
+      const controllerResponse = await rolesController.update(
+        `${roleId}`,
+        updateRoleDto,
+        1,
+      );
+
+      expect(controllerResponse.data).toStrictEqual({});
+      expect(controllerResponse.statusCode).toStrictEqual(409);
+      expect(controllerResponse.message).toStrictEqual(
+        'Existe un registro con la misma información.',
+      );
+    }
+  });
+
   it('deberia actualizar el rol correctamente pero fallar la actualizacion de sus permisos.', async () => {
-    updateRoleDto.permissions = [50];
+    jest.spyOn(prismaService.rolesPermissions, 'createMany').mockRejectedValue('error');
+    updateRoleDto.permissions = [4];
+    updateRoleDto.name = 'adminTest role';
+    try {
+      await rolesService.update(
+        roleId,
+        updateRoleDto,
+        1,
+      );
+    } catch (error) {
+      const genericResponseOK = new GenericResponseTestDataBuilder().build(
+        error.data,
+        error.statusCode,
+        error.message,
+      );
+
+      jest
+        .spyOn(rolesController, 'update')
+        .mockResolvedValue(genericResponseOK);
+
+      const controllerResponse = await rolesController.update(
+        `${roleId}`,
+        updateRoleDto,
+        1,
+      );
+
+      expect(controllerResponse.data).toStrictEqual({});
+      expect(controllerResponse.statusCode).toStrictEqual(500);
+      expect(controllerResponse.message).toStrictEqual(
+        'Error interno del servidor',
+      );
+
+      const log = await prismaService.logs.findMany({
+        where: { modelId: roleId },
+      });
+      if(log.length > 0)
+        for(let i = 0; i < log.length; i++)
+          await prismaService.logs.delete({ where: { id: log[i].id } });
+      
+      await prismaService.roles.delete({ where: { id: roleId } });
+    }
+
+  });
+
+  it('deberia fallar la actualizacion del rol, error de servidor', async () => {
+    jest.spyOn(prismaService.roles, 'update').mockRejectedValue('error');
     updateRoleDto.name = 'adminTest role';
     try {
       await rolesService.update(roleId, updateRoleDto, 1);
@@ -342,154 +401,20 @@ describe('RolesService Role-update', () => {
         .spyOn(rolesController, 'update')
         .mockResolvedValue(genericResponseOK);
 
-      const controlllerResponse = await rolesController.update(
+      const controllerResponse = await rolesController.update(
         `${roleId}`,
         updateRoleDto,
         1,
       );
 
-      expect(controlllerResponse.data).toStrictEqual({});
-      expect(controlllerResponse.statusCode).toStrictEqual(500);
-      expect(controlllerResponse.message).toStrictEqual(
-        'Error inesperado del servidor.',
+      expect(controllerResponse.data).toStrictEqual({});
+      expect(controllerResponse.statusCode).toStrictEqual(500);
+      expect(controllerResponse.message).toStrictEqual(
+        "Error interno del servidor",
       );
     }
 
     //await rolesService.updateRolePermission(roleId, [5]);
   });
 
-  it('deberia actualizar el rol correctamente pero fallar la actualizacion de sus permisos.', async () => {
-    updateRoleDto.permissions = [50];
-    updateRoleDto.name = 'adminTest role';
-    try {
-      await rolesService.update(roleId, updateRoleDto, 1);
-    } catch (error) {
-      // const genericResponseOK = new GenericResponseTestDataBuilder().build(
-      //   serviceResponse,
-      //   HttpStatus.OK,
-      //   'Rol actualizado correctamente.',
-      // );
-      // jest.spyOn(rolesController, 'update').mockResolvedValue(genericResponseOK);
-      // const controlllerResponse = await rolesController.update(
-      //   `${roleId}`,
-      //   updateRoleDto,
-      //   1,
-      // );
-      // expect(controlllerResponse.data).toStrictEqual(genericResponseOK.data);
-      // expect(controlllerResponse.statusCode).toStrictEqual(200);
-      // expect(controlllerResponse.message).toStrictEqual(
-      //   'Rol actualizado correctamente.',
-      // );
-    }
-
-    //await rolesService.updateRolePermission(roleId, [5]);
-  });
-
-  // it('deberia actualizar un rol, eliminando e insertando permisos.', async () => {
-  //   updateRoleDto.permissions = [1, 2];
-
-  //   const serviceResponse = await rolesService.update(roleId, updateRoleDto, 1);
-  //   await rolesService.updateRolePermission(roleId, [1, 2]);
-
-  //   const genericResponseOK = new GenericResponseTestDataBuilder().build(
-  //     serviceResponse,
-  //     HttpStatus.OK,
-  //     'Rol actualizado correctamente.',
-  //   );
-
-  //   jest.spyOn(rolesController, 'update').mockResolvedValue(genericResponseOK);
-
-  //   const controlllerResponse = await rolesController.update(
-  //     `${roleId}`,
-  //     updateRoleDto,
-  //     1,
-  //   );
-
-  //   // Luego de crear los permisos del rol, se eliminan de BD atraves del roleId
-
-  //   if (controlllerResponse.statusCode === 200) {
-  //     const currentRolePermission =
-  //       await prismaService.rolesPermissions.findMany({
-  //         where: { roleId: roleId },
-  //       });
-  //     for (let i = 0; i < currentRolePermission.length; i++) {
-  //       await prismaService.rolesPermissions.delete({
-  //         where: { id: currentRolePermission[i].id },
-  //       });
-  //     }
-  //   }
-
-  //   expect(controlllerResponse.data).toStrictEqual(genericResponseOK.data);
-  //   expect(controlllerResponse.statusCode).toStrictEqual(200);
-  //   expect(controlllerResponse.message).toStrictEqual(
-  //     'Rol actualizado correctamente.',
-  //   );
-  // });
-
-  // it('deberia de fallar la actualizacion de un rol que no esta registrado.', async () => {
-  //   try {
-  //     updateRoleDto.name = 'administrador';
-  //     await rolesService.update(2, updateRoleDto, 1);
-  //   } catch (error) {
-  //     const genericResponseOK = new GenericResponseTestDataBuilder().build(
-  //       [],
-  //       error.response.status,
-  //       error.response.error,
-  //     );
-
-  //     jest
-  //       .spyOn(rolesController, 'update')
-  //       .mockResolvedValue(genericResponseOK);
-
-  //     const controlllerResponse = await rolesController.update(
-  //       `${roleId}`,
-  //       updateRoleDto,
-  //       1,
-  //     );
-
-  //     expect(controlllerResponse.data).toStrictEqual([]);
-  //     expect(controlllerResponse.statusCode).toStrictEqual(409);
-  //     expect(controlllerResponse.message).toStrictEqual(
-  //       'Error, el rol ya se encuentra registrado.',
-  //     );
-  //   }
-  // });
-
-  // it('deberia de fallar la actualizacion de permisos pero deberia actualizar el rol.', async () => {
-  //   jest
-  //     .spyOn(prismaService.rolesPermissions, 'findMany')
-  //     .mockRejectedValue('error');
-  //   updateRoleDto.name = 'admin_test_2';
-  //   try {
-  //     await rolesService.update(roleId, updateRoleDto, 1);
-  //     await rolesService.updateRolePermission(roleId, [888, 999]);
-  //   } catch (error) {
-  //     const genericResponseError = new GenericResponseTestDataBuilder().build(
-  //       [],
-  //       error.response.statusCode,
-  //       error.response.message,
-  //     );
-
-  //     jest
-  //       .spyOn(rolesController, 'update')
-  //       .mockResolvedValue(genericResponseError);
-
-  //     const controlllerResponse = await rolesController.update(
-  //       `${roleId}`,
-  //       updateRoleDto,
-  //       1,
-  //     );
-
-  //     // Luego de actualizar el rol, se elimina de BD atraves de su Id
-  //     await prismaService.roles.delete({
-  //       where: { id: roleId },
-  //     });
-
-  //     expect(controlllerResponse.data).toStrictEqual([]);
-  //     expect(controlllerResponse.statusCode).toStrictEqual(500);
-  //     expect(controlllerResponse.message).toStrictEqual(
-  //       'El Rol fue actualizado pero Se presento un error al actualizar sus permisos. Error error',
-  //     );
-  //   }
-  // });
 });

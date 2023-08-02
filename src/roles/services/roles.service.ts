@@ -35,8 +35,7 @@ export class RolesService {
       createRoleDto.name = createRoleDto.name.toLowerCase().trim();
       delete createRoleDto.permissions;
       role = await this.prismaService.roles.create({ data: createRoleDto });
-
-      if (permissions.length > 0) {
+      if (permissions && permissions.length > 0) {
         const rolesPermissions: ICreateRolePermission[] = permissions.map(
           (permission) => {
             return { roleId: role.id, permissionId: permission };
@@ -84,7 +83,7 @@ export class RolesService {
           where: { id: role.id },
         });
       }
-      this.handleExceptions(error);
+      handleExceptions(error);
     }
   }
 
@@ -153,35 +152,35 @@ export class RolesService {
       return role;
     } catch (error) {
       this.logger.error(error);
-      this.handleExceptions(error);
+      handleExceptions(error);
     }
   }
 
-  private handleExceptions(error: any): never {
-    if (error.code === '23505')
-      throw new GenericResponse(
-        {},
-        HttpStatus.CONFLICT.valueOf(),
-        'Error gestionando rol.',
-      );
-    if (error.code === 'P2002')
-      throw new GenericResponse(
-        {},
-        HttpStatus.CONFLICT.valueOf(),
-        'El rol ya se encuentra registrado, validar el nombre.',
-      );
-    if (error.code === 'P2003')
-      throw new GenericResponse(
-        {},
-        HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-        'No se pudo gestionar el rol por error de comunicación con la base de datos.',
-      );
-    throw new GenericResponse(
-      {},
-      HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
-      'Error inesperado del servidor.',
-    );
-  }
+  // private handleExceptions(error: any): never {
+  //   if (error.code === '23505')
+  //     throw new GenericResponse(
+  //       {},
+  //       HttpStatus.CONFLICT.valueOf(),
+  //       'Error gestionando rol.',
+  //     );
+  //   if (error.code === 'P2002')
+  //     throw new GenericResponse(
+  //       {},
+  //       HttpStatus.CONFLICT.valueOf(),
+  //       'El rol ya se encuentra registrado, validar el nombre.',
+  //     );
+  //   if (error.code === 'P2003')
+  //     throw new GenericResponse(
+  //       {},
+  //       HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+  //       'No se pudo gestionar el rol por error de comunicación con la base de datos.',
+  //     );
+  //   throw new GenericResponse(
+  //     {},
+  //     HttpStatus.INTERNAL_SERVER_ERROR.valueOf(),
+  //     'Error inesperado del servidor.',
+  //   );
+  // }
 
   async updateRolePermission(roleId: number, permissions: number[]) {
     try {
