@@ -34,14 +34,36 @@ export class AlliesAdvisorService {
     }
   }
 
-  async remove(id: number) {
+  async findOneById(id: number) {
     try {
-      const recordsFound = await this.prismaService.alliesAdvisor.delete({
-        where: { id },
+      const recordsFound = await this.prismaService.alliesAdvisor.findUnique({
+        where: { id: id },
       });
       return recordsFound;
     } catch (error) {
       handleExceptions(error);
     }
+  }
+
+  async remove(id: number) {
+    try {
+      await this.prismaService.alliesAdvisor.delete({
+        where: { id },
+      });
+      return {};
+    } catch (error) {
+      handleExceptions(error);
+    }
+  }
+
+  async isAllyAddedToAdvisor(advisorId: string, allyId: string) {
+    let response = false;
+    const recordsFound = await this.prismaService.alliesAdvisor.findMany({
+      where: { advisorId: Number(advisorId), allyId: Number(allyId) },
+    });
+    if (recordsFound.length > 0) {
+      response = true;
+    }
+    return response;
   }
 }

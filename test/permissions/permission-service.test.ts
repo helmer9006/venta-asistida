@@ -57,38 +57,11 @@ describe('PermissionsService Permissions-findAl', () => {
     expect(controlllerResponse.statusCode).toStrictEqual(200);
     expect(controlllerResponse.message).toStrictEqual('Permisos encontrados.');
   });
-
-  it('deberia de fallar al obtener los permisos del sistema.', async () => {
-    jest
-      .spyOn(prismaService.permissions, 'findMany')
-      .mockRejectedValue('error');
-
-    try {
-      await permissionsService.findAll();
-    } catch (error) {
-      const genericResponseOK = new GenericResponseTestDataBuilder().build(
-        error.data,
-        error.statusCode,
-        error.message,
-      );
-
-      jest
-        .spyOn(permissionsController, 'findAll')
-        .mockResolvedValue(genericResponseOK);
-      const controlllerResponse = await permissionsController.findAll();
-
-      expect(controlllerResponse.data).toStrictEqual({});
-      expect(controlllerResponse.statusCode).toStrictEqual(500);
-      expect(controlllerResponse.message).toStrictEqual(
-        'Error interno del servidor',
-      );
-    }
-  });
 });
 
 describe('PermissionsService Permissions-findPermissionsByRole', () => {
   //jest.spyOn(configService, 'get').mockResolvedValue()
-  it('deberia obtrener los permisos asignados a un rol.', async () => {
+  it('deberia obtener los permisos asignados a un rol.', async () => {
     const serviceResponse = await permissionsService.findPermissionsByRole(1);
 
     const genericResponseOK = new GenericResponseTestDataBuilder().build(

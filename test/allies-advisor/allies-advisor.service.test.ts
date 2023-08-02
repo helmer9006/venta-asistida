@@ -54,54 +54,66 @@ describe('AlliesAdvisorService /create', () => {
       HttpStatus.OK,
       'Registrado correctamente',
     );
+    console.log('genericResponseOK', genericResponseOK);
     jest
       .spyOn(alliesAdvController, 'create')
       .mockResolvedValue(genericResponseOK);
     const controllerResponse = await alliesAdvController.create(
       payloadCreateAlliesAdvisor,
     );
-    // create register of allies for advisor successfully
-    if (controllerResponse.statusCode === 200)
-      alliesAdvId = controllerResponse.data.id;
+    console.log('controllerResponse', controllerResponse);
     //validation response of service with response controller.
     expect(controllerResponse.data).toStrictEqual(genericResponseOK.data);
     expect(controllerResponse.statusCode).toStrictEqual(
       genericResponseOK.statusCode,
     );
     expect(controllerResponse.message).toStrictEqual(genericResponseOK.message);
-    expect(genericResponseOK.data.id).toBeDefined();
+    expect(genericResponseOK.data.count).toBeGreaterThan(0);
     const id =
       genericResponseOK && genericResponseOK.data
         ? genericResponseOK.data.id
         : null;
-    if (id) {
-      // delete aliesAdvisor created
+    // delete aliesAdvisor created
+    const reg = await prismaService.alliesAdvisor.findMany({
+      where: {
+        allyId: payloadCreateAlliesAdvisor[0].allyId,
+        advisorId: payloadCreateAlliesAdvisor[0].advisorId,
+      },
+    });
+    if (reg.length > 0) {
       await prismaService.alliesAdvisor.delete({
-        where: { id: id },
+        where: { id: reg[0].id },
       });
     }
   });
 
   it('Error cuando se intenta agregar un aliado a un asesor que ya está agregado.', async () => {
-    let serviceResponse, genericResponseOK;
     try {
-      serviceResponse = await alliesAdvService.create(
-        payloadCreateAlliesAdvisorError,
-      );
-      genericResponseOK = new GenericResponseTestDataBuilder().build(
-        serviceResponse,
-        HttpStatus.NOT_FOUND,
-        'Existe un registro con la misma información.',
-      );
-      const id =
-        genericResponseOK && genericResponseOK.data
-          ? genericResponseOK.data.id
-          : null;
-      if (id) {
-        // delete aliesAdvisor created
-        await prismaService.alliesAdvisor.delete({
-          where: { id: id },
-        });
+      jest
+        .spyOn(prismaService.alliesAdvisor, 'create')
+        .mockRejectedValue('error');
+
+      try {
+        await alliesAdvService.create(payloadCreateAlliesAdvisorError);
+      } catch (error) {
+        const genericResponseOK = new GenericResponseTestDataBuilder().build(
+          error.data,
+          error.statusCode,
+          error.message,
+        );
+        console.log('genericResponseOK', genericResponseOK);
+        jest
+          .spyOn(alliesAdvController, 'create')
+          .mockResolvedValue(genericResponseOK);
+        const controlllerResponse = await alliesAdvController.create(
+          payloadCreateAlliesAdvisorError,
+        );
+        console.log(controlllerResponse);
+        expect(controlllerResponse.data).toStrictEqual({});
+        expect(controlllerResponse.statusCode).toStrictEqual(409);
+        expect(controlllerResponse.message).toStrictEqual(
+          'Existe un registro con la misma información.',
+        );
       }
     } catch (error) {
       //validation response error
@@ -135,20 +147,49 @@ describe('AlliesAdvisorService FindAll by advisorId', () => {
     expect(controllerResponse.statusCode).toStrictEqual(200);
     expect(controllerResponse.message).toStrictEqual('Registros encontrados.');
   });
+
+  it('deberia fallar al consultar registro de aliados asociados a un asesor.', async () => {
+    jest
+      .spyOn(prismaService.alliesAdvisor, 'findMany')
+      .mockRejectedValue('error');
+
+    try {
+      await alliesAdvService.findAll(Number(payloadAdvisorId));
+    } catch (error) {
+      const genericResponseOK = new GenericResponseTestDataBuilder().build(
+        error.data,
+        error.statusCode,
+        error.message,
+      );
+
+      jest
+        .spyOn(alliesAdvController, 'findAll')
+        .mockResolvedValue(genericResponseOK);
+      const controlllerResponse = await alliesAdvController.findAll(
+        payloadAdvisorId,
+      );
+
+      expect(controlllerResponse.data).toStrictEqual({});
+      expect(controlllerResponse.statusCode).toStrictEqual(500);
+      expect(controlllerResponse.message).toStrictEqual(
+        'Error interno del servidor',
+      );
+    }
+  });
 });
 
 describe('AlliesAdvisorService Delete by advisorId', () => {
-  it('Eliminar registor de aliado asociado a asesor.', async () => {
+  it('Eliminar registro de aliado asociado a asesor.', async () => {
     const responseService = await alliesAdvService.remove(
       Number(payloadAdvisorId),
     );
     const genericResponseOK = new GenericResponseTestDataBuilder().build(
       responseService,
       HttpStatus.OK,
-      'Registros encontrados.',
+      'Registro eliminado correctamente.',
     );
     jest
-      .spyOn(alliesAdvController, 'findAll')
+      .spyOn(alliesAdvController, 'remove')
       .mockResolvedValue(genericResponseOK);
 
     const controllerResponse = await alliesAdvController.findAll(
@@ -157,6 +198,36 @@ describe('AlliesAdvisorService Delete by advisorId', () => {
 
     expect(controllerResponse.data).toStrictEqual(responseService);
     expect(controllerResponse.statusCode).toStrictEqual(200);
-    expect(controllerResponse.message).toStrictEqual('Registros encontrados.');
+    expect(controllerResponse.message).toStrictEqual(
+      'Registro eliminado correctamente.',
+    );
+  });
+
+  it('deberia fallar al eliminar registro de aliado asigando a asesor porque no existe.', async () => {
+    const id = '9999999999';
+    jest
+      .spyOn(prismaService.alliesAdvisor, 'delete')
+      .mockRejectedValue('error');
+
+    try {
+      await alliesAdvService.remove(Number(id));
+    } catch (error) {
+      const genericResponseOK = new GenericResponseTestDataBuilder().build(
+        error.data,
+        error.statusCode,
+        error.message,
+      );
+      console.log('genericResponseOK', genericResponseOK);
+      jest
+        .spyOn(alliesAdvController, 'remove')
+        .mockResolvedValue(genericResponseOK);
+      const controlllerResponse = await alliesAdvController.remove(id);
+      console.log(controlllerResponse);
+      expect(controlllerResponse.data).toStrictEqual({});
+      expect(controlllerResponse.statusCode).toStrictEqual(500);
+      expect(controlllerResponse.message).toStrictEqual(
+        'Error interno del servidor',
+      );
+    }
   });
 });
