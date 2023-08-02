@@ -12,6 +12,7 @@ import { GetTokenDto } from '@src/auth/models/dto/get-token.dto';
 import { PrismaService } from '@src/prisma/services/prisma.service';
 import { SW_RESPONSES } from '@src/shared/helpers/responses-swagger';
 import { AuthService } from '@src/auth/services/auth.service';
+import { Auth } from '../decorators';
 
 @Controller('auth')
 @ApiTags('Services Authentication')
@@ -51,6 +52,18 @@ export class AuthController {
   @ApiOkResponse(SW_RESPONSES.getAuthOkReponse)
   async signout(@Req() req: Request, @Res() res: Response) {
     const url = await this.authService.signout();
+    res.status(200).json({
+      data: url,
+      statusCode: 200,
+      message: 'Url encontrada exitosamente',
+    });
+  }
+
+  @Get('/passwordReset')
+  @Auth()
+  @ApiOkResponse(SW_RESPONSES.getAuthOkReponse)
+  async passwordReset(@Req() req: Request, @Res() res: Response) {
+    const url = await this.authService.passwordReset();
     res.status(200).json({
       data: url,
       statusCode: 200,

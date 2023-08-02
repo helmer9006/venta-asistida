@@ -79,6 +79,14 @@ export class AuthService {
     );
     return url;
   }
+  passwordReset() {
+    const url = this.getAuthCode(
+      this.configService.get('RESET_PASSWORD_POLICY_AUTHORITY'),
+      [],
+      this.configuration.APP_B2C_STATES.PASSWORD_RESET,
+    );
+    return url;
+  }
 
   signout() {
     return this.configService.get('LOGOUT_ENDPOINT');
