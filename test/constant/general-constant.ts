@@ -152,12 +152,6 @@ export const testExpectValues = {
     model: 'Roles',
     modelId: 2,
   },
-  payloadCreateLogError: {
-    data: '{"id":1000,"name":"Administrador test 2","description":"administra parte del sistema","permissions":[],"isActive":false,"createdAt":"2023-07-05 22:36:45.559","updatedAt":"2023-07-05 22:36:45.559"}',
-    createdAt: new Date(),
-    model: 'Roles',
-    modelId: 2,
-  },
 
   payloadGetLogs: {
     modelId: 1,

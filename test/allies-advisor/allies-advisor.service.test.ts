@@ -69,56 +69,28 @@ describe('AlliesAdvisorService /create', () => {
     );
     expect(controllerResponse.message).toStrictEqual(genericResponseOK.message);
     expect(genericResponseOK.data.count).toBeGreaterThan(0);
-    const id =
-      genericResponseOK && genericResponseOK.data
-        ? genericResponseOK.data.id
-        : null;
-    // delete aliesAdvisor created
-    const reg = await prismaService.alliesAdvisor.findMany({
-      where: {
-        allyId: payloadCreateAlliesAdvisor[0].allyId,
-        advisorId: payloadCreateAlliesAdvisor[0].advisorId,
-      },
-    });
-    if (reg.length > 0) {
-      await prismaService.alliesAdvisor.delete({
-        where: { id: reg[0].id },
-      });
-    }
   });
 
   it('Error cuando se intenta agregar un aliado a un asesor que ya está agregado.', async () => {
     try {
-      jest
-        .spyOn(prismaService.alliesAdvisor, 'create')
-        .mockRejectedValue('error');
-
-      try {
-        await alliesAdvService.create(payloadCreateAlliesAdvisorError);
-      } catch (error) {
-        const genericResponseOK = new GenericResponseTestDataBuilder().build(
-          error.data,
-          error.statusCode,
-          error.message,
-        );
-        console.log('genericResponseOK', genericResponseOK);
-        jest
-          .spyOn(alliesAdvController, 'create')
-          .mockResolvedValue(genericResponseOK);
-        const controlllerResponse = await alliesAdvController.create(
-          payloadCreateAlliesAdvisorError,
-        );
-        console.log(controlllerResponse);
-        expect(controlllerResponse.data).toStrictEqual({});
-        expect(controlllerResponse.statusCode).toStrictEqual(409);
-        expect(controlllerResponse.message).toStrictEqual(
-          'Existe un registro con la misma información.',
-        );
-      }
+      await alliesAdvService.create(payloadCreateAlliesAdvisorError);
     } catch (error) {
-      //validation response error
-      expect(error.statusCode).toStrictEqual(409);
-      expect(error.message).toStrictEqual(
+      const genericResponseOK = new GenericResponseTestDataBuilder().build(
+        error.data,
+        error.statusCode,
+        error.message,
+      );
+      console.log('genericResponseOK', genericResponseOK);
+      jest
+        .spyOn(alliesAdvController, 'create')
+        .mockResolvedValue(genericResponseOK);
+      const controlllerResponse = await alliesAdvController.create(
+        payloadCreateAlliesAdvisor,
+      );
+      console.log(controlllerResponse);
+      expect(controlllerResponse.data).toStrictEqual({});
+      expect(controlllerResponse.statusCode).toStrictEqual(409);
+      expect(controlllerResponse.message).toStrictEqual(
         'Existe un registro con la misma información.',
       );
     }
@@ -128,7 +100,7 @@ describe('AlliesAdvisorService /create', () => {
 describe('AlliesAdvisorService FindAll by advisorId', () => {
   it('Obtener el listado de aliados asociados al asesor.', async () => {
     const responseService = await alliesAdvService.findAll(
-      Number(payloadAdvisorId),
+      payloadCreateAlliesAdvisor[0].advisorId,
     );
     const genericResponseOK = new GenericResponseTestDataBuilder().build(
       responseService,
@@ -140,7 +112,7 @@ describe('AlliesAdvisorService FindAll by advisorId', () => {
       .mockResolvedValue(genericResponseOK);
 
     const controllerResponse = await alliesAdvController.findAll(
-      payloadAdvisorId,
+      payloadCreateAlliesAdvisor[0].advisorId.toString(),
     );
 
     expect(controllerResponse.data).toStrictEqual(responseService);
@@ -149,9 +121,7 @@ describe('AlliesAdvisorService FindAll by advisorId', () => {
   });
 
   it('deberia fallar al consultar registro de aliados asociados a un asesor.', async () => {
-    jest
-      .spyOn(prismaService.alliesAdvisor, 'findMany')
-      .mockRejectedValue('error');
+    jest.spyOn(prismaService, '$queryRaw').mockRejectedValue('error');
 
     try {
       await alliesAdvService.findAll(Number(payloadAdvisorId));
@@ -180,11 +150,18 @@ describe('AlliesAdvisorService FindAll by advisorId', () => {
 
 describe('AlliesAdvisorService Delete by advisorId', () => {
   it('Eliminar registro de aliado asociado a asesor.', async () => {
-    const responseService = await alliesAdvService.remove(
-      Number(payloadAdvisorId),
-    );
+    // delete aliesAdvisor created
+    const reg = await prismaService.alliesAdvisor.findMany({
+      where: {
+        allyId: payloadCreateAlliesAdvisor[0].allyId,
+        advisorId: payloadCreateAlliesAdvisor[0].advisorId,
+      },
+    });
+    console.log('reg', reg);
+    const responseService = await alliesAdvService.remove(reg[0].id);
+    console.log(responseService);
     const genericResponseOK = new GenericResponseTestDataBuilder().build(
-      responseService,
+      {},
       HttpStatus.OK,
       'Registro eliminado correctamente.',
     );
@@ -192,11 +169,11 @@ describe('AlliesAdvisorService Delete by advisorId', () => {
       .spyOn(alliesAdvController, 'remove')
       .mockResolvedValue(genericResponseOK);
 
-    const controllerResponse = await alliesAdvController.findAll(
-      payloadAdvisorId,
+    const controllerResponse = await alliesAdvController.remove(
+      reg[0].id.toString(),
     );
-
-    expect(controllerResponse.data).toStrictEqual(responseService);
+    console.log('delete controllerResponse', controllerResponse);
+    expect(controllerResponse.data).toStrictEqual({});
     expect(controllerResponse.statusCode).toStrictEqual(200);
     expect(controllerResponse.message).toStrictEqual(
       'Registro eliminado correctamente.',

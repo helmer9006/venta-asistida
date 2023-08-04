@@ -55,15 +55,4 @@ export class AlliesAdvisorService {
       handleExceptions(error);
     }
   }
-
-  async isAllyAddedToAdvisor(advisorId: string, allyId: string) {
-    let response = false;
-    const recordsFound = await this.prismaService.alliesAdvisor.findMany({
-      where: { advisorId: Number(advisorId), allyId: Number(allyId) },
-    });
-    if (recordsFound.length > 0) {
-      response = true;
-    }
-    return response;
-  }
 }
