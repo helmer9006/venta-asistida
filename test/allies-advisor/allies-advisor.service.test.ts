@@ -62,7 +62,6 @@ describe('AlliesAdvisorService /create', () => {
       payloadCreateAlliesAdvisor,
     );
     console.log('controllerResponse', controllerResponse);
-    //validation response of service with response controller.
     expect(controllerResponse.data).toStrictEqual(genericResponseOK.data);
     expect(controllerResponse.statusCode).toStrictEqual(
       genericResponseOK.statusCode,
